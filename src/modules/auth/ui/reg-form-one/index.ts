@@ -1,0 +1,1 @@
+export { RegFormOne } from "./reg-form-one"

@@ -1,0 +1,1 @@
+export { RegFormThree } from "./reg-form-three"
