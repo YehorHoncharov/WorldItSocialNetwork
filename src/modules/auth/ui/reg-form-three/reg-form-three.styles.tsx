@@ -1,17 +1,18 @@
 import { StyleSheet } from "react-native";
 
 export const styles = StyleSheet.create({
-	container:{
+	container: {
 		flex: 0.95,
-		justifyContent: 'center',
-		alignItems: 'center',
-		gap: 15
+		justifyContent: "center",
+		alignItems: "center",
+		gap: 36,
 	},
 	signUp: {
-		fontSize: 25,	
+		fontSize: 24,
+		fontWeight: 500,
 	},
 	signUpText: {
-		alignItems: 'center',
+		alignItems: "center",
 		gap: 15,
 	},
 	image: {
@@ -19,6 +20,5 @@ export const styles = StyleSheet.create({
 		width: 109,
 		// height: 70,
 		// width: 130
-	}
-	
+	},
 });

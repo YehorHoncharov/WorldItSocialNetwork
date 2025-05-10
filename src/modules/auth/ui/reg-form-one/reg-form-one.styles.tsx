@@ -19,6 +19,7 @@ export const styles = StyleSheet.create({
 		width: 109,
 		// height: 70,
 		// width: 130
-	}
+	},
+
 	
 });

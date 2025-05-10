@@ -9,8 +9,10 @@ import T from "../icons/logo/t";
 import { styles } from "./header.styles";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Link, useRouter } from "expo-router";
+import { useState } from "react";
+import { IInputPasswordProps } from "../input/input.type";
 
-export function Header(){
+function Header(){
 const router = useRouter()
 
     function Logout(){
@@ -65,3 +67,35 @@ const router = useRouter()
         </View>
     )
 }
+
+function HeaderSecond(props: IInputPasswordProps) {
+	const { label, error, style, ...otherProps } = props;
+
+	const [hidden, setHidden] = useState(true);
+
+	return (
+		<View style={styles.container2}>
+            <View style={{flexDirection: "row", gap: 5, paddingLeft: 16, alignItems: "center", justifyContent: "center"}}>
+                <Image
+                    style={styles.worldItLogo}
+                    source={require("../../ui/images/world-it-logo.png")}
+                />
+                <View style={{flexDirection: "row", gap: 1, padding: 2}}>
+                    <W style={styles.w}/>
+                    <O style={styles.o}/>
+                    <R style={styles.r}/>
+                    <L style={styles.l}/>
+                    <D style={styles.d}/>
+                </View>
+                <View style={{flexDirection: "row", gap: 1, paddingTop: 5,}}>
+                    <I style={styles.i}/>
+                    <T style={styles.t}/>
+                </View>
+            </View>
+        </View>
+	);
+}
+
+Header.HeaderSecond = HeaderSecond;
+
+export { Header };

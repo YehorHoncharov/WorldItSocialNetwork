@@ -3,21 +3,17 @@ import { COLORS } from '../colors'
 
 export const styles = StyleSheet.create({
     button: {
-        width: 290,
-        height: 62,
-        borderRadius: 40,
+        width: 311,
+        height: 52,
+        borderRadius: 1234,
         justifyContent: "center",
         alignItems: "center",
-        backgroundColor: COLORS.purple,
-        color: COLORS.white
+        backgroundColor: "#543C52",
+        color: COLORS.white100
     },
     text: {
-        color: COLORS.white,
+        color: COLORS.white100,
+        fontSize: 16,
+        fontWeight: 500,
     }
-    // disabled: {
-    //     borderWidth: ,
-    //     borderColor: COLORS.,
-    //     backgroundColor: COLORS.,
-    //     opacity: 0.5
-    // }
 })

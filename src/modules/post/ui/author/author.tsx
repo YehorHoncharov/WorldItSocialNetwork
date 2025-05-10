@@ -33,9 +33,9 @@ export function Author() {
 				/>
 			</View>
 			<View>
-                <TouchableOpacity>
-                    <Dots style={{ height: 20, width: 20, paddingTop: 20 }} />
-                </TouchableOpacity>
+				<TouchableOpacity>
+					<Dots style={{ height: 20, width: 20, paddingTop: 20 }} />
+				</TouchableOpacity>
 			</View>
 		</View>
 	);

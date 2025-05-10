@@ -10,11 +10,7 @@ interface IUserContext {
 	login: (email: string, password: string) => void;
 	register: (
 		email: string,
-		name: string,
-		username: string,
 		password: string,
-		image: string,
-		about: string,
 		code: string
 	) => void;
 	isAuthenticated: () => boolean;
@@ -26,11 +22,7 @@ const initialValue: IUserContext = {
 	login: (email: string, password: string) => {},
 	register: (
 		email: string,
-		name: string,
-		username: string,
 		password: string,
-		image: string,
-		about: string,
 		code: string
 	) => {},
 	isAuthenticated: () => false,
@@ -92,11 +84,7 @@ export function UserContextProvider(props: IUserContextProviderProps) {
 
 	async function register(
 		email: string,
-		name: string,
-		username: string,
 		password: string,
-		image: string,
-		about: string,
 		code: string
 	) {
 		try {
@@ -105,11 +93,7 @@ export function UserContextProvider(props: IUserContextProviderProps) {
 				headers: { "Content-Type": "application/json" },
 				body: JSON.stringify({
 					email: email,
-					name: name,
-					username: username,
 					password: password,
-					image: image,
-					about: about,
 					code: code,
 				}),
 			});
@@ -135,7 +119,7 @@ export function UserContextProvider(props: IUserContextProviderProps) {
 			}
 
 			getData(token);
-			router.navigate({ pathname: "/registration/step-two" });
+			router.navigate({ pathname: "/registration/step-one" });
 			console.log(token);
 		};
 		checkToken();

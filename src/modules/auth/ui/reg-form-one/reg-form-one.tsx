@@ -7,6 +7,8 @@ import { useRouter } from "expo-router";
 import { Button } from "../../../../shared/ui/button";
 import { useState } from "react";
 import { COLORS } from "../../../../shared/ui/colors";
+import { sendCode } from "../../hooks/useCode";
+import { HeaderRegAuth } from "../../../../shared/ui/header-reg-auth";
 
 export function RegFormOne() {
 	const { handleSubmit, control } = useForm<IRegister>();
@@ -16,15 +18,21 @@ export function RegFormOne() {
 
 	function onSubmit(data: IRegister) {
 		const { ...rightData } = data;
-		router.navigate({
-			pathname: "/registration/step-two",
+		if (rightData.password === rightData.passwordConfirm) {
+			sendCode(rightData.email)
+			router.navigate({
+			pathname: "/registration/step-three",
 			params: rightData,
 		});
-		// console.log(data)
+		}
+		
 	}
+	
 
 	return (
 		<View style={styles.container}>
+
+		
 			<View
 				style={{
 					gap: 10,
@@ -32,43 +40,12 @@ export function RegFormOne() {
 					alignItems: "center",
 				}}
 			>
-				<Image
-					style={styles.image}
-					source={require("./../../../../shared/ui/images/sign-in-image.png")}
-				/>
 				<View style={styles.signUpText}></View>
 
-				<Text style={styles.signUp}>Sign up</Text>
-				<View style={{ alignItems: "center" }}>
-					<Text style={{ opacity: 0.4 }}>
-						Please enter your username
-					</Text>
-					<Text style={{ opacity: 0.4 }}>email and password</Text>
-				</View>
+				<Text style={styles.signUp}>Приєднуйся до World IT</Text>
 			</View>
 
 			<View>
-				<Controller
-					control={control}
-					name="username"
-					rules={{
-						required: {
-							value: true,
-							message: "Username is required",
-						},
-					}}
-					render={({ field, fieldState }) => {
-						return (
-							<Input
-								placeholder="Username"
-								value={field.value}
-								onChangeText={field.onChange}
-								onChange={field.onChange}
-								error={fieldState.error?.message}
-							/>
-						);
-					}}
-				/>
 				<Controller
 					control={control}
 					name="email"
@@ -81,7 +58,30 @@ export function RegFormOne() {
 					render={({ field, fieldState }) => {
 						return (
 							<Input
-								placeholder="Email"
+								label = "Електронна пошта"
+								placeholder="you@example.com"
+								value={field.value}
+								onChangeText={field.onChange}
+								onChange={field.onChange}
+								error={fieldState.error?.message}
+							/>
+						);
+					}}
+				/>
+				<Controller
+					control={control}
+					name="password"
+					rules={{
+						required: {
+							value: true,
+							message: "Password is required",
+						},
+					}}
+					render={({ field, fieldState }) => {
+						return (
+							<Input.Password
+								label = "Пароль"
+								placeholder="Введіть пароль"
 								value={field.value}
 								onChangeText={field.onChange}
 								onChange={field.onChange}
@@ -98,11 +98,12 @@ export function RegFormOne() {
 							message: "Password is required",
 						},
 					}}
-					name="password"
+					name="passwordConfirm"
 					render={({ field, fieldState }) => {
 						return (
 							<Input.Password
-								placeholder="Password"
+								label="Підтвердження паролю"
+								placeholder="Повторіть пароль"
 								onChange={field.onChange}
 								onChangeText={field.onChange}
 								value={field.value}
@@ -114,24 +115,6 @@ export function RegFormOne() {
 			</View>
 
 			<View style={{ gap: 10 }}>
-				<View
-					style={{
-						flexDirection: "row",
-						alignItems: "center",
-						gap: 7,
-					}}
-				>
-					<Switch
-						trackColor={{ false: "#ccc", true: "#6366f1" }}
-						thumbColor={isEnabled ? "#fff" : "#fff"}
-						ios_backgroundColor="#ccc"
-						onValueChange={toggleSwitch}
-						value={isEnabled}
-					/>
-					<Text style={{ color: COLORS.blue }}>
-						Keep me signed in
-					</Text>
-				</View>
 				<Button onPress={handleSubmit(onSubmit)} label="Next"></Button>
 			</View>
 		</View>

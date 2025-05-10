@@ -8,6 +8,7 @@ import { router } from "expo-router";
 import { ILogin } from "./login-form-one.types";
 import { useUserContext } from "../../context/user-context";
 
+
 export function LoginFormOne() {
 	const { control, handleSubmit } = useForm<ILogin>();
 
@@ -16,26 +17,16 @@ export function LoginFormOne() {
 	const { login } = useUserContext();
 
 	function onNext(data: ILogin) {
-		const {password ,...email } = data;
+		const { password, ...email } = data;
 		login(email.email, password);
-		// router.navigate({ pathname: "/login/login-two", params: email });
 	}
+
 
 	return (
 		<View style={styles.container}>
-			<Image
-				style={styles.image}
-				source={require("./../../../../shared/ui/images/sign-in-image.png")}
-			/>
-
+	
 			<View style={styles.signUpText}>
-				<Text style={styles.signUp}>Sign in</Text>
-				<View style={{ alignItems: "center" }}>
-					<Text style={{ opacity: 0.4 }}>
-						Please enter your username
-					</Text>
-					<Text style={{ opacity: 0.4 }}>email and password</Text>
-				</View>
+				<Text style={styles.signUp}>Раді тебе знову бачити!</Text>
 			</View>
 
 			<View>
@@ -51,7 +42,7 @@ export function LoginFormOne() {
 					render={({ field, fieldState }) => {
 						return (
 							<Input
-								placeholder="Email"
+								placeholder="you@example.com"
 								value={field.value}
 								onChange={field.onChange}
 								onChangeText={field.onChange}
@@ -72,7 +63,7 @@ export function LoginFormOne() {
 					render={({ field, fieldState }) => {
 						return (
 							<Input.Password
-								placeholder="Password"
+								placeholder="Введи пароль"
 								onChange={field.onChange}
 								onChangeText={field.onChange}
 								value={field.value}
@@ -82,26 +73,8 @@ export function LoginFormOne() {
 					}}
 				/>
 			</View>
-
-			<View style={{ gap: 10 }}>
-				<View
-					style={{
-						flexDirection: "row",
-						alignItems: "center",
-						gap: 7,
-					}}
-				>
-					<Switch
-						trackColor={{ false: "#ccc", true: "#6366f1" }}
-						thumbColor={isEnabled ? "#fff" : "#fff"}
-						ios_backgroundColor="#ccc"
-						onValueChange={toggleSwitch}
-						value={isEnabled}
-					/>
-					<Text style={{ color: "#4B56D2" }}>Keep me signed in</Text>
-				</View>
-				<Button label="Next" onPress={handleSubmit(onNext)}></Button>
-			</View>
+			<Button label="Увійдіть" onPress={handleSubmit(onNext)}></Button>
+			<Text>--  aбо увійдіть за допомогою QR-коду --</Text>
 		</View>
 	);
 }

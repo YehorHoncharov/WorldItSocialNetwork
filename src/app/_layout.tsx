@@ -1,6 +1,7 @@
 import { Stack } from "expo-router";
 import { Providers } from "./providers";
 
+
 export default function RootLayout(){
     return(
         <Providers>
@@ -9,10 +10,11 @@ export default function RootLayout(){
                     headerShown: false
                 }}/>
                 <Stack.Screen name="(auth)" options={{
-                        headerShown: false
+                    headerShown: false
                 }}/>
                 <Stack.Screen name="(main)" options={{
-                        headerShown: false
+                    headerShown: false,
+                    
                 }}/>
 
             </Stack>
