@@ -1,4 +1,4 @@
-import { RegFormTwo } from "../../../modules/auth/ui/reg-form-two";
+// import { RegFormTwo } from "../../../modules/auth/ui/reg-form-two";
 import { router } from "expo-router";
 import { StyleSheet, View } from "react-native";
 import { COLORS } from "../../../shared/ui/colors";
@@ -21,6 +21,7 @@ export default function Register() {
 				contentContainerStyle={{
 					flex: 1,
 				}}
+				overScrollMode="never"
 			>
 				<TouchableOpacity
 					style={{
@@ -36,7 +37,7 @@ export default function Register() {
 						Go back
 					</Text>
 				</TouchableOpacity>
-				<RegFormTwo />
+				{/* <RegFormTwo /> */}
 			</ScrollView>
 		</SafeAreaView>
 	);

@@ -15,6 +15,7 @@ export default function MainPage() {
 			<SafeAreaView style={{ flex: 1, backgroundColor: "#ffffff" }}>
 				<Header />
 				<ScrollView
+					overScrollMode="never"
 					contentContainerStyle={{
 						flexGrow: 1,
 						alignItems: "center",
