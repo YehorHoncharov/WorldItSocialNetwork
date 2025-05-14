@@ -12,7 +12,7 @@ import T from "../icons/logo-orange/t";
 export function MainFrame() {
 	const router = useRouter();
 	function onPress() {
-		router.navigate("/main-page");
+		router.navigate("/home");
 	}
 	return (
 		<TouchableWithoutFeedback onPress={onPress}>

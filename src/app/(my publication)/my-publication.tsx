@@ -6,7 +6,7 @@ import Post from "../../modules/post/ui/main-page/main.page";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 
-export default function MainPage() {
+export default function MyPublications() {
 
 	const {top} = useSafeAreaInsets()
 

@@ -9,11 +9,13 @@ import T from "../icons/logo/t";
 import { styles } from "./header.styles";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Link, useRouter } from "expo-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { IInputPasswordProps } from "../input/input.type";
+import { MyPublicationModal } from "../../../modules/my_publications/modal/modal";
 
 function Header(){
-const router = useRouter()
+    const router = useRouter()
+    const [modalOpened, setModalOpened] = useState<boolean>(false)
 
     function Logout(){
         try {
@@ -25,8 +27,20 @@ const router = useRouter()
     function onReg(){
         router.navigate("/registration/step-one")
     }
+
+    // useEffect(()=>{
+    //     function Opened(){
+    //         if (modalOpened === true){
+                
+    //         }
+    //     }
+    //     Opened()
+    // }, [])
+
+    
     return (
         <View style={styles.container}>
+            {modalOpened ? <MyPublicationModal modalVisible={modalOpened} changeVisibility={()=>{setModalOpened(!modalOpened)}}></MyPublicationModal> : null}
             <View style={{flexDirection: "row", gap: 5, paddingLeft: 16, alignItems: "center", justifyContent: "center"}}>
                 <Image
                     style={styles.worldItLogo}
@@ -45,7 +59,7 @@ const router = useRouter()
                 </View>
             </View>
             <View style={{flexDirection: "row", gap: 8, marginRight: 16}}>
-                <TouchableWithoutFeedback>
+                <TouchableWithoutFeedback onPress={()=>{setModalOpened(!modalOpened)}}>
                     <Image
                         style={styles.plus}
                         source={require("../images/plus-in-circle.png")}

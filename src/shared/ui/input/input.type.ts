@@ -8,6 +8,7 @@ export interface IInputProps extends TextInputProps {
     error?: string,
     value?: string,
     height?: number,
+    width?: number
 }
 
 export interface IInputPasswordProps extends Omit<IInputProps, "rightIcon" | "leftIcon"> {}
