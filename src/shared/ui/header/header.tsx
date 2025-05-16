@@ -27,16 +27,6 @@ function Header(){
     function onReg(){
         router.navigate("/registration/step-one")
     }
-
-    // useEffect(()=>{
-    //     function Opened(){
-    //         if (modalOpened === true){
-                
-    //         }
-    //     }
-    //     Opened()
-    // }, [])
-
     
     return (
         <View style={styles.container}>

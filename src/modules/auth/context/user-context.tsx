@@ -48,10 +48,11 @@ export function UserContextProvider(props: IUserContextProviderProps) {
 
 	async function getData(token: string) {
 		try {
-			const response = await fetch("http://192.168.1.104/user/reg", {
+			const response = await fetch("http://192.168.1.104:3000/user/me", {
 				headers: { Authorization: `Bearer ${token}` },
 			});
 			const result: Response<IUser> = await response.json();
+			console.log(result)
 			if (result.status === "error") {
 				console.log(result.message);
 				return;
@@ -112,14 +113,13 @@ export function UserContextProvider(props: IUserContextProviderProps) {
 
 	useEffect(() => {
 		const checkToken = async () => {
-			const tokenDel = await AsyncStorage.removeItem("token");
+			// const tokenDel = await AsyncStorage.removeItem("token");
 			const token = await AsyncStorage.getItem("token");
 			if (!token) {
 				return;
 			}
-
 			getData(token);
-			router.navigate({ pathname: "/registration/step-one" });
+			// router.navigate({ pathname: "/registration/step-one" });
 			console.log(token);
 		};
 		checkToken();

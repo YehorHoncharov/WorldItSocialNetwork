@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
 	Modal,
 	Pressable,
@@ -9,6 +9,7 @@ import {
 	Image,
 	TextInput,
 	ScrollView,
+	Alert,
 } from "react-native";
 import Cross from "../../../shared/ui/icons/cross";
 import SendArrow from "../../../shared/ui/icons/send-arrow";
@@ -17,43 +18,88 @@ import {
 	launchImageLibraryAsync,
 	requestMediaLibraryPermissionsAsync,
 } from "expo-image-picker";
+import { POST } from "../../../shared/api/post";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useUserContext } from "../../auth/context/user-context";
+import { usePostsById } from "../../post/hooks/use-get-post";
+import { useLocalSearchParams } from "expo-router";
+
 
 interface Props {
 	modalVisible: boolean;
 	changeVisibility: () => void;
-	onSubmit?: (data: {
-		title: string;
-		topic: string;
-		description: string;
-		link: string;
-	}) => void;
 }
 
-export function MyPublicationModal({
-	modalVisible,
-	changeVisibility,
-	onSubmit,
-}: Props) {
-	const [title, setTitle] = useState("");
-	const [topic, setTopic] = useState("");
-	const [description, setDescription] = useState("");
-	const [link, setLink] = useState("");
+export function MyPublicationModal({ modalVisible, changeVisibility }: Props) {
+	const [name, setName] = useState("");
+	const [theme, setTheme] = useState("");
+	const [text, setText] = useState("");
+	const [links, setLinks] = useState("");
 	const [images, setImages] = useState<string[]>([]);
+	const [tokenUser, setTokenUser] = useState<string>("");
+	const { user } = useUserContext();
+	const params = useLocalSearchParams();
+	const { post } = usePostsById(Number(params.id))
 
-	const handleSubmit = () => {
-		if (title && topic && description) {
-			changeVisibility();
-			setTitle("");
-			setTopic("");
-			setDescription("");
-			setLink("");
-			setImages([]);
-			// Optionally call onSubmit here
-			if (onSubmit) {
-				onSubmit({ title, topic, description, link });
-			}
-		}
+	const getToken = async (): Promise<string> => {
+		const token = await AsyncStorage.getItem("token");
+		return token || "";
 	};
+
+	useEffect(() => {
+		getToken().then(setTokenUser);
+	}, []);
+
+const handleSubmit = async () => {
+	if (!name || !theme || !text) {
+		Alert.alert("Помилка", "Будь ласка, заповніть обов'язкові поля");
+		return;
+	}
+
+	if (!user) {
+		console.log("bad user");
+		return;
+	}
+
+	try {
+		const formattedImages = images.length > 0 
+		? { 
+			create: images.map(url => ({ 
+				url,
+				postId: user.id })) 
+			} 
+		: undefined;
+
+		await POST({
+		endpoint: "http://192.168.1.104:3000/posts/create",
+		headers: {
+			"Content-Type": "application/json",
+			Authorization: `Bearer ${tokenUser}`,
+		},
+		token: tokenUser,
+		body: {
+			name,
+			theme,
+			text,
+			links: links || undefined,
+			images: formattedImages,
+			authorId: user.id,
+		},
+		});
+
+		setName("");
+		setTheme("");
+		setText("");
+		setLinks("");
+		setImages([]);
+		changeVisibility();
+
+		Alert.alert("Успіх", "Публікацію успішно створено");
+	} catch (err) {
+		console.error("Помилка при створенні поста:", err);
+		Alert.alert("Помилка", "Не вдалося створити публікацію");
+	}
+};
 
 	async function onSearch() {
 		const result = await requestMediaLibraryPermissionsAsync();
@@ -62,12 +108,14 @@ export function MyPublicationModal({
 				mediaTypes: "images",
 				allowsMultipleSelection: true,
 				selectionLimit: 10,
-				base64: false,
+				base64: true,
 			});
 
 			if (imagesResult.assets) {
-				const uris = imagesResult.assets.map((asset) => asset.uri);
-				setImages((prev) => [...prev, ...uris]);
+				const base64Images = imagesResult.assets.map(
+					(asset) => `data:image/jpeg;base64,${asset.base64}`
+				);
+				setImages((prev) => [...prev, ...base64Images]);
 			}
 		}
 	}
@@ -82,7 +130,9 @@ export function MyPublicationModal({
 			<View style={styles.centeredView}>
 				<View style={styles.modalView}>
 					<View style={styles.header}>
-						<Text style={styles.modalTitle}>Створення публікації</Text>
+						<Text style={styles.modalTitle}>
+							Створення публікації
+						</Text>
 						<Pressable onPress={changeVisibility}>
 							<Cross style={{ width: 15, height: 15 }} />
 						</Pressable>
@@ -94,22 +144,22 @@ export function MyPublicationModal({
 								width={343}
 								label="Назва публікації"
 								placeholder="Напишіть назву публікації"
-								value={title}
-								onChangeText={setTitle}
+								value={name}
+								onChangeText={setName}
 							/>
 							<Input
 								width={343}
 								label="Тема публікації"
 								placeholder="Напишіть тему публікації"
-								value={topic}
-								onChangeText={setTopic}
+								value={theme}
+								onChangeText={setTheme}
 							/>
 							<View>
 								<TextInput
 									style={styles.textArea}
 									placeholder="Введіть опис публікації"
-									value={description}
-									onChangeText={setDescription}
+									value={text}
+									onChangeText={setText}
 									multiline
 									maxLength={150}
 									textAlignVertical="top"
@@ -120,14 +170,12 @@ export function MyPublicationModal({
 								width={343}
 								label="Посилання"
 								placeholder="Ваше посилання..."
-								value={link}
-								onChangeText={setLink}
+								value={links}
+								onChangeText={setLinks}
 							/>
 						</View>
 
-						<View
-							style={styles.imageGrid}
-						>
+						<View style={styles.imageGrid}>
 							{images.map((uri, idx) => (
 								<Image
 									key={idx}
@@ -156,8 +204,12 @@ export function MyPublicationModal({
 									style={styles.submitButton}
 									onPress={handleSubmit}
 								>
-									<Text style={styles.submitText}>Публікація</Text>
-									<SendArrow style={{ width: 20, height: 20 }} />
+									<Text style={styles.submitText}>
+										Публікація
+									</Text>
+									<SendArrow
+										style={{ width: 20, height: 20 }}
+									/>
 								</TouchableOpacity>
 							</View>
 						</View>
