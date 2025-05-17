@@ -21,7 +21,6 @@ import {
 import { POST } from "../../../shared/api/post";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useUserContext } from "../../auth/context/user-context";
-import { usePostsById } from "../../post/hooks/use-get-post";
 import { useLocalSearchParams } from "expo-router";
 
 
@@ -38,8 +37,7 @@ export function MyPublicationModal({ modalVisible, changeVisibility }: Props) {
 	const [images, setImages] = useState<string[]>([]);
 	const [tokenUser, setTokenUser] = useState<string>("");
 	const { user } = useUserContext();
-	const params = useLocalSearchParams();
-	const { post } = usePostsById(Number(params.id))
+	// const params = useLocalSearchParams();
 
 	const getToken = async (): Promise<string> => {
 		const token = await AsyncStorage.getItem("token");

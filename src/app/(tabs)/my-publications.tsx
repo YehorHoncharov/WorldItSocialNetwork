@@ -23,8 +23,7 @@ export default function MyPublications() {
                         paddingTop: 10,
                     }}
                 >
-                    <Post />
-                    <Post />
+            
                 </ScrollView>
             </SafeAreaView>
         </Providers>

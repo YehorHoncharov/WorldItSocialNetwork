@@ -1,22 +1,23 @@
 import { View, Text, Image, TouchableOpacity } from "react-native";
 import { styles } from "./content.styles";
 import Like from "../../../../shared/ui/icons/like";
+import { usePosts } from "../../hooks/use-get-post";
+import { IPost } from "../../types/post";
 
-export function Content() {
+export function Content(props:IPost) {
+
 	return (
 		<View style={styles.container}>
 			<View style={styles.textContainer}>
 				<Text style={{ fontSize: 14 }}>
-					Інколи найкращі ідеї народжуються в тиші 🌿 Природа, книга і
-					спокій — усе, що потрібно, аби перезавантажитись.
+					{props.text}
 				</Text>
 				<Text style={{ fontSize: 14 }}>
-					#відпочинок #натхнення #життя #природа #читання #спокій
-					#гармонія
+					{props.tags}
 				</Text>
 			</View>
 			<View style={styles.imageCont}>
-				<Image
+				{/* <Image
 					style={styles.imageLarge}
 					source={require("./../../../../shared/ui/images/picture-one.png")}
 				/>
@@ -35,7 +36,15 @@ export function Content() {
 				<Image
 					style={styles.imageSmall}
 					source={require("./../../../../shared/ui/images/picture-five.png")}
-				/>
+				/> */}
+				
+				{/* {props.images.map((image) => (
+					<Image
+						key={image.id}
+						style={styles.imageLarge}
+						source={{ uri: image.url }}
+					/>
+				))} */}
 			</View>
 
 			<View

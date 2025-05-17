@@ -73,7 +73,7 @@ export function RegFormTwo() {
 			<Text style={styles.headerText}>Sign up</Text>
 			<Text
 				style={{
-					color: COLORS.grey,
+					color: COLORS.blue20,
 					textAlign: "center",
 					maxWidth: 170,
 				}}

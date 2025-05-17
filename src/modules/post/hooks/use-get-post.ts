@@ -1,34 +1,38 @@
 import { useState, useEffect } from "react";
 import { IPost } from "../types/post"
+import { GET } from "../../../shared/api/get";
+import { Result, Success } from "../../../shared/types/result";
 
-export function usePostsById(id: number){
+export function usePosts(){
 
-    const [post, setPost] = useState<IPost>()
-    const [isLoading, setIsLoading] = useState(true)
-    const [error, setError] = useState<string>()
+    const [posts, setPosts] = useState<IPost[]>([])
 
     useEffect(() => {
         async function getPost() {
             try {
-                setIsLoading(true)
-                const response = get(`http://192.168.1.104:3000/posts/${id}`)
+                console.log("response")
+                const response = await fetch('http://192.168.1.104:3000/posts')
+                console.log(" posle response")
                 const result = await response.json()
-                if (result.status === 'success') {
-                    setPost(result.data)
-                } else {
-                    setError(result.message)
+                console.log("=============")
+                console.log(result)
+                if (!result){
+                    return
                 }
+                console.log("usePostssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss")
+                console.log(result)
+                setPosts(result)
+                
+                
             }
             catch (error) {
                 const err = error instanceof Error ? error.message : undefined
-                setError(`${err}`)
+                console.error("Error fetching posts:", err); 
             }
-            finally {
-                setIsLoading(false)
-            }
+            
         }
         getPost()
-    }, [id])
+    }, [])
 
-    return {post: post, isLoading: isLoading, error: error}
+    return {posts: posts}
 }

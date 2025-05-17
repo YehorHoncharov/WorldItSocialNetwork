@@ -21,6 +21,7 @@ export async function GET<T>(params: IGetRequestParams): Promise<Result<T>> {
 		if (responseData.status === "error"){
 			return { ...responseData, code: response.status }
 		}
+		
 
         return responseData
 	} catch (err) {

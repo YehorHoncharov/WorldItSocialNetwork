@@ -2,8 +2,10 @@ import { SafeAreaView, ScrollView, View } from "react-native";
 import { Author } from "../author/author";
 import { Content } from "../content/content";
 import { Providers } from "../../../../app/providers";
+import { IPost } from "../../types/post";
 
-export default function Post() {
+export default function Post(props: IPost) {
+	const {id, name, text, images, user} = props
 	return (
 		<Providers>
 			<SafeAreaView
@@ -17,7 +19,7 @@ export default function Post() {
 				}}
 			>
 				<Author></Author>
-				<Content></Content>
+				<Content id={id} name={name} text={text} images={images} user={user}></Content>
 			</SafeAreaView>
 		</Providers>
 	);

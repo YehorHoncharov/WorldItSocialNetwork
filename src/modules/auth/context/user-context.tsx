@@ -57,6 +57,8 @@ export function UserContextProvider(props: IUserContextProviderProps) {
 				console.log(result.message);
 				return;
 			}
+
+			console.log(result.data)
 			setUser(result.data);
 		} catch (error) {
 			console.error("Error fetching user data:", error);
@@ -120,7 +122,6 @@ export function UserContextProvider(props: IUserContextProviderProps) {
 			}
 			getData(token);
 			// router.navigate({ pathname: "/registration/step-one" });
-			console.log(token);
 		};
 		checkToken();
 	}, []);

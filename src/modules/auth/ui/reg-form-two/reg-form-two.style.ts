@@ -15,7 +15,7 @@ export const styles = StyleSheet.create({
 	},
 	headerText: {
 		fontSize: 32,
-		color: COLORS.black,
+		color: COLORS.blue10,
 		fontWeight: "400",
 	},
 	imageContainer: {
@@ -35,7 +35,7 @@ export const styles = StyleSheet.create({
 	},
 	uploadText: {
 		fontSize: 13,
-		color: COLORS.grey,
+		color: COLORS.blue50,
 		fontWeight: "regular",
 	},
 	image: {
