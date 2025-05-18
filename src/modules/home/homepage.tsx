@@ -5,10 +5,9 @@ import { View } from "react-native"
 
 export function Homepage(){
     const {posts} = usePosts()
-    console.log("posts empty")
     console.log(posts)
     return (
-        <View>
+        <View style={{gap: 10}}>
             {posts.map((post) => (
                 <Post key={post.id} 
                 id={post.id}

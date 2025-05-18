@@ -91,6 +91,7 @@ export function UserContextProvider(props: IUserContextProviderProps) {
 		code: string
 	) {
 		try {
+			console.log("111111")
 			const response = await fetch("http://192.168.1.104:3000/user/reg", {
 				method: "POST",
 				headers: { "Content-Type": "application/json" },

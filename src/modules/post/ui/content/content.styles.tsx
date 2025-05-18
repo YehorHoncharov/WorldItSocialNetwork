@@ -1,39 +1,83 @@
-import { StyleSheet } from "react-native";
+import { StyleSheet } from 'react-native';
 
 export const styles = StyleSheet.create({
-	container: {
-		justifyContent: "center",
-		alignItems: "center",
-		gap: 16,
-		padding: 16,
-	},
-	textContainer: {
-		justifyContent: "center",
-		alignItems: "center",
-		width: 343,
-	},
-	imageCont: {
-		flexDirection: "row",
-		flexWrap: "wrap",
-		gap: 8,
-		justifyContent: "center",
-		alignItems: "center",
-	},
-	imageLarge: {
-		width: 167.5,
-		height: 203,
-		marginBottom: 8,
-		borderRadius: 16,
-	},
-	imageSmall: {
-		width: 109,
-		height: 203,
-		marginBottom: 8,
-		borderRadius: 16,
-	},
-	postButs: {
-		flexDirection: "row",
-		alignItems: "center",
-		gap: 8,
-	},
+  container: {
+    padding: 16,
+    backgroundColor: '#fff',
+    marginBottom: 16,
+    borderRadius: 8,
+  },
+  textContainer: {
+    marginBottom: 12,
+  },
+  text: {
+    fontSize: 14,
+    marginBottom: 8,
+  },
+  tags: {
+    fontSize: 14,
+    color: '#666',
+  },
+  imageContainer: {
+    marginBottom: 12,
+  },
+  twoImageContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    flexWrap: 'wrap',
+  },
+  threeImageWrapper: {
+    justifyContent: 'space-between',
+  },
+  imageSingle: {
+    width: '100%',
+    height: 300,
+    borderRadius: 8,
+  },
+  imageHalf: {
+    width: '48%',
+    aspectRatio: 1,
+    borderRadius: 8,
+    marginBottom: 8,
+  },
+  imageLargeThird: {
+    width: '100%',
+    aspectRatio: 1,
+    borderRadius: 8,
+    marginTop: 8,
+  },
+  imageGrid: {
+    width: '32%',
+    aspectRatio: 1,
+    borderRadius: 4,
+    margin: 1,
+  },
+  postStatsContainer: {
+    flexDirection: 'row',
+    gap: 24,
+  },
+  postButs: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  statText: {
+    fontSize: 14,
+  },
+  eyeIcon: {
+    width: 20,
+    height: 20,
+  },
+  gridContainer: {
+    padding: 4,
+  },
+  imageWrapper: {
+    flex: 1,
+    padding: 4,
+    aspectRatio: 1,
+  },
+  image: {
+    flex: 1,
+    borderRadius: 8,
+  },
 });
