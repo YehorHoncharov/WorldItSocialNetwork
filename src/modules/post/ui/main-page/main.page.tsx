@@ -5,7 +5,9 @@ import { Providers } from "../../../../app/providers";
 import { IPost } from "../../types/post";
 
 export default function Post(props: IPost) {
-	const {id, name, text, images, user} = props
+
+	const {id, name, text, theme, images, user} = props
+
 	return (
 		<Providers>
 			<SafeAreaView
@@ -18,8 +20,8 @@ export default function Post(props: IPost) {
 					backgroundColor: "#ffffff",
 				}}
 			>
-				<Author></Author>
-				<Content id={id} name={name} text={text} images={images} user={user}></Content>
+				<Author id={id} name={name} text={text} theme={theme} images={images} user={user}></Author>
+				<Content id={id} name={name} text={text} theme={theme} images={images} user={user}></Content>
 			</SafeAreaView>
 		</Providers>
 	);

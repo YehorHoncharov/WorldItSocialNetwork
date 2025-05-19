@@ -21,14 +21,18 @@ import {
 import { POST } from "../../../shared/api/post";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useUserContext } from "../../auth/context/user-context";
-import { useLocalSearchParams } from "expo-router";
+import { Picker } from "@react-native-picker/picker";
+import DropDownPicker from "react-native-dropdown-picker";
 
 
 interface Props {
 	modalVisible: boolean;
 	changeVisibility: () => void;
 }
-
+interface TagItem {
+  label: string;
+  value: string;
+}
 export function MyPublicationModal({ modalVisible, changeVisibility }: Props) {
 	const [name, setName] = useState("");
 	const [theme, setTheme] = useState("");
@@ -37,6 +41,13 @@ export function MyPublicationModal({ modalVisible, changeVisibility }: Props) {
 	const [images, setImages] = useState<string[]>([]);
 	const [tokenUser, setTokenUser] = useState<string>("");
 	const { user } = useUserContext();
+	const [open, setOpen] = useState(false);
+	const [value, setValue] = useState([]);
+	const [items, setItems] = useState<TagItem[]>([
+		{label: 'Apple', value: 'apple'},
+		{label: 'Banana', value: 'banana'},
+		{label: 'Ananas', value: 'ananas'},
+	]);
 	// const params = useLocalSearchParams();
 
 	const getToken = async (): Promise<string> => {
@@ -107,7 +118,7 @@ const handleSubmit = async () => {
 			const imagesResult = await launchImageLibraryAsync({
 				mediaTypes: "images",
 				allowsMultipleSelection: true,
-				selectionLimit: 10,
+				selectionLimit: 7,
 				base64: true,
 			});
 
@@ -173,6 +184,39 @@ const handleSubmit = async () => {
 								value={links}
 								onChangeText={setLinks}
 							/>
+							<View style={{ width: 343 }}>
+								<DropDownPicker
+									open={open}
+									value={value}
+									items={items}
+									setOpen={setOpen}
+									setValue={setValue}
+									setItems={setItems}
+									multiple={true}
+									min={0}
+									max={5}
+									listMode="SCROLLVIEW"
+									dropDownDirection="TOP"
+									autoScroll={true}
+									placeholder="Оберіть тег"
+									translation={{
+										SELECTED_ITEMS_COUNT_TEXT: {
+										1: "Обрано 1 елемент",
+										n: "Обрано {count} елементів",
+										},
+									}}
+									/>
+							</View>
+							<View style={styles.selectedTagsContainer}>
+							{value.map((tag) => {
+								const label = items.find((item) => item.value === tag)?.label || tag;
+								return (
+								<View key={tag} style={styles.tag}>
+									<Text style={styles.tagText}>{label}</Text>
+								</View>
+								);
+							})}
+							</View>
 						</View>
 
 						<View style={styles.imageGrid}>
@@ -306,4 +350,20 @@ const styles = StyleSheet.create({
 		height: 225,
 		borderRadius: 16,
 	},
+	selectedTagsContainer: {
+		flexDirection: "row",
+		flexWrap: "wrap",
+		marginTop: 10,
+		gap: 8,
+		},
+	tag: {
+		backgroundColor: "#EEE",
+		borderRadius: 12,
+		paddingHorizontal: 10,
+		paddingVertical: 4,
+		},
+	tagText: {
+		color: "#333",
+		fontSize: 14,
+		},
 });

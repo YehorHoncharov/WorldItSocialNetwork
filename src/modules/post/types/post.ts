@@ -17,14 +17,3 @@ export interface IPost{
     
 }
 
-    // id Int @id @default(autoincrement())
-    // name String
-    // theme String
-    // tags String?
-    // text String
-    // links String?
-    // images Image[]
-    // views Int?
-    // likes Int?
-    // author User @relation(fields: [authorId], references: [id])
-    // authorId Int
