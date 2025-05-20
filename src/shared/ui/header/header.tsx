@@ -25,7 +25,7 @@ function Header(){
         }
     }
     function onReg(){
-        router.navigate("/registration/step-one")
+        router.navigate("/settings")
     }
     
     return (

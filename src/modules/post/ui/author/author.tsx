@@ -1,54 +1,96 @@
-import { View, Image, Text, TouchableOpacity } from "react-native";
+import React, { useState, useRef, useEffect } from "react";
+import { View, Image, Text, TouchableOpacity, LayoutChangeEvent } from "react-native";
 import Dots from "../../../../shared/ui/icons/dots";
 import { styles } from "./author.styles";
 import { IPost } from "../../types/post";
 import { ModalPost } from "../modal-post/modal-post";
-import { useState, useRef } from "react";
 
-export function Author(props: IPost) {
-    const [modalVisible, setModalVisible] = useState(false);
-    const dotsRef = useRef<View>(null);
+export function Author({ scrollOffset = 0, ...props }: IPost & { scrollOffset?: number }) {
+  const [modalVisible, setModalVisible] = useState(false);
+  const [dotsPosition, setDotsPosition] = useState({ x: 150, y: 78 });
+  const containerRef = useRef<View>(null);
+  const dotsRef = useRef<React.ElementRef<typeof TouchableOpacity>>(null);
+  const [containerSize, setContainerSize] = useState({
+    width: 400,
+    height: 725,
+  });
 
-    return (
-        <View style={styles.container}>
-            <View style={styles.main}>
-                <View style={styles.contant}>
-                    <View style={{ position: "relative" }}>
-                        <Image
-                            style={{ width: 46, height: 46 }}
-                            source={require("../../../../shared/ui/images/karen.png")}
-                        />
-                        <Image
-                            style={{
-                                width: 20,
-                                height: 20,
-                                position: "absolute",
-                                top: 27,
-                                left: 27,
-                            }}
-                            source={require("../../../../shared/ui/images/avatar-indicator.png")}
-                        />
-                    </View>
-                    <Text>X_AE_A-13</Text>
-                </View>
+  // Вимірюємо позицію крапок
+  const measureDots = () => {
+    if (dotsRef.current) {
+      dotsRef.current.measureInWindow((x, y, width, height) => {
+        setDotsPosition({ x, y });
+      });
+    }
+  };
 
-                <Image
-                    style={{ height: 50, width: 130.83 }}
-                    source={require("../../../../shared/ui/images/signature.png")}
-                />
-            </View>
-            <View>
-                <TouchableOpacity 
-                    ref={dotsRef}
-                    onPress={() => setModalVisible(true)}
-                >
-                    <Dots style={{ height: 20, width: 20 }} />
-                </TouchableOpacity>
-            </View>
-            <ModalPost 
-                visible={modalVisible} 
-                onClose={() => setModalVisible(false)}
+  // Вимірюємо позицію при відкритті модалки
+  useEffect(() => {
+    if (modalVisible) {
+      measureDots();
+    }
+  }, [modalVisible]);
+
+  // Вимірюємо позицію при скролі
+  useEffect(() => {
+    if (modalVisible) {
+      measureDots();
+    }
+  }, [scrollOffset, modalVisible]);
+
+  const handleContainerLayout = (event: LayoutChangeEvent) => {
+    const { width, height } = event.nativeEvent.layout;
+    setContainerSize({ width, height });
+  };
+
+  return (
+    <View
+      style={styles.container}
+      ref={containerRef}
+      onLayout={handleContainerLayout}
+    >
+      <View style={styles.main}>
+        <View style={styles.contant}>
+          <View style={{ position: "relative" }}>
+            <Image
+              style={{ width: 46, height: 46 }}
+              source={require("../../../../shared/ui/images/karen.png")}
             />
+            <Image
+              style={{
+                width: 20,
+                height: 20,
+                position: "absolute",
+                top: 27,
+                left: 27,
+              }}
+              source={require("../../../../shared/ui/images/avatar-indicator.png")}
+            />
+          </View>
+          <Text>X_AE_A-13</Text>
         </View>
-    );
+
+        <Image
+          style={{ height: 50, width: 130.83 }}
+          source={require("../../../../shared/ui/images/signature.png")}
+        />
+      </View>
+      <View>
+        <TouchableOpacity
+          ref={dotsRef}
+          onPress={() => setModalVisible(true)}
+        >
+          <Dots style={{ height: 20, width: 20 }} />
+        </TouchableOpacity>
+      </View>
+      <ModalPost
+        visible={modalVisible}
+        onClose={() => setModalVisible(false)}
+        postId={props.id}
+        dotsPosition={dotsPosition}
+        containerSize={containerSize}
+        scrollOffset={scrollOffset}
+      />
+    </View>
+  );
 }

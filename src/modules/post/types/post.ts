@@ -14,6 +14,4 @@ export interface IPost{
     links?: string,
     images: IPostImg[],
     user: IUser
-    
 }
-

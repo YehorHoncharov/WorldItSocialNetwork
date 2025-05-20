@@ -5,28 +5,20 @@ export const styles = StyleSheet.create({
         flex: 1,
     },
     modalContainer: {
-        position: 'absolute',
-        width: 343,
-        height: 140,
-        backgroundColor: 'white',
+        backgroundColor: "#E9E5EE",
         borderRadius: 12,
-        paddingVertical: 8,
-        top: 90,
-        left: 100
     },
     dotsContainer: {
-        position: 'absolute',
-        top: 10,
-        right: 10,
-        padding: 10,
+        alignItems: "flex-end",
+        padding: 5,
     },
     dotsIcon: {
         width: 20,
         height: 20,
     },
     modalOption: {
-        flexDirection: 'row',
-        alignItems: 'center',
+        flexDirection: "row",
+        alignItems: "center",
         paddingVertical: 12,
         paddingHorizontal: 16,
     },
@@ -36,16 +28,15 @@ export const styles = StyleSheet.create({
         marginLeft: 12,
     },
     deleteText: {
-        color: 'red',
+        color: "red",
     },
     divider: {
         height: 1,
-        backgroundColor: '#CDCED2',
+        backgroundColor: "#CDCED2",
         marginVertical: 4,
     },
     icon: {
         width: 20,
         height: 20,
     },
-
 });

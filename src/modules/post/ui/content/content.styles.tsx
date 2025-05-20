@@ -114,12 +114,14 @@ export const styles = StyleSheet.create({
     marginBottom: 8,
   },
   imageHalf: {
-    width: '48%',
+    width: 167.5,
+    height: 203,
     aspectRatio: 1,
     borderRadius: 8,
   },
   imageThird: {
-    width: '32%',
+    width: 109,
+    height: 203,
     aspectRatio: 1,
     borderRadius: 8,
   },

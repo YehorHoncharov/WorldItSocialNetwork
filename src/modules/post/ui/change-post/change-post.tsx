@@ -4,13 +4,13 @@ import {
   Pressable,
   View,
   Text,
+  StyleSheet,
   TouchableOpacity,
   Image,
   TextInput,
   ScrollView,
-  ActivityIndicator,
+  Alert,
 } from "react-native";
-
 import {
   launchImageLibraryAsync,
   requestMediaLibraryPermissionsAsync,
@@ -18,33 +18,53 @@ import {
 
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-import { IPost } from "../../types/post";
+import DropDownPicker from "react-native-dropdown-picker";
 import { useUserContext } from "../../../auth/context/user-context";
-import { POST } from "../../../../shared/api/post";
-import { styles } from "./change-post.styles";
+import { PUT } from "../../../../shared/api/put";
 import Cross from "../../../../shared/ui/icons/cross";
 import { Input } from "../../../../shared/ui/input";
 import SendArrow from "../../../../shared/ui/icons/send-arrow";
-import Toast from "react-native-toast-message";
-import { PUT } from "../../../../shared/api/put";
-
 
 interface Props {
   modalVisible: boolean;
   changeVisibility: () => void;
-  post?: IPost; 
-  refreshPosts?: () => void; 
+  postData: {
+    id: number;
+    name: string;
+    theme: string;
+    text: string;
+    links?: string;
+    images?: string[];
+    tags?: string[];
+  };
+
 }
 
-export default function ChangePostModal({ modalVisible, changeVisibility, post, refreshPosts }: Props) {
-  const [name, setName] = useState(post?.name || "");
-  const [theme, setTheme] = useState(post?.theme || "");
-  const [text, setText] = useState(post?.text || "");
-  const [links, setLinks] = useState(post?.links || "");
-  const [images, setImages] = useState<string[]>(post?.images?.map(img => img.url) || []);
+interface TagItem {
+  label: string;
+  value: string;
+}
+
+export function ChangePostModal({ 
+  modalVisible, 
+  changeVisibility,
+  postData,
+
+}: Props) {
+  const [name, setName] = useState(postData.name);
+  const [theme, setTheme] = useState(postData.theme);
+  const [text, setText] = useState(postData.text);
+  const [links, setLinks] = useState(postData.links || "");
+  const [images, setImages] = useState<string[]>(postData.images || []);
   const [tokenUser, setTokenUser] = useState<string>("");
-  const [isLoading, setIsLoading] = useState(false);
   const { user } = useUserContext();
+  const [open, setOpen] = useState(false);
+  const [value, setValue] = useState(postData.tags || []);
+  const [items, setItems] = useState<TagItem[]>([
+    {label: 'Apple', value: 'apple'},
+    {label: 'Banana', value: 'banana'},
+    {label: 'Ananas', value: 'ananas'},
+  ]);
 
   const getToken = async (): Promise<string> => {
     const token = await AsyncStorage.getItem("token");
@@ -53,119 +73,59 @@ export default function ChangePostModal({ modalVisible, changeVisibility, post, 
 
   useEffect(() => {
     getToken().then(setTokenUser);
-    if (post) {
-      setName(post.name);
-      setTheme(post.theme || "");
-      setText(post.text);
-      setLinks(post.links || "");
-      setImages(post.images?.map(img => img.url) || []);
-    } else {
-      setName("");
-      setTheme("");
-      setText("");
-      setLinks("");
-      setImages([]);
+    if (modalVisible) {
+      setName(postData.name);
+      setTheme(postData.theme);
+      setText(postData.text);
+      setLinks(postData.links || "");
+      setImages(postData.images || []);
+      setValue(postData.tags || []);
     }
-  }, [post, modalVisible]);
+  }, [modalVisible, postData]);
 
   const handleSubmit = async () => {
     if (!name || !theme || !text) {
-      Toast.show({
-        type: 'error',
-        text1: 'Ошибка',
-        text2: 'Пожалуйста, заполните обязательные поля',
-      });
+      Alert.alert("Помилка", "Будь ласка, заповніть обов'язкові поля");
       return;
     }
 
     if (!user) {
-      Toast.show({
-        type: 'error',
-        text1: 'Ошибка',
-        text2: 'Вы не авторизованы',
-      });
+      Alert.alert("Упс... схоже ви не авторизовані 😞, тому не можете редагувати пост");
       return;
     }
-
-    setIsLoading(true);
 
     try {
       const formattedImages = images.length > 0 
         ? { 
             create: images.map(url => ({ 
               url,
-              postId: user.id 
+              postId: postData.id 
             })) 
           } 
         : undefined;
 
-      if (post) {
-        await PUT({
-          endpoint: `http://192.168.1.104:3000/posts/update/${post.id}`,
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${tokenUser}`,
-          },
-          token: tokenUser,
-          body: {
-            name,
-            theme,
-            text,
-            links: links || undefined,
-            images: formattedImages,
-          },
-        });
-
-        Toast.show({
-          type: 'success',
-          text1: 'Успех',
-          text2: 'Пост успешно обновлен',
-        });
-      } else {
-        await POST({
-          endpoint: "http://192.168.1.104:3000/posts/create",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${tokenUser}`,
-          },
-          token: tokenUser,
-          body: {
-            name,
-            theme,
-            text,
-            links: links || undefined,
-            images: formattedImages,
-            authorId: user.id,
-          },
-        });
-
-        Toast.show({
-          type: 'success',
-          text1: 'Успех',
-          text2: 'Пост успешно создан',
-        });
-      }
-
-
-      if (!post) {
-        setName("");
-        setTheme("");
-        setText("");
-        setLinks("");
-        setImages([]);
-      }
-      
-      changeVisibility();
-      refreshPosts?.();
-    } catch (err) {
-      console.error("Ошибка:", err);
-      Toast.show({
-        type: 'error',
-        text1: 'Ошибка',
-        text2: 'Произошла ошибка при сохранении',
+      await PUT({
+        endpoint: `http://192.168.1.104:3000/posts/update/${postData.id}`,
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${tokenUser}`,
+        },
+        token: tokenUser,
+        body: {
+          name,
+          theme,
+          text,
+          links: links || undefined,
+          images: formattedImages,
+          tags: value,
+        },
       });
-    } finally {
-      setIsLoading(false);
+
+      changeVisibility();
+      Alert.alert("Успіх", "Публікацію успішно оновлено");
+    } catch (err) {
+      console.error("Помилка при оновленні поста:", err);
+      Alert.alert("Помилка", "Не вдалося оновити публікацію");
     }
   };
 
@@ -189,7 +149,7 @@ export default function ChangePostModal({ modalVisible, changeVisibility, post, 
   }
 
   const removeImage = (index: number) => {
-    setImages(prev => prev.filter((_, i) => i !== index));
+    setImages(images.filter((_, i) => i !== index));
   };
 
   return (
@@ -203,7 +163,7 @@ export default function ChangePostModal({ modalVisible, changeVisibility, post, 
         <View style={styles.modalView}>
           <View style={styles.header}>
             <Text style={styles.modalTitle}>
-              {post ? 'Редактирование публикации' : 'Создание публикации'}
+              Редагування публікації
             </Text>
             <Pressable onPress={changeVisibility}>
               <Cross style={{ width: 15, height: 15 }} />
@@ -245,6 +205,39 @@ export default function ChangePostModal({ modalVisible, changeVisibility, post, 
                 value={links}
                 onChangeText={setLinks}
               />
+              <View style={{ width: 343 }}>
+                <DropDownPicker
+                  open={open}
+                  value={value}
+                  items={items}
+                  setOpen={setOpen}
+                  setValue={setValue}
+                  setItems={setItems}
+                  multiple={true}
+                  min={0}
+                  max={5}
+                  listMode="SCROLLVIEW"
+                  dropDownDirection="TOP"
+                  autoScroll={true}
+                  placeholder="Оберіть тег"
+                  translation={{
+                    SELECTED_ITEMS_COUNT_TEXT: {
+                      1: "Обрано 1 елемент",
+                      n: "Обрано {count} елементів",
+                    },
+                  }}
+                />
+              </View>
+              <View style={styles.selectedTagsContainer}>
+                {value.map((tag) => {
+                  const label = items.find((item) => item.value === tag)?.label || tag;
+                  return (
+                    <View key={tag} style={styles.tag}>
+                      <Text style={styles.tagText}>{label}</Text>
+                    </View>
+                  );
+                })}
+              </View>
             </View>
 
             <View style={styles.imageGrid}>
@@ -269,31 +262,148 @@ export default function ChangePostModal({ modalVisible, changeVisibility, post, 
               <View style={styles.iconRow}>
                 <TouchableOpacity onPress={onSearch}>
                   <Image
-                    source={require("../../../shared/ui/images/pictures-modal.png")}
+                    source={require("../../../../shared/ui/images/bitch.png")}
                     style={styles.icon}
                   />
                 </TouchableOpacity>
-                {isLoading ? (
-                  <ActivityIndicator size="small" color="#543C52" />
-                ) : (
-                  <TouchableOpacity
-                    style={styles.submitButton}
-                    onPress={handleSubmit}
-                  >
-                    <Text style={styles.submitText}>
-                      {post ? 'Обновить' : 'Опубликовать'}
-                    </Text>
-                    <SendArrow
-                      style={{ width: 20, height: 20 }}
-                    />
-                  </TouchableOpacity>
-                )}
+                <TouchableOpacity
+                  style={styles.submitButton}
+                  onPress={handleSubmit}
+                >
+                  <Text style={styles.submitText}>
+                    Оновити
+                  </Text>
+                  <SendArrow
+                    style={{ width: 20, height: 20 }}
+                  />
+                </TouchableOpacity>
               </View>
             </View>
           </ScrollView>
         </View>
       </View>
-      <Toast />
     </Modal>
   );
 }
+
+const styles = StyleSheet.create({
+  centeredView: {
+    flex: 1,
+    justifyContent: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+  },
+  modalView: {
+    width: "100%",
+    maxHeight: "80%",
+    backgroundColor: "white",
+    borderRadius: 20,
+    padding: 20,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  header: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 16,
+  },
+  modalTitle: {
+    fontSize: 24,
+    fontWeight: "500",
+    color: "#070A1C",
+  },
+  form: {
+    gap: 5,
+    marginBottom: 20,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  textArea: {
+    width: 343,
+    minHeight: 100,
+    padding: 16,
+    borderWidth: 1,
+    borderColor: "#CDCED2",
+    borderRadius: 10,
+    fontSize: 16,
+  },
+  actions: {
+    gap: 16,
+    marginTop: 16,
+  },
+  iconRow: {
+    flexDirection: "row",
+    justifyContent: "flex-end",
+    gap: 16,
+  },
+  icon: {
+    width: 40,
+    height: 40,
+  },
+  submitButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#543C52",
+    padding: 12,
+    borderRadius: 1234,
+    gap: 8,
+  },
+  submitText: {
+    color: "white",
+    fontSize: 16,
+    fontWeight: "600",
+  },
+  scrollArea: {
+    flexGrow: 0,
+  },
+  imageGrid: {
+    flexDirection: "column",
+    gap: 8,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  imageContainer: {
+    position: 'relative',
+  },
+  imageAdded: {
+    width: 343,
+    height: 225,
+    borderRadius: 16,
+  },
+  removeImageButton: {
+    position: 'absolute',
+    top: 10,
+    right: 10,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    width: 30,
+    height: 30,
+    borderRadius: 15,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  removeImageText: {
+    color: 'white',
+    fontSize: 20,
+    fontWeight: 'bold',
+  },
+  selectedTagsContainer: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    marginTop: 10,
+    gap: 8,
+  },
+  tag: {
+    backgroundColor: "#EEE",
+    borderRadius: 12,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+  },
+  tagText: {
+    color: "#333",
+    fontSize: 14,
+  },
+});
