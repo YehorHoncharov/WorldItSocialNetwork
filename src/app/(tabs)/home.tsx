@@ -1,35 +1,29 @@
-import { SafeAreaView, ScrollView, StatusBar, View } from "react-native";
-import { Providers } from "../providers";
-import { Header } from "../../shared/ui/header/header";
-import Post from "../../modules/post/ui/main-page/main.page";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { Homepage } from "../../modules/home/homepage";
+import React from 'react';
+import { View } from 'react-native';
 
 
+import { Providers } from '../providers';
+import { Homepage } from '../../modules/home/homepage';
+import { Header } from '../../shared/ui/header';
+import { StyleSheet } from 'react-native';
 
 
 export default function MainPage() {
-
-    const {top} = useSafeAreaInsets()
-
     return (
         <Providers>
-            <SafeAreaView style={{ flex: 1, backgroundColor: "#ffffff" }}>
+            <View style={styles.container}>
                 <Header />
-                <ScrollView
-                    overScrollMode="never"
-                    contentContainerStyle={{
-                        flexGrow: 1,
-                        alignItems: "center",
-                        backgroundColor: "#FAF8FF",
-                        gap: 10,
-                        paddingTop: 10,
-                    }}
-                >
-                    <Homepage />
-                    
-                </ScrollView>
-            </SafeAreaView>
+                <Homepage />
+            </View>
         </Providers>
     );
 }
+
+const styles = StyleSheet.create({
+    container: {
+        width: "100%",
+        maxWidth: 800,
+        gap: 10,
+        paddingBottom: 20,
+    }
+});

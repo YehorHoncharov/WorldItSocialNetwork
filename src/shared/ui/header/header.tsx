@@ -8,68 +8,92 @@ import I from "../icons/logo/i";
 import T from "../icons/logo/t";
 import { styles } from "./header.styles";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { Link, useRouter } from "expo-router";
-import { useEffect, useState } from "react";
+import { useRouter } from "expo-router";
+import { useState } from "react";
 import { IInputPasswordProps } from "../input/input.type";
 import { MyPublicationModal } from "../../../modules/my_publications/modal/modal";
 
-function Header(){
-    const router = useRouter()
-    const [modalOpened, setModalOpened] = useState<boolean>(false)
+function Header() {
+	const router = useRouter();
+	const [modalOpened, setModalOpened] = useState<boolean>(false);
 
-    function Logout(){
-        try {
-        AsyncStorage.removeItem("token")
-        }catch {
-            console.log("ошибки выхода")
-        }
-    }
-    function onReg(){
-        router.navigate("/settings")
-    }
-    
-    return (
-        <View style={styles.container}>
-            {modalOpened ? <MyPublicationModal modalVisible={modalOpened} changeVisibility={()=>{setModalOpened(!modalOpened)}}></MyPublicationModal> : null}
-            <View style={{flexDirection: "row", gap: 5, paddingLeft: 16, alignItems: "center", justifyContent: "center"}}>
-                <Image
-                    style={styles.worldItLogo}
-                    source={require("../../ui/images/world-it-logo.png")}
-                />
-                <View style={{flexDirection: "row", gap: 1, padding: 2}}>
-                    <W style={styles.w}/>
-                    <O style={styles.o}/>
-                    <R style={styles.r}/>
-                    <L style={styles.l}/>
-                    <D style={styles.d}/>
-                </View>
-                <View style={{flexDirection: "row", gap: 1, paddingTop: 5,}}>
-                    <I style={styles.i}/>
-                    <T style={styles.t}/>
-                </View>
-            </View>
-            <View style={{flexDirection: "row", gap: 8, marginRight: 16}}>
-                <TouchableWithoutFeedback onPress={()=>{setModalOpened(!modalOpened)}}>
-                    <Image
-                        style={styles.plus}
-                        source={require("../images/plus-in-circle.png")}
-                    />
-                </TouchableWithoutFeedback>
-                <TouchableWithoutFeedback onPress={onReg}>
-                        <Image
-                            style={styles.settings}
-                            source={require("../images/settings-in-circle.png")}
-                        />
-                </TouchableWithoutFeedback>
-                <TouchableWithoutFeedback onPress={Logout}>
-                    <Image
-                        style={styles.exit}
-                        source={require("../images/exit-in-circle.png")}
-                    />
-                </TouchableWithoutFeedback>
-            </View>
-        </View>
-    )
+	function Logout() {
+		try {
+            console.log("выход нажат");
+			const deleteToken = AsyncStorage.removeItem("token");
+            console.log("token удален", deleteToken);
+		} catch {
+			console.log("ошибки выхода");
+		}
+	}
+	function onReg() {
+		router.navigate("/settings");
+	}
+
+	return (
+		<View style={styles.container}>
+			{modalOpened ? (
+				<MyPublicationModal
+					modalVisible={modalOpened}
+					changeVisibility={() => {
+						setModalOpened(!modalOpened);
+					}}
+				></MyPublicationModal>
+			) : null}
+			<View
+				style={{
+					flexDirection: "row",
+					gap: 5,
+					paddingLeft: 16,
+					alignItems: "center",
+					justifyContent: "center",
+				}}
+			>
+				<Image
+					style={styles.worldItLogo}
+					source={require("../../ui/images/world-it-logo.png")}
+				/>
+				<View style={{ flexDirection: "row", gap: 1, padding: 2 }}>
+					<W style={styles.w} />
+					<O style={styles.o} />
+					<R style={styles.r} />
+					<L style={styles.l} />
+					<D style={styles.d} />
+				</View>
+				<View style={{ flexDirection: "row", gap: 1, paddingTop: 5 }}>
+					<I style={styles.i} />
+					<T style={styles.t} />
+				</View>
+			</View>
+			<View style={{ flexDirection: "row", gap: 8, marginRight: 16 }}>
+				<TouchableWithoutFeedback
+					onPress={() => {
+						setModalOpened(!modalOpened);
+					}}
+				>
+					<Image
+						style={styles.plus}
+						source={require("../images/plus-in-circle.png")}
+					/>
+				</TouchableWithoutFeedback>
+				<TouchableWithoutFeedback onPress={onReg}>
+					<Image
+						style={styles.settings}
+						source={require("../images/settings-in-circle.png")}
+					/>
+				</TouchableWithoutFeedback>
+				<TouchableWithoutFeedback
+					onPress={
+						Logout}
+				>
+					<Image
+						style={styles.exit}
+						source={require("../images/exit-in-circle.png")}
+					/>
+				</TouchableWithoutFeedback>
+			</View>
+		</View>
+	);
 }
 
 function HeaderSecond(props: IInputPasswordProps) {
@@ -79,24 +103,32 @@ function HeaderSecond(props: IInputPasswordProps) {
 
 	return (
 		<View style={styles.container2}>
-            <View style={{flexDirection: "row", gap: 5, paddingLeft: 16, alignItems: "center", justifyContent: "center"}}>
-                <Image
-                    style={styles.worldItLogo}
-                    source={require("../../ui/images/world-it-logo.png")}
-                />
-                <View style={{flexDirection: "row", gap: 1, padding: 2}}>
-                    <W style={styles.w}/>
-                    <O style={styles.o}/>
-                    <R style={styles.r}/>
-                    <L style={styles.l}/>
-                    <D style={styles.d}/>
-                </View>
-                <View style={{flexDirection: "row", gap: 1, paddingTop: 5,}}>
-                    <I style={styles.i}/>
-                    <T style={styles.t}/>
-                </View>
-            </View>
-        </View>
+			<View
+				style={{
+					flexDirection: "row",
+					gap: 5,
+					paddingLeft: 16,
+					alignItems: "center",
+					justifyContent: "center",
+				}}
+			>
+				<Image
+					style={styles.worldItLogo}
+					source={require("../../ui/images/world-it-logo.png")}
+				/>
+				<View style={{ flexDirection: "row", gap: 1, padding: 2 }}>
+					<W style={styles.w} />
+					<O style={styles.o} />
+					<R style={styles.r} />
+					<L style={styles.l} />
+					<D style={styles.d} />
+				</View>
+				<View style={{ flexDirection: "row", gap: 1, paddingTop: 5 }}>
+					<I style={styles.i} />
+					<T style={styles.t} />
+				</View>
+			</View>
+		</View>
 	);
 }
 

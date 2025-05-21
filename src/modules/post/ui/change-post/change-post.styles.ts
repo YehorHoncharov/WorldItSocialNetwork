@@ -52,7 +52,6 @@ export const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "flex-end",
     gap: 16,
-    alignItems: "center",
   },
   icon: {
     width: 40,
@@ -104,5 +103,31 @@ export const styles = StyleSheet.create({
     color: 'white',
     fontSize: 20,
     fontWeight: 'bold',
+  },
+  selectedTagsContainer: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    marginTop: 10,
+    gap: 8,
+  },
+  tag: {
+    backgroundColor: "#EEE",
+    borderRadius: 12,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+  },
+  tagText: {
+    color: "#333",
+    fontSize: 14,
+  },
+  errorText: {
+    color: "red",
+    fontSize: 14,
+    textAlign: "center",
+  },
+  noImagesText: {
+    color: "#333",
+    fontSize: 14,
+    textAlign: "center",
   },
 });

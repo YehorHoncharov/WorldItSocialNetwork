@@ -1,8 +1,34 @@
-import { View, Text, Image } from "react-native";
+import { View, Text, Image, TouchableOpacity } from "react-native";
 import { Input } from "../../shared/ui/input";
 import { styles } from "./settings.styles";
+import { useUserContext } from "../auth/context/user-context";
+import { useRouter } from "expo-router";
 
 export function Settings(){
+
+    const { user } = useUserContext();
+    const router = useRouter();
+
+    function handlePress() {
+        router.navigate("/registration/step-one");
+    }
+
+    if (!user) {
+        return (
+            <View style={[styles.container, { justifyContent: 'center', alignItems: 'center', flex: 1 }]}>
+                <Text style={{ fontSize: 18, textAlign: "center", marginBottom: 20 }}>
+                    Ви не авторизовані
+                </Text>
+                <TouchableOpacity 
+                    style={styles.authButton}
+                    onPress={handlePress}
+                >
+                    <Text style={styles.authButtonText}>Увійти або зареєструватись</Text>
+                </TouchableOpacity>
+            </View>
+        );
+    }
+
     return (
         <View style={{gap: 8}}>
             <View style={styles.container}>

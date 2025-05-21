@@ -23,15 +23,15 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useUserContext } from "../../auth/context/user-context";
 import { Picker } from "@react-native-picker/picker";
 import DropDownPicker from "react-native-dropdown-picker";
-
+import { usePosts } from "../../post/hooks/use-get-post";
 
 interface Props {
 	modalVisible: boolean;
 	changeVisibility: () => void;
 }
 interface TagItem {
-  label: string;
-  value: string;
+	label: string;
+	value: string;
 }
 export function MyPublicationModal({ modalVisible, changeVisibility }: Props) {
 	const [name, setName] = useState("");
@@ -44,11 +44,13 @@ export function MyPublicationModal({ modalVisible, changeVisibility }: Props) {
 	const [open, setOpen] = useState(false);
 	const [value, setValue] = useState([]);
 	const [items, setItems] = useState<TagItem[]>([
-		{label: 'Apple', value: 'apple'},
-		{label: 'Banana', value: 'banana'},
-		{label: 'Ananas', value: 'ananas'},
+		{ label: "Apple", value: "apple" },
+		{ label: "Banana", value: "banana" },
+		{ label: "Ananas", value: "ananas" },
 	]);
 	// const params = useLocalSearchParams();
+
+	const { refetch } = usePosts();
 
 	const getToken = async (): Promise<string> => {
 		const token = await AsyncStorage.getItem("token");
@@ -59,58 +61,78 @@ export function MyPublicationModal({ modalVisible, changeVisibility }: Props) {
 		getToken().then(setTokenUser);
 	}, []);
 
-const handleSubmit = async () => {
-	if (!name || !theme || !text) {
-		Alert.alert("Помилка", "Будь ласка, заповніть обов'язкові поля");
-		return;
+	const handleSubmit = async () => {
+		console.log("[refetch] Начало обработки submit");
+		if (!name || !theme || !text) {
+			Alert.alert("Помилка", "Будь ласка, заповніть обов'язкові поля");
+			return;
+		}
+
+		if (!user) {
+			Alert.alert(
+				"Упс... схоже ви не авторизовані 😞, тому не можете створити пост🙄"
+			);
+			return;
+		}
+
+		try {
+			const formattedImages =
+				images.length > 0
+					? {
+							create: images.map((url) => ({
+								url,
+								postId: user.id,
+							})),
+					  }
+					: undefined;
+
+			console.log("[refetch] Отправка запроса на создание поста");
+			await POST({
+				endpoint: "http://192.168.1.104:3000/posts/create",
+				headers: {
+					"Content-Type": "application/json",
+					Authorization: `Bearer ${tokenUser}`,
+				},
+				token: tokenUser,
+				body: {
+					name,
+					theme,
+					text,
+					links: links || undefined,
+					images: formattedImages,
+					authorId: user.id,
+				},
+			});
+
+			setName("");
+			setTheme("");
+			setText("");
+			setLinks("");
+			setImages([]);
+			changeVisibility();
+
+			console.log("Публікацію успішно створено");
+			Alert.alert("Успіх", "Публікацію успішно створено");
+		} catch (err) {
+			console.error("[refetch] Ошибка в процессе создания поста:", err);
+			console.error("Помилка при створенні поста:", err);
+			Alert.alert("Помилка", "Не вдалося створити публікацію");
+		}
+	};
+
+	async function handleSubmitWithRefetch() {
+		handleSubmit();
+		console.log(
+			"[refetch] Запрос на создание поста успешен, запуск refetch"
+		);
+		const updatedPosts = await refetch();
+		console.log(
+			`[refetch] Обновленный список содержит ${
+				updatedPosts?.length || 0
+			} постов`
+		);
+		// refetch();
 	}
-
-	if (!user) {
-		console.log("bad user");
-		Alert.alert("Упс... схоже ви не авторизовані 😞, тому не можете створити пост🙄");
-		return;
-	}
-
-	try {
-		const formattedImages = images.length > 0 
-		? { 
-			create: images.map(url => ({ 
-				url,
-				postId: user.id })) 
-			} 
-		: undefined;
-
-		await POST({
-		endpoint: "http://192.168.1.104:3000/posts/create",
-		headers: {
-			"Content-Type": "application/json",
-			Authorization: `Bearer ${tokenUser}`,
-		},
-		token: tokenUser,
-		body: {
-			name,
-			theme,
-			text,
-			links: links || undefined,
-			images: formattedImages,
-			authorId: user.id,
-		},
-		});
-
-		setName("");
-		setTheme("");
-		setText("");
-		setLinks("");
-		setImages([]);
-		changeVisibility();
-
-		console.log("Публікацію успішно створено");
-		Alert.alert("Успіх", "Публікацію успішно створено");
-	} catch (err) {
-		console.error("Помилка при створенні поста:", err);
-		Alert.alert("Помилка", "Не вдалося створити публікацію");
-	}
-};
 
 	async function onSearch() {
 		const result = await requestMediaLibraryPermissionsAsync();
@@ -201,21 +223,25 @@ const handleSubmit = async () => {
 									placeholder="Оберіть тег"
 									translation={{
 										SELECTED_ITEMS_COUNT_TEXT: {
-										1: "Обрано 1 елемент",
-										n: "Обрано {count} елементів",
+											1: "Обрано 1 елемент",
+											n: "Обрано {count} елементів",
 										},
 									}}
-									/>
+								/>
 							</View>
 							<View style={styles.selectedTagsContainer}>
-							{value.map((tag) => {
-								const label = items.find((item) => item.value === tag)?.label || tag;
-								return (
-								<View key={tag} style={styles.tag}>
-									<Text style={styles.tagText}>{label}</Text>
-								</View>
-								);
-							})}
+								{value.map((tag) => {
+									const label =
+										items.find((item) => item.value === tag)
+											?.label || tag;
+									return (
+										<View key={tag} style={styles.tag}>
+											<Text style={styles.tagText}>
+												{label}
+											</Text>
+										</View>
+									);
+								})}
 							</View>
 						</View>
 
@@ -246,7 +272,7 @@ const handleSubmit = async () => {
 								</TouchableOpacity>
 								<TouchableOpacity
 									style={styles.submitButton}
-									onPress={handleSubmit}
+									onPress={handleSubmitWithRefetch}
 								>
 									<Text style={styles.submitText}>
 										Публікація
@@ -355,15 +381,15 @@ const styles = StyleSheet.create({
 		flexWrap: "wrap",
 		marginTop: 10,
 		gap: 8,
-		},
+	},
 	tag: {
 		backgroundColor: "#EEE",
 		borderRadius: 12,
 		paddingHorizontal: 10,
 		paddingVertical: 4,
-		},
+	},
 	tagText: {
 		color: "#333",
 		fontSize: 14,
-		},
+	},
 });

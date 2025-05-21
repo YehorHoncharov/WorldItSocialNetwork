@@ -27,4 +27,15 @@ export const styles = StyleSheet.create({
         width: 40,
         height: 40
     },
+     authButton: {
+        backgroundColor: '#543C52',
+        padding: 15,
+        borderRadius: 8,
+        width: '80%',
+        alignItems: 'center'
+    },
+    authButtonText: {
+        color: 'white',
+        fontWeight: '600'
+    }
 })

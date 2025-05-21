@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import {
   Modal,
   Pressable,
@@ -14,30 +14,31 @@ import {
 import {
   launchImageLibraryAsync,
   requestMediaLibraryPermissionsAsync,
+  MediaTypeOptions,
 } from "expo-image-picker";
-
 import AsyncStorage from "@react-native-async-storage/async-storage";
-
 import DropDownPicker from "react-native-dropdown-picker";
 import { useUserContext } from "../../../auth/context/user-context";
 import { PUT } from "../../../../shared/api/put";
 import Cross from "../../../../shared/ui/icons/cross";
 import { Input } from "../../../../shared/ui/input";
 import SendArrow from "../../../../shared/ui/icons/send-arrow";
+import { styles } from "./change-post.styles";
+
+interface PostData {
+  id: number;
+  name: string;
+  theme: string;
+  text: string;
+  links?: string;
+  images?: string[]; // Для відображення у UI
+  tags?: string[];
+}
 
 interface Props {
   modalVisible: boolean;
   changeVisibility: () => void;
-  postData: {
-    id: number;
-    name: string;
-    theme: string;
-    text: string;
-    links?: string;
-    images?: string[];
-    tags?: string[];
-  };
-
+  postData: PostData;
 }
 
 interface TagItem {
@@ -45,26 +46,69 @@ interface TagItem {
   value: string;
 }
 
+interface ImageUpdate {
+  create?: { url: string; postId: number }[];
+  delete?: string[];
+}
+
+interface UpdateData {
+  name?: string;
+  theme?: string;
+  text?: string;
+  links?: string;
+  tags?: string[];
+  images?: ImageUpdate;
+}
+
 export function ChangePostModal({ 
   modalVisible, 
   changeVisibility,
   postData,
-
 }: Props) {
+  const { user } = useUserContext();
   const [name, setName] = useState(postData.name);
   const [theme, setTheme] = useState(postData.theme);
   const [text, setText] = useState(postData.text);
   const [links, setLinks] = useState(postData.links || "");
   const [images, setImages] = useState<string[]>(postData.images || []);
   const [tokenUser, setTokenUser] = useState<string>("");
-  const { user } = useUserContext();
+  const [isLoading, setIsLoading] = useState(false);
   const [open, setOpen] = useState(false);
-  const [value, setValue] = useState(postData.tags || []);
+  const [value, setValue] = useState<string[]>(postData.tags || []);
   const [items, setItems] = useState<TagItem[]>([
-    {label: 'Apple', value: 'apple'},
-    {label: 'Banana', value: 'banana'},
-    {label: 'Ananas', value: 'ananas'},
+    { label: 'Apple', value: 'apple' },
+    { label: 'Banana', value: 'banana' },
+    { label: 'Ananas', value: 'ananas' },
   ]);
+
+  // Базовий URL для нормалізації відносних URL-адрес
+  const API_BASE_URL = "http://192.168.1.104:3000";
+
+const normalizedImages = useMemo(() => {
+  return postData.images?.map(uri => {
+    if (!uri) return null;
+    if (
+      uri.startsWith('http') ||
+      uri.startsWith('data:image') ||
+      uri.startsWith('file:')
+    ) {
+      return uri;
+    } else {
+      return `${API_BASE_URL}/${uri.startsWith('') ? uri.slice(1) + "/" : uri}`;
+    }
+  }).filter((uri): uri is string => !!uri) || [];
+}, [postData.images]);
+
+
+  // Зберігаємо початкові значення для порівняння змін
+  const initialData = useMemo(() => ({
+    name: postData.name,
+    theme: postData.theme,
+    text: postData.text,
+    links: postData.links || "",
+    images: normalizedImages,
+    tags: postData.tags || [],
+  }), [postData, normalizedImages]);
 
   const getToken = async (): Promise<string> => {
     const token = await AsyncStorage.getItem("token");
@@ -78,10 +122,22 @@ export function ChangePostModal({
       setTheme(postData.theme);
       setText(postData.text);
       setLinks(postData.links || "");
-      setImages(postData.images || []);
+      setImages(normalizedImages);
       setValue(postData.tags || []);
+      console.log("postData.images:", postData.images);
+      console.log("normalizedImages:", normalizedImages);
+      console.log("images state:", normalizedImages);
     }
-  }, [modalVisible, postData]);
+  }, [
+    modalVisible,
+    postData.id,
+    postData.name,
+    postData.theme,
+    postData.text,
+    postData.links,
+    normalizedImages,
+    postData.tags,
+  ]);
 
   const handleSubmit = async () => {
     if (!name || !theme || !text) {
@@ -90,66 +146,115 @@ export function ChangePostModal({
     }
 
     if (!user) {
-      Alert.alert("Упс... схоже ви не авторизовані 😞, тому не можете редагувати пост");
+      Alert.alert("Помилка", "Ви не авторизовані для редагування посту");
       return;
     }
 
-    try {
-      const formattedImages = images.length > 0 
-        ? { 
-            create: images.map(url => ({ 
-              url,
-              postId: postData.id 
-            })) 
-          } 
-        : undefined;
+    // Валідація URL для links
+    if (links && !isValidUrl(links)) {
+      Alert.alert("Помилка", "Введіть валідне посилання");
+      return;
+    }
 
+    const updatedData: UpdateData = {};
+
+    if (name !== initialData.name) updatedData.name = name;
+    if (theme !== initialData.theme) updatedData.theme = theme;
+    if (text !== initialData.text) updatedData.text = text;
+    if (links !== initialData.links) updatedData.links = links || undefined;
+
+    // Завжди включаємо теги
+    updatedData.tags = value;
+
+  const imagesForServer = images.map(url =>
+    url.startsWith(API_BASE_URL) ? url.replace(API_BASE_URL, '') : url
+  );
+
+  updatedData.images = imagesForServer.length > 0
+    ? {
+        create: imagesForServer.map(url => ({
+          url,
+          postId: user.id,
+        })),
+      }
+    : undefined;
+
+
+    // Додаємо видалені зображення, якщо вони є
+    const deletedImages = initialData.images.filter(uri => !images.includes(uri));
+    if (deletedImages.length > 0) {
+      updatedData.images = {
+        ...updatedData.images,
+        delete: deletedImages,
+      };
+    }
+
+    // Якщо немає змін (крім tags і images, які завжди включаємо), показуємо повідомлення
+    if (Object.keys(updatedData).length === (updatedData.tags ? 1 : 0) && !updatedData.images) {
+      Alert.alert("Інформація", "Жодних змін не внесено");
+      changeVisibility();
+      return;
+    }
+
+    setIsLoading(true);
+    try {
       await PUT({
-        endpoint: `http://192.168.1.104:3000/posts/update/${postData.id}`,
+        endpoint: `${API_BASE_URL}/posts/${postData.id}`,
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${tokenUser}`,
         },
         token: tokenUser,
-        body: {
-          name,
-          theme,
-          text,
-          links: links || undefined,
-          images: formattedImages,
-          tags: value,
-        },
+        body: updatedData,
       });
 
       changeVisibility();
       Alert.alert("Успіх", "Публікацію успішно оновлено");
-    } catch (err) {
-      console.error("Помилка при оновленні поста:", err);
-      Alert.alert("Помилка", "Не вдалося оновити публікацію");
+    } catch (err: any) {
+      console.error("Помилка при оновленні поста:", err.message);
+      Alert.alert("Помилка", err.message || "Не вдалося оновити публікацію");
+    } finally {
+      setIsLoading(false);
     }
   };
 
   async function onSearch() {
     const result = await requestMediaLibraryPermissionsAsync();
-    if (result.status === "granted") {
-      const imagesResult = await launchImageLibraryAsync({
-        mediaTypes: "images",
-        allowsMultipleSelection: true,
-        selectionLimit: 7,
-        base64: true,
-      });
+    if (result.status !== "granted") {
+      Alert.alert("Помилка", "Потрібен дозвіл для доступу до галереї");
+      return;
+    }
 
-      if (imagesResult.assets) {
-        const base64Images = imagesResult.assets.map(
-          (asset) => `data:image/jpeg;base64,${asset.base64}`
-        );
-        setImages((prev) => [...prev, ...base64Images]);
-      }
+    const imagesResult = await launchImageLibraryAsync({
+      mediaTypes: MediaTypeOptions.Images,
+      allowsMultipleSelection: true,
+      selectionLimit: 7,
+      base64: true,
+    });
+
+    if (!imagesResult.canceled && imagesResult.assets) {
+      const base64Images = imagesResult.assets
+        .filter(asset => asset.base64)
+        .map(asset => `data:image/jpeg;base64,${asset.base64}`);
+      setImages(prev => [...prev, ...base64Images]);
     }
   }
 
   const removeImage = (index: number) => {
     setImages(images.filter((_, i) => i !== index));
+  };
+
+  const isValidImageUri = (uri: string): boolean => {
+    return uri.startsWith('data:image') || uri.startsWith('http') || uri.startsWith('file:');
+  };
+
+  const isValidUrl = (url: string): boolean => {
+    try {
+      new URL(url);
+      return true;
+    } catch {
+      return false;
+    }
   };
 
   return (
@@ -205,7 +310,7 @@ export function ChangePostModal({
                 value={links}
                 onChangeText={setLinks}
               />
-              <View style={{ width: 343 }}>
+              <View style={{ width: 343, zIndex: 1000 }}>
                 <DropDownPicker
                   open={open}
                   value={value}
@@ -241,37 +346,49 @@ export function ChangePostModal({
             </View>
 
             <View style={styles.imageGrid}>
-              {images.map((uri, idx) => (
-                <View key={idx} style={styles.imageContainer}>
-                  <Image
-                    source={{ uri }}
-                    style={styles.imageAdded}
-                    resizeMode="cover"
-                  />
-                  <TouchableOpacity 
-                    style={styles.removeImageButton} 
-                    onPress={() => removeImage(idx)}
-                  >
-                    <Text style={styles.removeImageText}>×</Text>
-                  </TouchableOpacity>
-                </View>
-              ))}
+              {images.length > 0 ? (
+                images.map((uri, idx) => (
+                  isValidImageUri(uri) ? (
+                    <View key={idx} style={styles.imageContainer}>
+                      <Image
+                        source={{ uri }}
+                        style={styles.imageAdded}
+                        resizeMode="cover"
+                        onError={() => console.warn(`Failed to load image: ${uri}`)}
+                      />
+                      <TouchableOpacity 
+                        style={styles.removeImageButton} 
+                        onPress={() => removeImage(idx)}
+                      >
+                        <Text style={styles.removeImageText}>×</Text>
+                      </TouchableOpacity>
+                    </View>
+                  ) : (
+                    <View key={idx} style={styles.imageContainer}>
+                      <Text style={styles.errorText}>Невалідне зображення</Text>
+                    </View>
+                  )
+                ))
+              ) : (
+                <Text style={styles.noImagesText}>Немає зображень</Text>
+              )}
             </View>
 
             <View style={styles.actions}>
               <View style={styles.iconRow}>
                 <TouchableOpacity onPress={onSearch}>
                   <Image
-                    source={require("../../../../shared/ui/images/bitch.png")}
+                    source={require("../../../../shared/ui/images/pictures-modal.png")}
                     style={styles.icon}
                   />
                 </TouchableOpacity>
                 <TouchableOpacity
-                  style={styles.submitButton}
+                  style={[styles.submitButton, isLoading && { opacity: 0.6 }]}
                   onPress={handleSubmit}
+                  disabled={isLoading}
                 >
                   <Text style={styles.submitText}>
-                    Оновити
+                    {isLoading ? "Оновлення..." : "Оновити"}
                   </Text>
                   <SendArrow
                     style={{ width: 20, height: 20 }}
@@ -285,125 +402,3 @@ export function ChangePostModal({
     </Modal>
   );
 }
-
-const styles = StyleSheet.create({
-  centeredView: {
-    flex: 1,
-    justifyContent: "center",
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
-  },
-  modalView: {
-    width: "100%",
-    maxHeight: "80%",
-    backgroundColor: "white",
-    borderRadius: 20,
-    padding: 20,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
-    elevation: 5,
-  },
-  header: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: 16,
-  },
-  modalTitle: {
-    fontSize: 24,
-    fontWeight: "500",
-    color: "#070A1C",
-  },
-  form: {
-    gap: 5,
-    marginBottom: 20,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  textArea: {
-    width: 343,
-    minHeight: 100,
-    padding: 16,
-    borderWidth: 1,
-    borderColor: "#CDCED2",
-    borderRadius: 10,
-    fontSize: 16,
-  },
-  actions: {
-    gap: 16,
-    marginTop: 16,
-  },
-  iconRow: {
-    flexDirection: "row",
-    justifyContent: "flex-end",
-    gap: 16,
-  },
-  icon: {
-    width: 40,
-    height: 40,
-  },
-  submitButton: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: "#543C52",
-    padding: 12,
-    borderRadius: 1234,
-    gap: 8,
-  },
-  submitText: {
-    color: "white",
-    fontSize: 16,
-    fontWeight: "600",
-  },
-  scrollArea: {
-    flexGrow: 0,
-  },
-  imageGrid: {
-    flexDirection: "column",
-    gap: 8,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  imageContainer: {
-    position: 'relative',
-  },
-  imageAdded: {
-    width: 343,
-    height: 225,
-    borderRadius: 16,
-  },
-  removeImageButton: {
-    position: 'absolute',
-    top: 10,
-    right: 10,
-    backgroundColor: 'rgba(0,0,0,0.5)',
-    width: 30,
-    height: 30,
-    borderRadius: 15,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  removeImageText: {
-    color: 'white',
-    fontSize: 20,
-    fontWeight: 'bold',
-  },
-  selectedTagsContainer: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    marginTop: 10,
-    gap: 8,
-  },
-  tag: {
-    backgroundColor: "#EEE",
-    borderRadius: 12,
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-  },
-  tagText: {
-    color: "#333",
-    fontSize: 14,
-  },
-});

@@ -15,6 +15,17 @@ import { ChangePostModal } from "../change-post/change-post";
 import { DELETE } from "../../../../shared/api/delete";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { usePosts } from "../../hooks/use-get-post";
+import { IPost, IPostImg } from "../../types/post";
+
+interface ModalPostProps {
+  visible: boolean;
+  onClose: () => void;
+  postId: number;
+  dotsPosition: { x: number; y: number };
+  containerSize: { width: number; height: number };
+  scrollOffset?: number;
+  initialPosition?: { x: number; y: number };
+}
 
 export function ModalPost({
   visible,
@@ -24,15 +35,7 @@ export function ModalPost({
   containerSize,
   scrollOffset = 0,
   initialPosition,
-}: {
-  visible: boolean;
-  onClose: () => void;
-  postId: number;
-  dotsPosition: { x: number; y: number };
-  containerSize: { width: number; height: number };
-  scrollOffset?: number;
-  initialPosition?: { x: number; y: number };
-}) {
+}: ModalPostProps) {
   const [modalOpened, setModalOpened] = useState<boolean>(false);
   const [tokenUser, setTokenUser] = useState<string>("");
   const { posts, setPosts } = usePosts();
@@ -49,95 +52,106 @@ export function ModalPost({
   const modalWidth = 343;
   const modalHeight = 140;
 
-	const { height: screenHeight } = Dimensions.get("window");
+  const { height: screenHeight } = Dimensions.get("window");
 
-	const adjustedX = dotsPosition.x - modalWidth + 145;
-	const adjustedY = dotsPosition.y - scrollOffset - 5;
-	const clampedY = Math.min(Math.max(adjustedY, 0), screenHeight - modalHeight);
+  const adjustedX = dotsPosition.x - modalWidth + 145;
+  const adjustedY = dotsPosition.y - scrollOffset - 5;
+  const clampedY = Math.min(Math.max(adjustedY, 0), screenHeight - modalHeight);
 
   async function handleDelete(postId: number) {
     try {
-      await fetch(`http://192.168.1.104:3000/posts/${postId}`, { method: "DELETE" }); 
-      setPosts(posts.filter((post) => post.id !== postId));
-    } catch (error) {
-      console.error("Помилка видалення:", error);
+      await DELETE({
+        endpoint: `http://192.168.1.104:3000/posts/${postId}`,
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${tokenUser}`,
+        },
+        token: tokenUser,
+      });
+      setPosts(posts.filter((post: IPost) => post.id !== postId));
+      onClose();
+    } catch (error: any) {
+      console.error("Помилка видалення:", error.message);
     }
   }
 
+  const currentPost = posts.find((post: IPost) => post.id === postId);
+
   return (
-    <Modal
-      transparent={true}
-      animationType="fade"
-      visible={visible}
-      onRequestClose={onClose}
-    >
-      {modalOpened ? (
+    <>
+      {modalOpened && currentPost ? (
         <ChangePostModal
           modalVisible={modalOpened}
           postData={{
             id: postId,
-            name: "name",
-            theme: "posts.theme",
-            text: "posts.text",
-            links: "posts.links",
-            images: ["posts.images"],
-            tags: ["posts.tags"],
+            name: currentPost.name || "",
+            theme: currentPost.theme || "",
+            text: currentPost.text || "",
+            links: currentPost.links || "",
+            images: currentPost.images?.map((img: IPostImg) => img.url) || [],
+            tags: currentPost.tags ? [currentPost.tags] : [],
           }}
           changeVisibility={() => {
-            setModalOpened(!modalOpened);
+            setModalOpened(false);
           }}
         />
       ) : null}
-      <TouchableOpacity
-        style={styles.modalOverlay}
-        activeOpacity={1}
-        onPress={onClose}
+      <Modal
+        transparent={true}
+        animationType="fade"
+        visible={visible && !modalOpened}
+        onRequestClose={onClose}
       >
-        <View
-          style={[
-            styles.modalContainer,
-            {
-              position: "absolute",
-              top: adjustedY,
-              left: adjustedX,
-            },
-          ]}
+        <TouchableOpacity
+          style={styles.modalOverlay}
+          activeOpacity={1}
+          onPress={onClose}
         >
-          <View style={styles.dotsContainer}>
-            <Dots style={styles.dotsIcon} />
+          <View
+            style={[
+              styles.modalContainer,
+              {
+                position: "absolute",
+                top: clampedY,
+                left: adjustedX,
+              },
+            ]}
+          >
+            <View style={styles.dotsContainer}>
+              <Dots style={styles.dotsIcon} />
+            </View>
+
+            <TouchableOpacity
+              style={styles.modalOption}
+              onPress={() => {
+                setModalOpened(true);
+                onClose();
+              }}
+            >
+              <Pencil style={styles.icon} />
+              <Text style={styles.optionText}>Редагувати допис</Text>
+            </TouchableOpacity>
+
+            <View style={styles.divider} />
+
+            <TouchableOpacity
+              style={styles.modalOption}
+              onPress={() => {
+                console.log("Delete pressed");
+                handleDelete(postId);
+              }}
+            >
+              <Image
+                source={require("../../../../shared/ui/images/trash.png")}
+                style={{ width: 20, height: 24 }}
+              />
+              <Text style={[styles.optionText, styles.deleteText]}>
+                Видалити публікацію
+              </Text>
+            </TouchableOpacity>
           </View>
-
-          <TouchableOpacity
-            style={styles.modalOption}
-            onPress={() => {
-              setModalOpened(true);
-              onClose();
-            }}
-          >
-            <Pencil style={styles.icon} />
-            <Text style={styles.optionText}>Редагувати допис</Text>
-          </TouchableOpacity>
-
-          <View style={styles.divider} />
-
-          <TouchableOpacity
-            style={styles.modalOption}
-            onPress={() => {
-              console.log("Delete pressed");
-              handleDelete(postId);
-              onClose();
-            }}
-          >
-            <Image
-              source={require("../../../../shared/ui/images/trash.png")}
-              style={{ width: 20, height: 24 }}
-            />
-            <Text style={[styles.optionText, styles.deleteText]}>
-              Видалити публікацію
-            </Text>
-          </TouchableOpacity>
-        </View>
-      </TouchableOpacity>
-    </Modal>
+        </TouchableOpacity>
+      </Modal>
+    </>
   );
 }
