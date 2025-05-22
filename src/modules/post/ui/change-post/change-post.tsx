@@ -4,12 +4,12 @@ import {
   Pressable,
   View,
   Text,
-  StyleSheet,
   TouchableOpacity,
   Image,
   TextInput,
   ScrollView,
   Alert,
+  StyleSheet
 } from "react-native";
 import {
   launchImageLibraryAsync,
@@ -23,42 +23,8 @@ import { PUT } from "../../../../shared/api/put";
 import Cross from "../../../../shared/ui/icons/cross";
 import { Input } from "../../../../shared/ui/input";
 import SendArrow from "../../../../shared/ui/icons/send-arrow";
+import { Props, TagItem, UpdateData } from "./types";
 import { styles } from "./change-post.styles";
-
-interface PostData {
-  id: number;
-  name: string;
-  theme: string;
-  text: string;
-  links?: string;
-  images?: string[]; // Для відображення у UI
-  tags?: string[];
-}
-
-interface Props {
-  modalVisible: boolean;
-  changeVisibility: () => void;
-  postData: PostData;
-}
-
-interface TagItem {
-  label: string;
-  value: string;
-}
-
-interface ImageUpdate {
-  create?: { url: string; postId: number }[];
-  delete?: string[];
-}
-
-interface UpdateData {
-  name?: string;
-  theme?: string;
-  text?: string;
-  links?: string;
-  tags?: string[];
-  images?: ImageUpdate;
-}
 
 export function ChangePostModal({ 
   modalVisible, 
@@ -66,80 +32,58 @@ export function ChangePostModal({
   postData,
 }: Props) {
   const { user } = useUserContext();
-  const [name, setName] = useState(postData.name);
-  const [theme, setTheme] = useState(postData.theme);
-  const [text, setText] = useState(postData.text);
-  const [links, setLinks] = useState(postData.links || "");
-  const [images, setImages] = useState<string[]>(postData.images || []);
-  const [tokenUser, setTokenUser] = useState<string>("");
+  const [name, setName] = useState("");
+  const [theme, setTheme] = useState("");
+  const [text, setText] = useState("");
+  const [links, setLinks] = useState("");
+  const [images, setImages] = useState<string[]>([]);
+  const [tokenUser, setTokenUser] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [open, setOpen] = useState(false);
-  const [value, setValue] = useState<string[]>(postData.tags || []);
+  const [value, setValue] = useState<string[]>([]);
   const [items, setItems] = useState<TagItem[]>([
     { label: 'Apple', value: 'apple' },
     { label: 'Banana', value: 'banana' },
     { label: 'Ananas', value: 'ananas' },
   ]);
 
-  // Базовий URL для нормалізації відносних URL-адрес
   const API_BASE_URL = "http://192.168.1.104:3000";
 
-const normalizedImages = useMemo(() => {
-  return postData.images?.map(uri => {
-    if (!uri) return null;
-    if (
-      uri.startsWith('http') ||
-      uri.startsWith('data:image') ||
-      uri.startsWith('file:')
-    ) {
-      return uri;
-    } else {
-      return `${API_BASE_URL}/${uri.startsWith('') ? uri.slice(1) + "/" : uri}`;
-    }
-  }).filter((uri): uri is string => !!uri) || [];
-}, [postData.images]);
-
-
-  // Зберігаємо початкові значення для порівняння змін
-  const initialData = useMemo(() => ({
-    name: postData.name,
-    theme: postData.theme,
-    text: postData.text,
-    links: postData.links || "",
-    images: normalizedImages,
-    tags: postData.tags || [],
-  }), [postData, normalizedImages]);
-
-  const getToken = async (): Promise<string> => {
-    const token = await AsyncStorage.getItem("token");
-    return token || "";
-  };
+  const normalizedImages = useMemo(() => {
+    if (!postData?.images) return [];
+    return postData.images.map(img => {
+      const uri = img.url;
+      if (!uri) return null;
+      if (uri.startsWith('http') || uri.startsWith('https') || uri.startsWith('data:image')) {
+        return uri;
+      }
+      return `${API_BASE_URL}/${uri.startsWith('/') ? uri.slice(1) : uri}`;
+    }).filter((uri): uri is string => !!uri);
+  }, [postData?.images]);
 
   useEffect(() => {
-    getToken().then(setTokenUser);
+    const loadData = async () => {
+      const token = await AsyncStorage.getItem("token");
+      setTokenUser(token || "");
+
+      if (postData) {
+        setName(postData.name || "");
+        setTheme(postData.theme || "");
+        setText(postData.text || "");
+        setLinks(postData.links || "");
+        setImages(normalizedImages);
+        setValue(postData.tags?.map(tag => tag.tag.name) || []);
+      }
+    };
+
     if (modalVisible) {
-      setName(postData.name);
-      setTheme(postData.theme);
-      setText(postData.text);
-      setLinks(postData.links || "");
-      setImages(normalizedImages);
-      setValue(postData.tags || []);
-      console.log("postData.images:", postData.images);
-      console.log("normalizedImages:", normalizedImages);
-      console.log("images state:", normalizedImages);
+      loadData();
     }
-  }, [
-    modalVisible,
-    postData.id,
-    postData.name,
-    postData.theme,
-    postData.text,
-    postData.links,
-    normalizedImages,
-    postData.tags,
-  ]);
+  }, [modalVisible, postData, normalizedImages]);
 
   const handleSubmit = async () => {
+    if (!postData) return;
+    
     if (!name || !theme || !text) {
       Alert.alert("Помилка", "Будь ласка, заповніть обов'язкові поля");
       return;
@@ -150,50 +94,34 @@ const normalizedImages = useMemo(() => {
       return;
     }
 
-    // Валідація URL для links
     if (links && !isValidUrl(links)) {
       Alert.alert("Помилка", "Введіть валідне посилання");
       return;
     }
 
-    const updatedData: UpdateData = {};
+    const updatedData: UpdateData = {
+      name,
+      theme,
+      text,
+      links: links || undefined,
+      tags: value,
+    };
 
-    if (name !== initialData.name) updatedData.name = name;
-    if (theme !== initialData.theme) updatedData.theme = theme;
-    if (text !== initialData.text) updatedData.text = text;
-    if (links !== initialData.links) updatedData.links = links || undefined;
+    const newImages = images.filter(uri => 
+      uri.startsWith('data:image') && !normalizedImages.includes(uri)
+    );
+    
+    const deletedImages = normalizedImages.filter(uri => 
+      !images.includes(uri)
+    ).map(uri => 
+      uri.replace(`${API_BASE_URL}/`, '')
+    );
 
-    // Завжди включаємо теги
-    updatedData.tags = value;
-
-  const imagesForServer = images.map(url =>
-    url.startsWith(API_BASE_URL) ? url.replace(API_BASE_URL, '') : url
-  );
-
-  updatedData.images = imagesForServer.length > 0
-    ? {
-        create: imagesForServer.map(url => ({
-          url,
-          postId: user.id,
-        })),
-      }
-    : undefined;
-
-
-    // Додаємо видалені зображення, якщо вони є
-    const deletedImages = initialData.images.filter(uri => !images.includes(uri));
-    if (deletedImages.length > 0) {
+    if (newImages.length > 0 || deletedImages.length > 0) {
       updatedData.images = {
-        ...updatedData.images,
-        delete: deletedImages,
+        ...(newImages.length > 0 ? { create: newImages.map(url => ({ url })) } : {}),
+        ...(deletedImages.length > 0 ? { delete: deletedImages } : {})
       };
-    }
-
-    // Якщо немає змін (крім tags і images, які завжди включаємо), показуємо повідомлення
-    if (Object.keys(updatedData).length === (updatedData.tags ? 1 : 0) && !updatedData.images) {
-      Alert.alert("Інформація", "Жодних змін не внесено");
-      changeVisibility();
-      return;
     }
 
     setIsLoading(true);
@@ -204,21 +132,20 @@ const normalizedImages = useMemo(() => {
           "Content-Type": "application/json",
           Authorization: `Bearer ${tokenUser}`,
         },
-        token: tokenUser,
         body: updatedData,
       });
 
       changeVisibility();
       Alert.alert("Успіх", "Публікацію успішно оновлено");
     } catch (err: any) {
-      console.error("Помилка при оновленні поста:", err.message);
+      console.error("Помилка при оновленні поста:", err);
       Alert.alert("Помилка", err.message || "Не вдалося оновити публікацію");
     } finally {
       setIsLoading(false);
     }
   };
 
-  async function onSearch() {
+  const onSearch = async () => {
     const result = await requestMediaLibraryPermissionsAsync();
     if (result.status !== "granted") {
       Alert.alert("Помилка", "Потрібен дозвіл для доступу до галереї");
@@ -238,14 +165,10 @@ const normalizedImages = useMemo(() => {
         .map(asset => `data:image/jpeg;base64,${asset.base64}`);
       setImages(prev => [...prev, ...base64Images]);
     }
-  }
-
-  const removeImage = (index: number) => {
-    setImages(images.filter((_, i) => i !== index));
   };
 
-  const isValidImageUri = (uri: string): boolean => {
-    return uri.startsWith('data:image') || uri.startsWith('http') || uri.startsWith('file:');
+  const removeImage = (index: number) => {
+    setImages(prev => prev.filter((_, i) => i !== index));
   };
 
   const isValidUrl = (url: string): boolean => {
@@ -257,6 +180,10 @@ const normalizedImages = useMemo(() => {
     }
   };
 
+  if (!postData) {
+    return null;
+  }
+
   return (
     <Modal
       animationType="fade"
@@ -267,9 +194,7 @@ const normalizedImages = useMemo(() => {
       <View style={styles.centeredView}>
         <View style={styles.modalView}>
           <View style={styles.header}>
-            <Text style={styles.modalTitle}>
-              Редагування публікації
-            </Text>
+            <Text style={styles.modalTitle}>Редагування публікації</Text>
             <Pressable onPress={changeVisibility}>
               <Cross style={{ width: 15, height: 15 }} />
             </Pressable>
@@ -291,18 +216,13 @@ const normalizedImages = useMemo(() => {
                 value={theme}
                 onChangeText={setTheme}
               />
-              <View>
-                <TextInput
-                  style={styles.textArea}
-                  placeholder="Введіть опис публікації"
-                  value={text}
-                  onChangeText={setText}
-                  multiline
-                  maxLength={150}
-                  textAlignVertical="top"
-                  autoCapitalize="sentences"
-                />
-              </View>
+              <TextInput
+                style={styles.textArea}
+                placeholder="Введіть опис публікації"
+                value={text}
+                onChangeText={setText}
+                multiline
+              />
               <Input
                 width={343}
                 label="Посилання"
@@ -319,55 +239,34 @@ const normalizedImages = useMemo(() => {
                   setValue={setValue}
                   setItems={setItems}
                   multiple={true}
-                  min={0}
-                  max={5}
-                  listMode="SCROLLVIEW"
-                  dropDownDirection="TOP"
-                  autoScroll={true}
                   placeholder="Оберіть тег"
-                  translation={{
-                    SELECTED_ITEMS_COUNT_TEXT: {
-                      1: "Обрано 1 елемент",
-                      n: "Обрано {count} елементів",
-                    },
-                  }}
                 />
               </View>
               <View style={styles.selectedTagsContainer}>
-                {value.map((tag) => {
-                  const label = items.find((item) => item.value === tag)?.label || tag;
-                  return (
-                    <View key={tag} style={styles.tag}>
-                      <Text style={styles.tagText}>{label}</Text>
-                    </View>
-                  );
-                })}
+                {value.map((tag) => (
+                  <View key={tag} style={styles.tag}>
+                    <Text style={styles.tagText}>{tag}</Text>
+                  </View>
+                ))}
               </View>
             </View>
 
             <View style={styles.imageGrid}>
               {images.length > 0 ? (
                 images.map((uri, idx) => (
-                  isValidImageUri(uri) ? (
-                    <View key={idx} style={styles.imageContainer}>
-                      <Image
-                        source={{ uri }}
-                        style={styles.imageAdded}
-                        resizeMode="cover"
-                        onError={() => console.warn(`Failed to load image: ${uri}`)}
-                      />
-                      <TouchableOpacity 
-                        style={styles.removeImageButton} 
-                        onPress={() => removeImage(idx)}
-                      >
-                        <Text style={styles.removeImageText}>×</Text>
-                      </TouchableOpacity>
-                    </View>
-                  ) : (
-                    <View key={idx} style={styles.imageContainer}>
-                      <Text style={styles.errorText}>Невалідне зображення</Text>
-                    </View>
-                  )
+                  <View key={`${uri}-${idx}`} style={styles.imageContainer}>
+                    <Image
+                      source={{ uri }}
+                      style={styles.imageAdded}
+                      onError={() => console.warn("Failed to load image:", uri)}
+                    />
+                    <TouchableOpacity 
+                      style={styles.removeImageButton} 
+                      onPress={() => removeImage(idx)}
+                    >
+                      <Text style={styles.removeImageText}>×</Text>
+                    </TouchableOpacity>
+                  </View>
                 ))
               ) : (
                 <Text style={styles.noImagesText}>Немає зображень</Text>
@@ -390,9 +289,7 @@ const normalizedImages = useMemo(() => {
                   <Text style={styles.submitText}>
                     {isLoading ? "Оновлення..." : "Оновити"}
                   </Text>
-                  <SendArrow
-                    style={{ width: 20, height: 20 }}
-                  />
+                  <SendArrow style={{ width: 20, height: 20 }} />
                 </TouchableOpacity>
               </View>
             </View>
