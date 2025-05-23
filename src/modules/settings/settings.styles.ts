@@ -89,5 +89,16 @@ export const styles = StyleSheet.create({
     borderColor: '#CDCED2',
     borderRadius: 5,
     marginBottom: 10
+  },
+  buttonSave: {
+    flexDirection: 'row',
+    gap: 10,
+    borderWidth: 1,
+    borderColor: '#543C52',
+    borderRadius: 190,
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: 108,
+    height: 40
   }
 });

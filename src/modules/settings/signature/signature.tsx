@@ -184,6 +184,7 @@ export const SignaturePad = forwardRef<SignaturePadRef, SignaturePadProps>(
             webStyle={webStyle}
             autoClear={false}
             descriptionText=""
+            scrollable={false}
           />
         </View>
 

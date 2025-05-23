@@ -7,7 +7,6 @@ import {
   Dimensions,
 } from "react-native";
 import Pencil from "../../../../shared/ui/icons/pencil";
-import { useRouter } from "expo-router";
 import Dots from "../../../../shared/ui/icons/dots";
 import { useState, useEffect } from "react";
 import { styles } from "./modal-post.style";
@@ -37,12 +36,11 @@ export function ModalPost({
   initialPosition,
 }: ModalPostProps) {
   const [modalOpened, setModalOpened] = useState<boolean>(false);
-  const [tokenUser, setTokenUser] = useState<string>("");
+  const [tokenUser, setTokenUser] = useState<string | null>(null);
   const { posts, setPosts } = usePosts();
 
-  const getToken = async (): Promise<string> => {
-    const token = await AsyncStorage.getItem("token");
-    return token || "";
+  const getToken = async (): Promise<string | null> => {
+    return await AsyncStorage.getItem("token");
   };
 
   useEffect(() => {
@@ -51,14 +49,18 @@ export function ModalPost({
 
   const modalWidth = 343;
   const modalHeight = 140;
-
   const { height: screenHeight } = Dimensions.get("window");
 
-  const adjustedX = dotsPosition.x - modalWidth + 145;
-  const adjustedY = dotsPosition.y - scrollOffset - 5;
+  // Validate dotsPosition and scrollOffset
+  const adjustedX = Math.max(0, dotsPosition?.x ? dotsPosition.x - modalWidth + 145 : 0);
+  const adjustedY = dotsPosition?.y ? dotsPosition.y - scrollOffset - 5 : 0;
   const clampedY = Math.min(Math.max(adjustedY, 0), screenHeight - modalHeight);
 
   async function handleDelete(postId: number) {
+    if (!tokenUser) {
+      console.error("No token found");
+      return;
+    }
     try {
       await DELETE({
         endpoint: `http://192.168.1.104:3000/posts/${postId}`,
@@ -77,9 +79,14 @@ export function ModalPost({
 
   const currentPost = posts.find((post: IPost) => post.id === postId);
 
+  if (!currentPost) {
+    console.warn(`Post with ID ${postId} not found`);
+    return null;
+  }
+
   return (
     <>
-      {modalOpened && currentPost ? (
+      {modalOpened && (
         <ChangePostModal
           modalVisible={modalOpened}
           postData={{
@@ -88,14 +95,15 @@ export function ModalPost({
             theme: currentPost.theme || "",
             text: currentPost.text || "",
             links: currentPost.links || "",
-            images: currentPost.images?.map((img: IPostImg) => img.url) || [],
-            tags: currentPost.tags ? [currentPost.tags] : [],
+            images: currentPost.images || [],
+            tags: currentPost.tags || [],
+            authorId: currentPost.authorId || 0,
+            views: currentPost.views || null,
+            likes: currentPost.likes || null,
           }}
-          changeVisibility={() => {
-            setModalOpened(false);
-          }}
+          changeVisibility={() => setModalOpened(false)}
         />
-      ) : null}
+      )}
       <Modal
         transparent={true}
         animationType="fade"
@@ -120,7 +128,6 @@ export function ModalPost({
             <View style={styles.dotsContainer}>
               <Dots style={styles.dotsIcon} />
             </View>
-
             <TouchableOpacity
               style={styles.modalOption}
               onPress={() => {
@@ -131,15 +138,10 @@ export function ModalPost({
               <Pencil style={styles.icon} />
               <Text style={styles.optionText}>Редагувати допис</Text>
             </TouchableOpacity>
-
             <View style={styles.divider} />
-
             <TouchableOpacity
               style={styles.modalOption}
-              onPress={() => {
-                console.log("Delete pressed");
-                handleDelete(postId);
-              }}
+              onPress={() => handleDelete(postId)}
             >
               <Image
                 source={require("../../../../shared/ui/images/trash.png")}

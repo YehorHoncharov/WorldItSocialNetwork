@@ -1,8 +1,4 @@
-export interface PostImage {
-  id: number;
-  url: string;
-  userPostId: number;
-}
+import { IPost, IPostImg } from "../../types/post";
 
 export interface PostTag {
   tag: {
@@ -17,7 +13,7 @@ export interface PostData {
   theme: string | null;
   text: string;
   links: string | null;
-  images: PostImage[];
+  images: IPostImg[];
   tags: PostTag[];
   authorId: number;
   views: number | null;
@@ -27,7 +23,7 @@ export interface PostData {
 export interface Props {
   modalVisible: boolean;
   changeVisibility: () => void;
-  postData: PostData | null;
+  postData: IPost | null;
 }
 
 export interface TagItem {
@@ -41,10 +37,13 @@ export interface ImageUpdate {
 }
 
 export interface UpdateData {
-  name?: string;
-  theme?: string;
-  text?: string;
-  links?: string;
-  tags?: string[];
-  images?: ImageUpdate;
-}
+  name?: string | undefined;
+  theme?: string | undefined;
+  text: string | undefined;
+  links?: string | undefined;
+  tags?: string[] | undefined;
+  images?: {
+    create?: { url: string }[];
+    delete?: { id: number }[];
+  };
+};

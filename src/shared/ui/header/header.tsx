@@ -12,9 +12,11 @@ import { useRouter } from "expo-router";
 import { useState } from "react";
 import { IInputPasswordProps } from "../input/input.type";
 import { MyPublicationModal } from "../../../modules/my_publications/modal/modal";
+import { useUserContext } from "../../../modules/auth/context/user-context";
 
 function Header() {
 	const router = useRouter();
+	const { user } = useUserContext();
 	const [modalOpened, setModalOpened] = useState<boolean>(false);
 
 	function Logout() {
@@ -66,16 +68,18 @@ function Header() {
 				</View>
 			</View>
 			<View style={{ flexDirection: "row", gap: 8, marginRight: 16 }}>
-				<TouchableWithoutFeedback
-					onPress={() => {
-						setModalOpened(!modalOpened);
-					}}
-				>
-					<Image
-						style={styles.plus}
-						source={require("../images/plus-in-circle.png")}
-					/>
-				</TouchableWithoutFeedback>
+				{user ? 
+					<TouchableWithoutFeedback
+						onPress={() => {
+							setModalOpened(!modalOpened);
+						}}
+					>
+						<Image
+							style={styles.plus}
+							source={require("../images/plus-in-circle.png")}
+						/>
+					</TouchableWithoutFeedback> : null}
+				
 				<TouchableWithoutFeedback onPress={onReg}>
 					<Image
 						style={styles.settings}

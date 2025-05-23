@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { FlatList, RefreshControl, View, Text } from 'react-native';
 
 import Post from '../post/ui/main-page/main.page';
@@ -30,7 +30,7 @@ export function Homepage() {
                         name={item.name}
                         text={item.text}
                         images={item.images}
-                        user={item.user}
+                        // user={item.user}
                     />
                 </View>
             )}
@@ -48,7 +48,6 @@ export function Homepage() {
                     <Text>Нет постов для отображения</Text>
                 </View>
             }
-            // style={styles.flatList}
         />
     );
 }
