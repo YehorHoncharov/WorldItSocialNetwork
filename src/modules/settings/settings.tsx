@@ -9,22 +9,32 @@ import { SignaturePad, SignaturePadRef } from "./signature/signature";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import PencilIcon from "../../shared/ui/icons/pencil";
 import { Controller, useForm } from "react-hook-form";
-import { IUser } from "../auth/types";
-
+import DateTimePicker from '@react-native-community/datetimepicker';
+import { Platform, Pressable } from 'react-native';
+interface IUserForm{
+    id: number,
+    name?: string,
+    username?: string,
+    surname?: string,
+    dateOfBirth?: Date,
+    email: string,
+    password: string,
+    signature?: string,
+}
 export function Settings() {
-	const { control, handleSubmit } = useForm<IUser>({
+	const { control, handleSubmit, reset  } = useForm<IUserForm>({
   defaultValues: {
     dateOfBirth: new Date(),
   }})
 	const { user } = useUserContext();
-	const [name, setName] = useState("");
-	const [username, setUsername] = useState("");
-	const [surname, setSurname] = useState("");
-	const [dateOfBirth, setDateOfBirth] = useState<Date>(new Date());
-	const [email, setEmail] = useState("");
-	const [password, setPassword] = useState("");
-	const [signature, setSignature] = useState("");
-	const [tokenUser, setTokenUser] = useState("");
+	// const [name, setName] = useState("");
+	// const [username, setUsername] = useState("");
+	// const [surname, setSurname] = useState("");
+	// const [dateOfBirth, setDateOfBirth] = useState<Date>(new Date());
+	// const [email, setEmail] = useState("");
+	// const [password, setPassword] = useState("");
+	// const [signature, setSignature] = useState("");
+	// const [tokenUser, setTokenUser] = useState("");
 
 	const [isEditing, setIsEditing] = useState(false);
 
@@ -36,7 +46,7 @@ export function Settings() {
 		setIsEditing(!isEditing);
 	}
 
-	async function handleSave(data: IUser) {
+	async function handleSave(data: IUserForm) {
 		console.log("=============")
 		console.log(data)
 		console.log("=============")
@@ -50,7 +60,7 @@ export function Settings() {
 						name: data.name,
 						username: data.username,
 						surname: data.surname,
-						dateOfBirth: data.dateOfBirth,
+						dateOfBirth: data.dateOfBirth ? new Date(data.dateOfBirth) : new Date(),
 						email: data.email,
 						password: data.password,
 						signature: data.signature,
@@ -79,17 +89,17 @@ export function Settings() {
 
 	useEffect(() => {
 		async function loadData() {
-			const token = await AsyncStorage.getItem("token");
-			setTokenUser(token || "");
-
 			if (user) {
-				setName(user.name || "");
-				setUsername(user.username || "");
-				setSurname(user.surname || "");
-				setDateOfBirth(user.dateOfBirth || new Date());
-				setEmail(user.email || "");
-				setPassword(user.password || "");
-				setSignature(user.signature || "");
+				reset({
+					name: user.name || "",
+					username: user.username || "",
+					surname:user.surname || "",
+					dateOfBirth: user.dateOfBirth ? new Date(user.dateOfBirth): new Date(),
+					email: user.email || "",
+					password: user.password || "",
+					signature: user.signature || ""
+				})
+				
 			}
 		}
 		loadData();
@@ -245,20 +255,45 @@ export function Settings() {
 						/>
 
 						<Controller
-							control={control}
-							name="dateOfBirth"
-							render={({ field, fieldState }) => {
-								return (
-									<Input
-										width={343}
-										label="Дата народження"
-										placeholder="Введіть вашу дату народження"
-										value={field.value?.toString()} 
-      									onChangeText={(text) => field.onChange(new Date(text))}
-										editable={isEditing}
-									/>
-								);
-							}}
+						control={control}
+						name="dateOfBirth"
+						defaultValue={user?.dateOfBirth ? new Date(user.dateOfBirth) : new Date()}
+						render={({ field }) => {
+							const showDatepicker = () => {
+							setShow(true);
+							};
+
+							const [show, setShow] = useState(false);
+
+							return (
+							<>
+								<Pressable onPress={isEditing ? showDatepicker : undefined}>
+								<Input
+									width={343}
+									label="Дата народження"
+									value={field.value?.toLocaleDateString()}
+									editable={false}
+									pointerEvents="none"
+								/>
+								</Pressable>
+
+								{show && (
+								<DateTimePicker
+									value={field.value || new Date()}
+									mode="date"
+									display={Platform.OS === "ios" ? "spinner" : "default"}
+									onChange={(event, selectedDate) => {
+									setShow(Platform.OS === 'ios'); 
+									if (selectedDate) {
+										field.onChange(selectedDate);
+									}
+									}}
+									maximumDate={new Date()}
+								/>
+								)}
+							</>
+							);
+						}}
 						/>
 
 						<Controller

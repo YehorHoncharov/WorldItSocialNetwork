@@ -120,9 +120,23 @@ export function Content(props: IPost) {
 		<View style={styles.container}>
 			<View style={styles.textContainer}>
 				<Text>{props.name}</Text>
-				<Text>{props.theme}</Text>
-				<Text>{props.links}</Text>
+				{props.theme && <Text>{props.theme}</Text>}
+				{props.links && <Text selectable>{props.links}</Text>}
 				<Text style={styles.text}>{props.text}</Text>
+				{props.tags && props.tags.length > 0 && (
+					<View style={styles.tagsContainer}>
+						{props.tags.map((tagItem) => (
+							<View
+								key={`tag-${tagItem.tagId}`}
+								style={styles.tag}
+							>
+								<Text style={styles.tagText}>
+									{tagItem.tag.name}
+								</Text>
+							</View>
+						))}
+					</View>
+				)}
 			</View>
 
 			<FlatList
@@ -138,7 +152,9 @@ export function Content(props: IPost) {
 					<TouchableOpacity>
 						<Like width={20} height={20} />
 					</TouchableOpacity>
-					<Text style={styles.statText}>{123} Вподобань</Text>
+					<Text style={styles.statText}>
+						{props.likes ?? 0} Вподобань
+					</Text>
 				</View>
 				<View style={styles.postButs}>
 					<TouchableOpacity>
@@ -147,7 +163,9 @@ export function Content(props: IPost) {
 							source={require("./../../../../shared/ui/images/eye.png")}
 						/>
 					</TouchableOpacity>
-					<Text style={styles.statText}>{890} Переглядів</Text>
+					<Text style={styles.statText}>
+						{props.views ?? 0} Переглядів
+					</Text>
 				</View>
 			</View>
 		</View>

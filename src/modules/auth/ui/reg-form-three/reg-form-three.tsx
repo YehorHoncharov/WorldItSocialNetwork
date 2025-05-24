@@ -15,7 +15,7 @@ import {
 const CELL_COUNT = 6;
 
 export function RegFormThree() {
-	const { handleSubmit, control, setValue } = useForm<IRegCode>();
+	const { handleSubmit } = useForm<IRegCode>();
 	const router = useRouter();
 	const { register } = useUserContext();
 
@@ -37,6 +37,7 @@ export function RegFormThree() {
 
 	function onSubmit() {
 		register(params.email, params.password, code);
+		
 	}
 
 	return (
@@ -91,7 +92,7 @@ export function RegFormThree() {
 							}}
 							onLayout={getCellOnLayoutHandler(index)}
 						>
-							<Text style={{ fontSize: 16, color: "##81818D" }}>
+							<Text style={{ fontSize: 16, color: "#81818D" }}>
 								{symbol || (isFocused ? "|" : "_")}
 							</Text>
 						</View>

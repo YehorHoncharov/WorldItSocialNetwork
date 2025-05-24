@@ -23,7 +23,7 @@ export interface PostData {
 export interface Props {
   modalVisible: boolean;
   changeVisibility: () => void;
-  postData: IPost | null;
+  postData: IPost;
 }
 
 export interface TagItem {
@@ -37,13 +37,13 @@ export interface ImageUpdate {
 }
 
 export interface UpdateData {
-  name?: string | undefined;
-  theme?: string | undefined;
-  text: string | undefined;
-  links?: string | undefined;
-  tags?: string[] | undefined;
+  name?: string;
+  theme?: string;
+  text?: string;
+  links?: string;
+  tags?: string[];
   images?: {
     create?: { url: string }[];
     delete?: { id: number }[];
   };
-};
+}

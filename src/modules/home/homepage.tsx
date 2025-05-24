@@ -30,7 +30,12 @@ export function Homepage() {
                         name={item.name}
                         text={item.text}
                         images={item.images}
-                        // user={item.user}
+                        theme={item.theme}
+                        links={item.links}
+                        tags={item.tags}
+                        authorId={item.authorId}
+                        likes={item.likes}
+                        views={item.views}
                     />
                 </View>
             )}

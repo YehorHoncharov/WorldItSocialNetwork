@@ -17,7 +17,6 @@ import {
   MediaTypeOptions,
 } from "expo-image-picker";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import DropDownPicker from "react-native-dropdown-picker";
 import { useUserContext } from "../../../auth/context/user-context";
 import { PUT } from "../../../../shared/api/put";
 import Cross from "../../../../shared/ui/icons/cross";
@@ -26,6 +25,7 @@ import SendArrow from "../../../../shared/ui/icons/send-arrow";
 import { Props, TagItem, UpdateData } from "./types";
 import { styles } from "./change-post.styles";
 import { IPost, IPostImg } from "../../types/post";
+import DropDownPicker from "react-native-dropdown-picker";
 
 export function ChangePostModal({
   modalVisible,
@@ -51,28 +51,47 @@ export function ChangePostModal({
       const token = await AsyncStorage.getItem("token");
       setTokenUser(token || "");
 
+      console.log("postData:", JSON.stringify(postData, null, 2));
+
       if (postData) {
         setName(postData.name || "");
         setTheme(postData.theme || "");
         setText(postData.text || "");
         setLinks(postData.links || "");
-        setValue(postData.tags?.map((tag) => tag.tag.name) || []);
-        
-        const loadedImages = postData.images ? postData.images.map(img => ({
-          ...img,
-          url: img.url.startsWith('http') ? img.url : `${API_BASE_URL}/${img.url}`
-        })) : [];
-        setImages(loadedImages);
-      }
 
-      const availableTags = [
-        { label: "Технології", value: "технології" },
-        { label: "Подорожі", value: "подорожі" },
-        { label: "Їжа", value: "їжа" },
-        { label: "Спорт", value: "спорт" },
-        { label: "Мистецтво", value: "мистецтво" },
-      ];
-      setItems(availableTags);
+        // Витягуємо назви тегів і видаляємо дублікати
+        const tagsFromPost = Array.from(
+          new Set(
+            postData.tags
+              ?.map((tag) => (tag.tag && tag.tag.name ? tag.tag.name : null))
+              .filter((tag): tag is string => tag !== null) || []
+          )
+        );
+
+        setValue(tagsFromPost);
+
+        const loadedImages = postData.images
+          ? postData.images.map((img) => ({
+              ...img,
+              url: img.url.startsWith("http") ? img.url : `${API_BASE_URL}/${img.url.replace(/^\/+/, '')}`,
+            }))
+          : [];
+        setImages(loadedImages);
+
+        // Додаємо унікальні теги до списку доступних
+        const availableTags = Array.from(
+          new Set([
+            { label: "Технології", value: "технології" },
+            { label: "Подорожі", value: "подорожі" },
+            { label: "Їжа", value: "їжа" },
+            { label: "Спорт", value: "спорт" },
+            { label: "Мистецтво", value: "мистецтво" },
+            ...tagsFromPost.map((tag) => ({ label: tag, value: tag })),
+          ].map(item => JSON.stringify(item)))
+        ).map(item => JSON.parse(item));
+
+        setItems(availableTags);
+      }
     };
 
     if (modalVisible) {
@@ -81,104 +100,109 @@ export function ChangePostModal({
   }, [modalVisible, postData]);
 
   const handleSubmit = async () => {
-  if (!postData || !postData.id) {
-    Alert.alert("Помилка", "Дані поста або ID поста відсутні");
-    return;
-  }
-  if (!tokenUser) {
-    Alert.alert("Помилка", "Токен авторизації відсутній");
-    return;
-  }
-
-  if (!name.trim() || !theme.trim() || !text.trim()) {
-    Alert.alert("Помилка", "Будь ласка, заповніть всі обов'язкові поля");
-    return;
-  }
-
-  if (links && !isValidUrl(links)) {
-    Alert.alert("Помилка", "Будь ласка, введіть коректне посилання");
-    return;
-  }
-
-  const updatedData: UpdateData = {
-    name: name.trim(),
-    theme: theme.trim(),
-    text: text.trim(),
-    ...(links ? { links: links.trim() } : {}),
-    tags: value.filter(tag => typeof tag === 'string' && tag.trim() !== ''),
-  };
-
-  const existingImageIds = postData.images ? postData.images.map(img => img.id).filter(id => id !== undefined) : [];
-  const currentImages = images.filter(img => 
-    !img.url.startsWith('data:image') || existingImageIds.includes(img.id)
-  );
-
-  const newImages = images
-    .filter(img => img.url.startsWith("data:image"))
-    .filter(img => !(postData.images && postData.images.some(pi => pi.url === img.url)))
-    .map(img => {
-      if (!img.url.match(/^data:image\/(\w+);base64,.+$/)) {
-        console.warn("Некоректний формат зображення:", img.url);
-        return null;
-      }
-      return { url: img.url };
-    })
-    .filter(Boolean) as { url: string }[];
-
-  const deletedImages = postData.images
-    ? postData.images
-        .filter(img => img.id !== undefined && !currentImages.some(ci => ci.id === img.id))
-        .map(img => ({ id: img.id }))
-    : [];
-
-  if (newImages.length > 0 || deletedImages.length > 0) {
-    updatedData.images = {
-      ...(newImages.length > 0 ? { create: newImages } : {}),
-      ...(deletedImages.length > 0 ? { delete: deletedImages } : {}),
-    };
-  }
-
-  console.log("Дані для відправки:", JSON.stringify(updatedData, null, 2));
-
-  setIsLoading(true);
-  try {
-    const response = await PUT<IPost>({
-      endpoint: `${API_BASE_URL}/posts/${postData.id}`,
-      headers: {
-        "Content-Type": "application/json",
-      },
-      token: tokenUser,
-      body: updatedData,
-    });
-
-    console.log("post status:", response.status);
-    console.log("Відповідь сервера:", JSON.stringify(response, null, 2));
-
-    if (!response.status) {
-      console.error("Статус відповіді undefined:", JSON.stringify(response, null, 2));
-      Alert.alert("Помилка", "Отримано некоректну відповідь від сервера");
+    if (!postData || !postData.id) {
+      Alert.alert("Помилка", "Дані поста або ID поста відсутні");
+      return;
+    }
+    if (!tokenUser) {
+      Alert.alert("Помилка", "Токен авторизації відсутній");
       return;
     }
 
-    if (response.status === "success") {
-      console.log("Пост успішно оновлено:", JSON.stringify(response.data, null, 2));
-      Alert.alert("Успіх", "Пост успішно оновлено");
-      changeVisibility();
-    } else {
-      console.error("Помилка від сервера:", response.message, "Код:", response.code);
-      Alert.alert(
-        "Помилка",
-        response.message || "Не вдалося оновити пост",
-        response.code ? [{ text: "OK" }, { text: `Код: ${response.code}`, style: "destructive" }] : undefined
-      );
+    if (!name.trim() || !theme.trim() || !text.trim()) {
+      Alert.alert("Помилка", "Будь ласка, заповніть всі обов'язкові поля");
+      return;
     }
-  } catch (error) {
-    console.error("Помилка при відправці запиту:", error);
-    Alert.alert("Помилка", "Сталася помилка при оновленні поста");
-  } finally {
-    setIsLoading(false);
-  }
-};
+
+    if (links && !isValidUrl(links)) {
+      Alert.alert("Помилка", "Будь ласка, введіть коректне посилання");
+      return;
+    }
+
+    const updatedData: UpdateData = {
+      name: name.trim(),
+      theme: theme.trim(),
+      text: text.trim(),
+      ...(links ? { links: links.trim() } : {}),
+      tags: value.filter((tag) => typeof tag === "string" && tag.trim() !== ""),
+    };
+
+    console.log("Теги для відправки:", value);
+    console.log("Дані для відправки:", JSON.stringify(updatedData, null, 2));
+
+    const existingImageIds = postData.images
+      ? postData.images.map((img) => img.id).filter((id): id is number => typeof id === "number")
+      : [];
+    const currentImages = images.filter(
+      (img) => !img.url.startsWith("data:image") || existingImageIds.includes(img.id as number)
+    );
+
+    const newImages = images
+      .filter((img) => img.url.startsWith("data:image"))
+      .filter(
+        (img) =>
+          !(postData.images && postData.images.some((pi) => pi.url === img.url))
+      )
+      .map((img) => {
+        if (!img.url.match(/^data:image\/(\w+);base64,.+$/)) {
+          console.warn("Некоректний формат зображення:", img.url);
+          return null;
+        }
+        return { url: img.url };
+      })
+      .filter(Boolean) as { url: string }[];
+
+    const deletedImages = postData.images
+      ? postData.images
+          .filter(
+            (img) =>
+              typeof img.id === "number" &&
+              !currentImages.some((ci) => ci.id === img.id)
+          )
+          .map((img) => ({ id: img.id as number }))
+      : [];
+
+    if (newImages.length > 0 || deletedImages.length > 0) {
+      updatedData.images = {
+        ...(newImages.length > 0 ? { create: newImages } : {}),
+        ...(deletedImages.length > 0 ? { delete: deletedImages } : {}),
+      };
+    }
+
+    setIsLoading(true);
+    try {
+      const response = await PUT<IPost>({
+        endpoint: `${API_BASE_URL}/posts/${postData.id}`,
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${tokenUser}`,
+        },
+        body: updatedData,
+      });
+
+      console.log("Відповідь сервера:", JSON.stringify(response, null, 2));
+
+      if (response.status === "success") {
+        console.log("Пост успішно оновлено:", JSON.stringify(response.data, null, 2));
+        Alert.alert("Успіх", "Пост успішно оновлено");
+        changeVisibility();
+      } else {
+        console.error("Помилка від сервера:", response.message, "Код:", response.code);
+        Alert.alert(
+          "Помилка",
+          response.message || "Не вдалося оновити пост",
+          response.code
+            ? [{ text: "OK" }, { text: `Код: ${response.code}`, style: "destructive" }]
+            : [{ text: "OK" }]
+        );
+      }
+    } catch (error) {
+      console.error("Помилка при відправці запиту:", error);
+      Alert.alert("Помилка", "Сталася помилка при оновленні поста");
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const onSearch = async () => {
     const { status } = await requestMediaLibraryPermissionsAsync();
@@ -200,32 +224,30 @@ export function ChangePostModal({
     });
 
     if (!result.canceled && result.assets) {
-      const newImages = result.assets.map(asset => ({
-        id: 0,
-        url: `data:image/jpeg;base64,${asset.base64}`,
-        userPostId: postData?.id || 0,
-      }));
+      const newImages = result.assets
+        .filter((asset) => asset.base64)
+        .map((asset, index) => ({
+          id: `temp-${Date.now()}-${index}`,
+          url: `data:image/jpeg;base64,${asset.base64}`,
+          userPostId: postData?.id || 0,
+        }));
 
       if (images.length + newImages.length > 10) {
         Alert.alert("Увага", "Максимальна кількість зображень - 10");
         return;
       }
 
-      setImages(prev => [...prev, ...newImages]);
+      setImages((prev) => [...prev, ...newImages]);
     }
   };
 
   const removeImage = (index: number) => {
-    setImages(prev => prev.filter((_, i) => i !== index));
+    setImages((prev) => prev.filter((_, i) => i !== index));
   };
 
   const isValidUrl = (url: string): boolean => {
-    try {
-      new URL(url);
-      return true;
-    } catch {
-      return false;
-    }
+    const urlPattern = /^(https?:\/\/)([\w.-]+)\.([a-z]{2,})(\/.*)?$/i;
+    return urlPattern.test(url);
   };
 
   const renderImages = () => {
@@ -236,12 +258,12 @@ export function ChangePostModal({
     return (
       <View style={styles.imageGrid}>
         {images.map((img, idx) => (
-          <View key={`${img.id || idx}-${img.url}`} style={styles.imageContainer}>
+          <View key={`image-${img.id}-${idx}`} style={styles.imageContainer}>
             <Image
               source={{ uri: img.url }}
               style={styles.imageAdded}
               resizeMode="cover"
-              onError={() => console.warn("Не вдалося завантажити зображення")}
+              onError={() => console.warn(`Не вдалося завантажити зображення: ${img.url}`)}
             />
             <TouchableOpacity
               style={styles.removeImageButton}
@@ -275,7 +297,7 @@ export function ChangePostModal({
             </Pressable>
           </View>
 
-          <ScrollView 
+          <ScrollView
             style={styles.scrollArea}
             contentContainerStyle={{ paddingBottom: 20 }}
             keyboardShouldPersistTaps="handled"
@@ -332,14 +354,21 @@ export function ChangePostModal({
                   value={value}
                   items={items}
                   setOpen={setOpen}
-                  setValue={setValue}
+                  setValue={(callback) => {
+                    setValue((prev: string[]) => {
+                      const newValue = typeof callback === "function" ? callback(prev) : callback;
+                      const uniqueValues = Array.from(new Set(newValue)).map(String) as string[];
+                      console.log("Оновлені теги:", uniqueValues);
+                      return uniqueValues;
+                    });
+                  }}
                   setItems={setItems}
                   multiple={true}
                   min={0}
                   max={5}
                   mode="BADGE"
                   badgeDotColors={["#e76f51", "#00b4d8", "#e9c46a", "#e76f51", "#8ac926"]}
-                  placeholder="Оберіть теги (макс. 5)"
+                  placeholder="Оберіть теги"
                   searchable={true}
                   searchPlaceholder="Пошук тегів..."
                   listMode="SCROLLVIEW"
@@ -350,32 +379,37 @@ export function ChangePostModal({
               </View>
 
               <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8, marginTop: 5 }}>
-                {value.map((tag) => (
-                  <View key={tag} style={{ 
-                    backgroundColor: "#e0f2fe",
-                    paddingHorizontal: 12,
-                    paddingVertical: 6,
-                    borderRadius: 15,
-                  }}>
+                {value.map((tag, index) => (
+                  <View
+                    key={`${tag}-${index}`}
+                    style={{
+                      backgroundColor: "#e0f2fe",
+                      paddingHorizontal: 12,
+                      paddingVertical: 6,
+                      borderRadius: 15,
+                    }}
+                  >
                     <Text style={{ color: "#0369a1", fontSize: 14 }}>{tag}</Text>
                   </View>
                 ))}
               </View>
             </View>
 
-            <Text style={{ 
-              fontSize: 16,
-              fontWeight: "600",
-              marginTop: 20,
-              marginBottom: 10,
-              color: "#333",
-            }}>
+            <Text
+              style={{
+                fontSize: 16,
+                fontWeight: "600",
+                marginTop: 20,
+                marginBottom: 10,
+                color: "#333",
+              }}
+            >
               Зображення ({images.length}/10)
             </Text>
             {renderImages()}
 
             <View style={{ marginTop: 20, gap: 15 }}>
-              <TouchableOpacity 
+              <TouchableOpacity
                 style={{
                   backgroundColor: "#f0f0f0",
                   padding: 12,
@@ -390,15 +424,18 @@ export function ChangePostModal({
               </TouchableOpacity>
 
               <TouchableOpacity
-                style={[{
-                  backgroundColor: "#3b82f6",
-                  padding: 15,
-                  borderRadius: 8,
-                  flexDirection: "row",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  gap: 10,
-                }, isLoading && { opacity: 0.7 }]}
+                style={[
+                  {
+                    backgroundColor: "#3b82f6",
+                    padding: 15,
+                    borderRadius: 8,
+                    flexDirection: "row",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    gap: 10,
+                  },
+                  isLoading && { opacity: 0.7 },
+                ]}
                 onPress={handleSubmit}
                 disabled={isLoading}
               >

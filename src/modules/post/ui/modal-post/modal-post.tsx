@@ -31,9 +31,7 @@ export function ModalPost({
   onClose,
   postId,
   dotsPosition,
-  containerSize,
   scrollOffset = 0,
-  initialPosition,
 }: ModalPostProps) {
   const [modalOpened, setModalOpened] = useState<boolean>(false);
   const [tokenUser, setTokenUser] = useState<string | null>(null);
@@ -51,7 +49,7 @@ export function ModalPost({
   const modalHeight = 140;
   const { height: screenHeight } = Dimensions.get("window");
 
-  // Validate dotsPosition and scrollOffset
+
   const adjustedX = Math.max(0, dotsPosition?.x ? dotsPosition.x - modalWidth + 145 : 0);
   const adjustedY = dotsPosition?.y ? dotsPosition.y - scrollOffset - 5 : 0;
   const clampedY = Math.min(Math.max(adjustedY, 0), screenHeight - modalHeight);

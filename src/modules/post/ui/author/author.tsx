@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, ElementRef } from "react";
 import { View, Image, Text, TouchableOpacity, LayoutChangeEvent } from "react-native";
 import Dots from "../../../../shared/ui/icons/dots";
 import { styles } from "./author.styles";
@@ -9,13 +9,13 @@ export function Author({ scrollOffset = 0, ...props }: IPost & { scrollOffset?: 
   const [modalVisible, setModalVisible] = useState(false);
   const [dotsPosition, setDotsPosition] = useState({ x: 150, y: 78 });
   const containerRef = useRef<View>(null);
-  const dotsRef = useRef<React.ElementRef<typeof TouchableOpacity>>(null);
+  const dotsRef = useRef<ElementRef<typeof TouchableOpacity>>(null);
   const [containerSize, setContainerSize] = useState({
     width: 400,
     height: 725,
   });
 
-  // Вимірюємо позицію крапок
+
   const measureDots = () => {
     if (dotsRef.current) {
       dotsRef.current.measureInWindow((x, y, width, height) => {
@@ -24,14 +24,14 @@ export function Author({ scrollOffset = 0, ...props }: IPost & { scrollOffset?: 
     }
   };
 
-  // Вимірюємо позицію при відкритті модалки
+
   useEffect(() => {
     if (modalVisible) {
       measureDots();
     }
   }, [modalVisible]);
 
-  // Вимірюємо позицію при скролі
+
   useEffect(() => {
     if (modalVisible) {
       measureDots();

@@ -32,7 +32,8 @@
     "react-native-signature-canvas": "^4.7.4",
     "react-native-svg": "15.11.2",
     "react-native-toast-message": "^2.3.0",
-    "react-router-dom": "6"
+    "react-router-dom": "6",
+    "@react-native-community/datetimepicker": "8.3.0"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",
