@@ -112,9 +112,6 @@ export function RegStepTwoModal({ modalVisible, changeVisibility }: Props) {
 						<Text style={styles.modalTitle}>
 							Додай деталі про себе
 						</Text>
-						<Pressable onPress={changeVisibility}>
-							<Cross style={{ width: 15, height: 15 }} />
-						</Pressable>
 					</View>
 
 					<ScrollView style={styles.scrollArea}>
@@ -145,12 +142,6 @@ export function RegStepTwoModal({ modalVisible, changeVisibility }: Props) {
 
 						<View style={styles.actions}>
 							<View style={styles.iconRow}>
-								<TouchableOpacity>
-									<Image
-										source={require("../../../shared/ui/images/smile-modal.png")}
-										style={styles.icon}
-									/>
-								</TouchableOpacity>
 								<TouchableOpacity
 									style={styles.submitButton}
 									onPress={handleSubmit}

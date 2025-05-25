@@ -22,17 +22,38 @@ import { PUT } from "../../../../shared/api/put";
 import Cross from "../../../../shared/ui/icons/cross";
 import { Input } from "../../../../shared/ui/input";
 import SendArrow from "../../../../shared/ui/icons/send-arrow";
-import { Props, TagItem, UpdateData } from "./types";
+import DropDownPicker from "react-native-dropdown-picker";
+import { usePosts } from "../../hooks/use-get-post";
 import { styles } from "./change-post.styles";
 import { IPost, IPostImg } from "../../types/post";
-import DropDownPicker from "react-native-dropdown-picker";
 
-export function ChangePostModal({
-  modalVisible,
-  changeVisibility,
-  postData,
-}: Props) {
+// Типи для компонента
+interface TagItem {
+  label: string;
+  value: string;
+}
+
+interface UpdateData {
+  name: string;
+  theme: string;
+  text: string;
+  links?: string;
+  tags?: string[];
+  images?: {
+    create?: { url: string }[];
+    delete?: { id: number }[];
+  };
+}
+
+interface Props {
+  modalVisible: boolean;
+  changeVisibility: () => void;
+  postData: IPost | null;
+}
+
+export function ChangePostModal({ modalVisible, changeVisibility, postData }: Props) {
   const { user } = useUserContext();
+  const { refetch } = usePosts();
   const [name, setName] = useState("");
   const [theme, setTheme] = useState("");
   const [text, setText] = useState("");
@@ -46,6 +67,7 @@ export function ChangePostModal({
 
   const API_BASE_URL = "http://192.168.1.104:3000";
 
+  // Завантаження даних поста при відкритті модального вікна
   useEffect(() => {
     const loadData = async () => {
       const token = await AsyncStorage.getItem("token");
@@ -59,7 +81,7 @@ export function ChangePostModal({
         setText(postData.text || "");
         setLinks(postData.links || "");
 
-        // Витягуємо назви тегів і видаляємо дублікати
+        // Витягуємо унікальні назви тегів
         const tagsFromPost = Array.from(
           new Set(
             postData.tags
@@ -67,30 +89,35 @@ export function ChangePostModal({
               .filter((tag): tag is string => tag !== null) || []
           )
         );
-
         setValue(tagsFromPost);
 
+        // Нормалізуємо зображення
         const loadedImages = postData.images
-          ? postData.images.map((img) => ({
-              ...img,
-              url: img.url.startsWith("http") ? img.url : `${API_BASE_URL}/${img.url.replace(/^\/+/, '')}`,
-            }))
+          ? postData.images.map((img) => {
+              const normalizedUrl = img.url.startsWith("http")
+                ? img.url
+                : `${API_BASE_URL}/${img.url.replace(/^\/+/, "").replace(/\\/g, "/")}`;
+              console.log(`Завантажено зображення: ${normalizedUrl}`);
+              return { ...img, url: normalizedUrl };
+            })
           : [];
         setImages(loadedImages);
 
-        // Додаємо унікальні теги до списку доступних
-        const availableTags = Array.from(
-          new Set([
-            { label: "Технології", value: "технології" },
-            { label: "Подорожі", value: "подорожі" },
-            { label: "Їжа", value: "їжа" },
-            { label: "Спорт", value: "спорт" },
-            { label: "Мистецтво", value: "мистецтво" },
-            ...tagsFromPost.map((tag) => ({ label: tag, value: tag })),
-          ].map(item => JSON.stringify(item)))
-        ).map(item => JSON.parse(item));
-
-        setItems(availableTags);
+        // Формуємо список тегів
+        const defaultTags = [
+          { label: "Технології", value: "технології" },
+          { label: "Подорожі", value: "подорожі" },
+          { label: "Їжа", value: "їжа" },
+          { label: "Спорт", value: "спорт" },
+          { label: "Мистецтво", value: "мистецтво" },
+        ];
+        const additionalTags = tagsFromPost
+          .filter((tag) => !defaultTags.some((defaultTag) => defaultTag.value === tag))
+          .map((tag) => ({ label: tag, value: tag }));
+        const uniqueTags = Array.from(
+          new Set([...defaultTags, ...additionalTags].map((item) => JSON.stringify(item)))
+        ).map((item) => JSON.parse(item));
+        setItems(uniqueTags);
       }
     };
 
@@ -99,6 +126,7 @@ export function ChangePostModal({
     }
   }, [modalVisible, postData]);
 
+  // Обробка відправки форми
   const handleSubmit = async () => {
     if (!postData || !postData.id) {
       Alert.alert("Помилка", "Дані поста або ID поста відсутні");
@@ -108,14 +136,16 @@ export function ChangePostModal({
       Alert.alert("Помилка", "Токен авторизації відсутній");
       return;
     }
-
     if (!name.trim() || !theme.trim() || !text.trim()) {
-      Alert.alert("Помилка", "Будь ласка, заповніть всі обов'язкові поля");
+      Alert.alert("Помилка", "Заповніть усі обов’язкові поля");
       return;
     }
-
     if (links && !isValidUrl(links)) {
-      Alert.alert("Помилка", "Будь ласка, введіть коректне посилання");
+      Alert.alert("Помилка", "Введіть коректне посилання");
+      return;
+    }
+    if (value.length > 5) {
+      Alert.alert("Помилка", "Максимум 5 тегів");
       return;
     }
 
@@ -128,21 +158,15 @@ export function ChangePostModal({
     };
 
     console.log("Теги для відправки:", value);
-    console.log("Дані для відправки:", JSON.stringify(updatedData, null, 2));
+    console.log("Зображення для відправки:", images.map((img) => img.url));
 
-    const existingImageIds = postData.images
-      ? postData.images.map((img) => img.id).filter((id): id is number => typeof id === "number")
-      : [];
-    const currentImages = images.filter(
-      (img) => !img.url.startsWith("data:image") || existingImageIds.includes(img.id as number)
+    // Формуємо списки зображень для створення та видалення
+    const existingImages = postData.images || [];
+    const persistedImages = images.filter((img) =>
+      existingImages.some((pi) => pi.id === img.id && pi.url === img.url)
     );
-
     const newImages = images
       .filter((img) => img.url.startsWith("data:image"))
-      .filter(
-        (img) =>
-          !(postData.images && postData.images.some((pi) => pi.url === img.url))
-      )
       .map((img) => {
         if (!img.url.match(/^data:image\/(\w+);base64,.+$/)) {
           console.warn("Некоректний формат зображення:", img.url);
@@ -150,17 +174,12 @@ export function ChangePostModal({
         }
         return { url: img.url };
       })
-      .filter(Boolean) as { url: string }[];
+      .filter((img): img is { url: string } => img !== null);
 
-    const deletedImages = postData.images
-      ? postData.images
-          .filter(
-            (img) =>
-              typeof img.id === "number" &&
-              !currentImages.some((ci) => ci.id === img.id)
-          )
-          .map((img) => ({ id: img.id as number }))
-      : [];
+    const deletedImages = existingImages
+      .filter((pi) => !persistedImages.some((img) => img.id === pi.id))
+      .map((pi) => ({ id: pi.id as number }))
+      .filter((img) => typeof img.id === "number");
 
     if (newImages.length > 0 || deletedImages.length > 0) {
       updatedData.images = {
@@ -168,6 +187,8 @@ export function ChangePostModal({
         ...(deletedImages.length > 0 ? { delete: deletedImages } : {}),
       };
     }
+
+    console.log("Дані для відправки:", JSON.stringify(updatedData, null, 2));
 
     setIsLoading(true);
     try {
@@ -185,32 +206,26 @@ export function ChangePostModal({
       if (response.status === "success") {
         console.log("Пост успішно оновлено:", JSON.stringify(response.data, null, 2));
         Alert.alert("Успіх", "Пост успішно оновлено");
+        await refetch();
         changeVisibility();
       } else {
         console.error("Помилка від сервера:", response.message, "Код:", response.code);
-        Alert.alert(
-          "Помилка",
-          response.message || "Не вдалося оновити пост",
-          response.code
-            ? [{ text: "OK" }, { text: `Код: ${response.code}`, style: "destructive" }]
-            : [{ text: "OK" }]
-        );
+        Alert.alert("Помилка", response.message || "Не вдалося оновити пост");
       }
     } catch (error) {
-      console.error("Помилка при відправці запиту:", error);
-      Alert.alert("Помилка", "Сталася помилка при оновленні поста");
+      const message = error instanceof Error ? error.message : "Невідома помилка";
+      console.error("Помилка при відправленні запиту:", message);
+      Alert.alert("Помилка", `Не вдалося оновити пост: ${message}`);
     } finally {
       setIsLoading(false);
     }
   };
 
+  // Додавання зображень
   const onSearch = async () => {
     const { status } = await requestMediaLibraryPermissionsAsync();
     if (status !== "granted") {
-      Alert.alert(
-        "Дозвіл не надано",
-        "Для додавання зображень необхідно надати доступ до галереї"
-      );
+      Alert.alert("Дозвіл не надано", "Для додавання зображень необхідно надати доступ до галереї");
       return;
     }
 
@@ -226,11 +241,20 @@ export function ChangePostModal({
     if (!result.canceled && result.assets) {
       const newImages = result.assets
         .filter((asset) => asset.base64)
-        .map((asset, index) => ({
-          id: `temp-${Date.now()}-${index}`,
-          url: `data:image/jpeg;base64,${asset.base64}`,
-          userPostId: postData?.id || 0,
-        }));
+        .map((asset, index) => {
+          const maxSizeInBytes = 5 * 1024 * 1024; // 5 МБ
+          const base64Data = Buffer.from(asset.base64!, "base64");
+          if (base64Data.length > maxSizeInBytes) {
+            Alert.alert("Помилка", `Зображення ${index + 1} занадто велике (макс. 5 МБ)`);
+            return null;
+          }
+          return {
+            id: `temp-${Date.now()}-${index}`,
+            url: `data:image/jpeg;base64,${asset.base64}`,
+            userPostId: postData?.id || 0,
+          };
+        })
+        .filter((img): img is { id: string; url: string; userPostId: number } => img !== null);
 
       if (images.length + newImages.length > 10) {
         Alert.alert("Увага", "Максимальна кількість зображень - 10");
@@ -241,15 +265,18 @@ export function ChangePostModal({
     }
   };
 
+  // Видалення зображення
   const removeImage = (index: number) => {
     setImages((prev) => prev.filter((_, i) => i !== index));
   };
 
+  // Валідація URL
   const isValidUrl = (url: string): boolean => {
     const urlPattern = /^(https?:\/\/)([\w.-]+)\.([a-z]{2,})(\/.*)?$/i;
     return urlPattern.test(url);
   };
 
+  // Рендеринг зображень
   const renderImages = () => {
     if (images.length === 0) {
       return <Text style={styles.noImagesText}>Додайте зображення</Text>;
@@ -263,7 +290,11 @@ export function ChangePostModal({
               source={{ uri: img.url }}
               style={styles.imageAdded}
               resizeMode="cover"
-              onError={() => console.warn(`Не вдалося завантажити зображення: ${img.url}`)}
+              onError={(e) => {
+                console.error(`Помилка завантаження зображення: ${img.url}`, e.nativeEvent.error);
+                Alert.alert("Помилка", `Не вдалося завантажити зображення: ${img.url}`);
+              }}
+              onLoad={() => console.log(`Зображення завантажено: ${img.url}`)}
             />
             <TouchableOpacity
               style={styles.removeImageButton}
@@ -355,12 +386,16 @@ export function ChangePostModal({
                   items={items}
                   setOpen={setOpen}
                   setValue={(callback) => {
-                    setValue((prev: string[]) => {
-                      const newValue = typeof callback === "function" ? callback(prev) : callback;
-                      const uniqueValues = Array.from(new Set(newValue)).map(String) as string[];
-                      console.log("Оновлені теги:", uniqueValues);
-                      return uniqueValues;
-                    });
+                    const newValue = typeof callback === "function" ? callback(value) : callback;
+                    const uniqueValues = Array.from(new Set(newValue))
+                      .map(String)
+                      .filter((tag) => tag.trim() !== "");
+                    if (uniqueValues.length > 5) {
+                      Alert.alert("Помилка", "Максимум 5 тегів");
+                      return;
+                    }
+                    console.log("Оновлені теги:", uniqueValues);
+                    setValue(uniqueValues);
                   }}
                   setItems={setItems}
                   multiple={true}
@@ -368,12 +403,21 @@ export function ChangePostModal({
                   max={5}
                   mode="BADGE"
                   badgeDotColors={["#e76f51", "#00b4d8", "#e9c46a", "#e76f51", "#8ac926"]}
-                  placeholder="Оберіть теги"
+                  placeholder="Оберіть або додайте теги"
                   searchable={true}
-                  searchPlaceholder="Пошук тегів..."
+                  searchPlaceholder="Пошук або створення тегу..."
                   listMode="SCROLLVIEW"
                   scrollViewProps={{
                     nestedScrollEnabled: true,
+                  }}
+                  addCustomItem={true}
+                  onChangeSearchText={(text) => {
+                    if (text && !items.some((item) => item.value === text)) {
+                      setItems((prev) => [
+                        ...prev,
+                        { label: text, value: text },
+                      ]);
+                    }
                   }}
                 />
               </View>
@@ -387,9 +431,17 @@ export function ChangePostModal({
                       paddingHorizontal: 12,
                       paddingVertical: 6,
                       borderRadius: 15,
+                      flexDirection: "row",
+                      alignItems: "center",
+                      gap: 8,
                     }}
                   >
                     <Text style={{ color: "#0369a1", fontSize: 14 }}>{tag}</Text>
+                    <TouchableOpacity
+                      onPress={() => setValue((prev) => prev.filter((_, i) => i !== index))}
+                    >
+                      <Text style={{ color: "#0369a1", fontSize: 14 }}>×</Text>
+                    </TouchableOpacity>
                   </View>
                 ))}
               </View>
