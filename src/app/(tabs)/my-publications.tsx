@@ -12,7 +12,6 @@ export default function MyPublications() {
     return (
         <Providers>
             <SafeAreaView style={{ flex: 1, backgroundColor: "#ffffff" }}>
-                <Header />
                 <ScrollView
                     overScrollMode="never"
                     contentContainerStyle={{

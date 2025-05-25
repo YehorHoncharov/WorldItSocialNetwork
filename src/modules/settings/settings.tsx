@@ -6,7 +6,6 @@ import { useRouter } from "expo-router";
 
 import { useEffect, useRef, useState } from "react";
 import { SignaturePad, SignaturePadRef } from "./signature/signature";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import PencilIcon from "../../shared/ui/icons/pencil";
 import { Controller, useForm } from "react-hook-form";
 import DateTimePicker from '@react-native-community/datetimepicker';

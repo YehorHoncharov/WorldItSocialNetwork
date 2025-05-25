@@ -15,6 +15,9 @@ interface IUserContext {
 	) => void;
 	isAuthenticated: () => boolean;
 	updateUser: (updatedUser: IUser) => void;
+	setShowWelcomeModal: (value: boolean) => void,
+	showWelcomeModal: boolean | null; 
+
 }
 
 const initialValue: IUserContext = {
@@ -27,6 +30,8 @@ const initialValue: IUserContext = {
 	) => {},
 	isAuthenticated: () => false,
 	updateUser: (updatedUser: IUser) => {},
+	setShowWelcomeModal: (value: boolean) => {},
+	showWelcomeModal: null 
 };
 
 const userContext = createContext<IUserContext>(initialValue);
@@ -41,6 +46,7 @@ interface IUserContextProviderProps {
 
 export function UserContextProvider(props: IUserContextProviderProps) {
 	const [user, setUser] = useState<IUser | null>(null);
+	const [showWelcomeModal, setShowWelcomeModal] = useState(false);
 
 	const updateUser = (updatedUser: IUser) => {
 		setUser(updatedUser);
@@ -139,6 +145,8 @@ export function UserContextProvider(props: IUserContextProviderProps) {
 				register: register,
 				isAuthenticated: isAuthenticated,
 				updateUser: updateUser,
+				showWelcomeModal, 
+      			setShowWelcomeModal
 			}}
 		>
 			{props.children}

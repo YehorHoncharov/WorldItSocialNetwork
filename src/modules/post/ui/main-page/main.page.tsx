@@ -6,7 +6,7 @@ import { IPost } from "../../types/post";
 
 export default function Post(props: IPost) {
 
-	const {id, name, text, theme, images} = props
+	const {id, name, text, theme, images, likes, views, tags, links, authorId} = props
 
 	return (
 		<Providers>
@@ -20,8 +20,8 @@ export default function Post(props: IPost) {
 					backgroundColor: "#ffffff",
 				}}
 			>
-				<Author id={id} name={name} text={text} theme={theme} images={images}></Author>
-				<Content id={id} name={name} text={text} theme={theme} images={images} ></Content>
+				<Author id={id} name={name} text={text} theme={theme} images={images} likes={likes} links={links} authorId={authorId} views={views} tags={tags}></Author>
+				<Content id={id} name={name} text={text} theme={theme} likes={likes} links={links} authorId={authorId} views={views} tags={tags} images={images} ></Content>
 			</SafeAreaView>
 		</Providers>
 	);

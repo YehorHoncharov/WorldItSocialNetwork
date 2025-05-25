@@ -11,13 +11,14 @@ import {
 	useBlurOnFulfill,
 	useClearByFocusCell,
 } from "react-native-confirmation-code-field";
+import { RegStepTwoModal } from "../../../../app/(auth)/registration/step-two";
 
 const CELL_COUNT = 6;
 
 export function RegFormThree() {
 	const { handleSubmit } = useForm<IRegCode>();
 	const router = useRouter();
-	const { register } = useUserContext();
+	const { register, setShowWelcomeModal } = useUserContext();
 
 	const params = useLocalSearchParams<{
 		email: string;
@@ -37,8 +38,16 @@ export function RegFormThree() {
 
 	function onSubmit() {
 		register(params.email, params.password, code);
-		
+		if (code) {
+			router.navigate({
+			pathname: "/home",
+		});
+
+		setShowWelcomeModal(true)
+		}
 	}
+
+
 
 	return (
 		<View style={styles.container}>

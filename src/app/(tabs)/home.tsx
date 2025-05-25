@@ -12,7 +12,6 @@ export default function MainPage() {
     return (
         <Providers>
             <View style={styles.container}>
-                <Header />
                 <Homepage />
             </View>
         </Providers>
