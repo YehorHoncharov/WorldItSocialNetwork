@@ -11,23 +11,18 @@ import {
   Alert,
   ActivityIndicator,
 } from "react-native";
-import {
-  launchImageLibraryAsync,
-  requestMediaLibraryPermissionsAsync,
-  MediaTypeOptions,
-} from "expo-image-picker";
+import { launchImageLibraryAsync, requestMediaLibraryPermissionsAsync } from "expo-image-picker";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { useUserContext } from "../../../auth/context/user-context";
+import DropDownPicker from "react-native-dropdown-picker";
+import { usePosts } from "../../hooks/use-get-post";
 import { PUT } from "../../../../shared/api/put";
 import Cross from "../../../../shared/ui/icons/cross";
 import { Input } from "../../../../shared/ui/input";
 import SendArrow from "../../../../shared/ui/icons/send-arrow";
-import DropDownPicker from "react-native-dropdown-picker";
-import { usePosts } from "../../hooks/use-get-post";
 import { styles } from "./change-post.styles";
 import { IPost, IPostImg } from "../../types/post";
+import { TrashIcon } from "../../../../shared/ui/icons/trash-icon";
 
-// Типи для компонента
 interface TagItem {
   label: string;
   value: string;
@@ -52,7 +47,6 @@ interface Props {
 }
 
 export function ChangePostModal({ modalVisible, changeVisibility, postData }: Props) {
-  const { user } = useUserContext();
   const { refetch } = usePosts();
   const [name, setName] = useState("");
   const [theme, setTheme] = useState("");
@@ -63,17 +57,25 @@ export function ChangePostModal({ modalVisible, changeVisibility, postData }: Pr
   const [isLoading, setIsLoading] = useState(false);
   const [open, setOpen] = useState(false);
   const [value, setValue] = useState<string[]>([]);
-  const [items, setItems] = useState<TagItem[]>([]);
+  const [items, setItems] = useState<TagItem[]>([
+    { label: "Відпочинок", value: "#відпочинок" },
+    { label: "Натхнення", value: "#натхнення" },
+    { label: "Життя", value: "#життя" },
+    { label: "Природа", value: "#природа" },
+    { label: "Спокій", value: "#спокій" },
+    { label: "Читання", value: "#читання" },
+    { label: "Гармонія", value: "#гармонія" },
+    { label: "Музика", value: "#музика" },
+    { label: "Фільми", value: "#фільми" },
+    { label: "Подорожі", value: "#подорожі" },
+  ]);
 
   const API_BASE_URL = "http://192.168.1.104:3000";
 
-  // Завантаження даних поста при відкритті модального вікна
   useEffect(() => {
     const loadData = async () => {
       const token = await AsyncStorage.getItem("token");
       setTokenUser(token || "");
-
-      console.log("postData:", JSON.stringify(postData, null, 2));
 
       if (postData) {
         setName(postData.name || "");
@@ -81,43 +83,29 @@ export function ChangePostModal({ modalVisible, changeVisibility, postData }: Pr
         setText(postData.text || "");
         setLinks(postData.links || "");
 
-        // Витягуємо унікальні назви тегів
         const tagsFromPost = Array.from(
-          new Set(
-            postData.tags
-              ?.map((tag) => (tag.tag && tag.tag.name ? tag.tag.name : null))
-              .filter((tag): tag is string => tag !== null) || []
-          )
+          new Set(postData.tags?.map((tag) => tag.tag?.name).filter((tag): tag is string => tag !== null) || [])
         );
+        console.log("[ChangePostModal] Loaded tags:", tagsFromPost);
         setValue(tagsFromPost);
 
-        // Нормалізуємо зображення
         const loadedImages = postData.images
           ? postData.images.map((img) => {
-              const normalizedUrl = img.url.startsWith("http")
-                ? img.url
-                : `${API_BASE_URL}/${img.url.replace(/^\/+/, "").replace(/\\/g, "/")}`;
-              console.log(`Завантажено зображення: ${normalizedUrl}`);
-              return { ...img, url: normalizedUrl };
-            })
+            const relativeUrl = img.url.replace(/\\/g, "/").replace(/^\/?uploads\/*/i, "");
+            const normalizedUrl = img.url.startsWith("http")
+              ? img.url
+              : `${API_BASE_URL}/uploads/${relativeUrl}`;
+            console.log(`[ChangePostModal] Normalized image URL: ${normalizedUrl}`);
+            return { ...img, url: normalizedUrl, rawUrl: img.url }; // rawUrl тепер у типі
+          })
           : [];
+        console.log("[ChangePostModal] Loaded images:", loadedImages);
         setImages(loadedImages);
 
-        // Формуємо список тегів
-        const defaultTags = [
-          { label: "Технології", value: "технології" },
-          { label: "Подорожі", value: "подорожі" },
-          { label: "Їжа", value: "їжа" },
-          { label: "Спорт", value: "спорт" },
-          { label: "Мистецтво", value: "мистецтво" },
-        ];
         const additionalTags = tagsFromPost
-          .filter((tag) => !defaultTags.some((defaultTag) => defaultTag.value === tag))
+          .filter((tag) => !items.some((item) => item.value === tag))
           .map((tag) => ({ label: tag, value: tag }));
-        const uniqueTags = Array.from(
-          new Set([...defaultTags, ...additionalTags].map((item) => JSON.stringify(item)))
-        ).map((item) => JSON.parse(item));
-        setItems(uniqueTags);
+        setItems((prev) => [...prev, ...additionalTags]);
       }
     };
 
@@ -126,7 +114,6 @@ export function ChangePostModal({ modalVisible, changeVisibility, postData }: Pr
     }
   }, [modalVisible, postData]);
 
-  // Обробка відправки форми
   const handleSubmit = async () => {
     if (!postData || !postData.id) {
       Alert.alert("Помилка", "Дані поста або ID поста відсутні");
@@ -144,8 +131,17 @@ export function ChangePostModal({ modalVisible, changeVisibility, postData }: Pr
       Alert.alert("Помилка", "Введіть коректне посилання");
       return;
     }
-    if (value.length > 5) {
-      Alert.alert("Помилка", "Максимум 5 тегів");
+    if (value.length > 10) {
+      Alert.alert("Помилка", "Максимум 10 тегів");
+      return;
+    }
+
+    const sanitizedTags = value
+      .map((tag) => tag.trim())
+      .filter((tag) => tag.length > 0 && tag.length <= 50);
+
+    if (sanitizedTags.length !== value.length) {
+      Alert.alert("Помилка", "Теги повинні бути не довшими за 50 символів");
       return;
     }
 
@@ -154,22 +150,30 @@ export function ChangePostModal({ modalVisible, changeVisibility, postData }: Pr
       theme: theme.trim(),
       text: text.trim(),
       ...(links ? { links: links.trim() } : {}),
-      tags: value.filter((tag) => typeof tag === "string" && tag.trim() !== ""),
+      tags: sanitizedTags,
     };
 
-    console.log("Теги для відправки:", value);
-    console.log("Зображення для відправки:", images.map((img) => img.url));
-
-    // Формуємо списки зображень для створення та видалення
     const existingImages = postData.images || [];
+    console.log("[ChangePostModal] Existing images:", existingImages);
+    console.log("[ChangePostModal] Current images state:", images);
+
     const persistedImages = images.filter((img) =>
-      existingImages.some((pi) => pi.id === img.id && pi.url === img.url)
+      existingImages.some((pi) => pi.id === img.id && pi.url === img.rawUrl)
     );
+    console.log("[ChangePostModal] Persisted images:", persistedImages);
+
     const newImages = images
       .filter((img) => img.url.startsWith("data:image"))
       .map((img) => {
-        if (!img.url.match(/^data:image\/(\w+);base64,.+$/)) {
-          console.warn("Некоректний формат зображення:", img.url);
+        const matches = img.url.match(/^data:image\/(\w+);base64,(.+)$/);
+        if (!matches || !["jpeg", "png", "gif"].includes(matches[1].toLowerCase())) {
+          console.error(`[ChangePostModal] Непідтримуваний формат зображення: ${img.url.slice(0, 20)}...`);
+          return null;
+        }
+        const base64Data = matches[2];
+        const estimatedSizeInBytes = (base64Data.length * 3) / 4;
+        if (estimatedSizeInBytes > 5 * 1024 * 1024) {
+          console.error(`[ChangePostModal] Зображення занадто велике: ${img.url.slice(0, 20)}...`);
           return null;
         }
         return { url: img.url };
@@ -178,8 +182,13 @@ export function ChangePostModal({ modalVisible, changeVisibility, postData }: Pr
 
     const deletedImages = existingImages
       .filter((pi) => !persistedImages.some((img) => img.id === pi.id))
-      .map((pi) => ({ id: pi.id as number }))
-      .filter((img) => typeof img.id === "number");
+      .map((pi) => ({ id: pi.id }));
+    console.log("[ChangePostModal] Images to delete:", deletedImages);
+
+    if (newImages.length + persistedImages.length > 10) {
+      Alert.alert("Помилка", "Максимум 10 зображень дозволено");
+      return;
+    }
 
     if (newImages.length > 0 || deletedImages.length > 0) {
       updatedData.images = {
@@ -188,10 +197,9 @@ export function ChangePostModal({ modalVisible, changeVisibility, postData }: Pr
       };
     }
 
-    console.log("Дані для відправки:", JSON.stringify(updatedData, null, 2));
-
     setIsLoading(true);
     try {
+      console.log("[ChangePostModal] Відправка запиту:", JSON.stringify(updatedData, null, 2));
       const response = await PUT<IPost>({
         endpoint: `${API_BASE_URL}/posts/${postData.id}`,
         headers: {
@@ -201,82 +209,91 @@ export function ChangePostModal({ modalVisible, changeVisibility, postData }: Pr
         body: updatedData,
       });
 
-      console.log("Відповідь сервера:", JSON.stringify(response, null, 2));
+      console.log("[ChangePostModal] Відповідь:", response);
 
       if (response.status === "success") {
-        console.log("Пост успішно оновлено:", JSON.stringify(response.data, null, 2));
         Alert.alert("Успіх", "Пост успішно оновлено");
         await refetch();
         changeVisibility();
       } else {
-        console.error("Помилка від сервера:", response.message, "Код:", response.code);
         Alert.alert("Помилка", response.message || "Не вдалося оновити пост");
       }
     } catch (error) {
-      const message = error instanceof Error ? error.message : "Невідома помилка";
-      console.error("Помилка при відправленні запиту:", message);
-      Alert.alert("Помилка", `Не вдалося оновити пост: ${message}`);
+      console.error("[ChangePostModal] Помилка:", error);
+      Alert.alert("Помилка", `Не вдалося оновити пост: ${error instanceof Error ? error.message : "Невідома помилка"}`);
     } finally {
       setIsLoading(false);
     }
   };
 
-  // Додавання зображень
   const onSearch = async () => {
-    const { status } = await requestMediaLibraryPermissionsAsync();
-    if (status !== "granted") {
-      Alert.alert("Дозвіл не надано", "Для додавання зображень необхідно надати доступ до галереї");
-      return;
-    }
-
-    const result = await launchImageLibraryAsync({
-      mediaTypes: MediaTypeOptions.Images,
-      allowsMultipleSelection: true,
-      quality: 0.8,
-      allowsEditing: false,
-      aspect: [4, 3],
-      base64: true,
-    });
-
-    if (!result.canceled && result.assets) {
-      const newImages = result.assets
-        .filter((asset) => asset.base64)
-        .map((asset, index) => {
-          const maxSizeInBytes = 5 * 1024 * 1024; // 5 МБ
-          const base64Data = Buffer.from(asset.base64!, "base64");
-          if (base64Data.length > maxSizeInBytes) {
-            Alert.alert("Помилка", `Зображення ${index + 1} занадто велике (макс. 5 МБ)`);
-            return null;
-          }
-          return {
-            id: `temp-${Date.now()}-${index}`,
-            url: `data:image/jpeg;base64,${asset.base64}`,
-            userPostId: postData?.id || 0,
-          };
-        })
-        .filter((img): img is { id: string; url: string; userPostId: number } => img !== null);
-
-      if (images.length + newImages.length > 10) {
-        Alert.alert("Увага", "Максимальна кількість зображень - 10");
+    try {
+      const { status } = await requestMediaLibraryPermissionsAsync();
+      if (status !== "granted") {
+        Alert.alert("Дозвіл не надано", "Для додавання зображень необхідно надати доступ до галереї");
         return;
       }
 
-      setImages((prev) => [...prev, ...newImages]);
+      const result = await launchImageLibraryAsync({
+        mediaTypes: ['images'],
+        allowsMultipleSelection: true,
+        quality: 0.8,
+        allowsEditing: false,
+        base64: true,
+      });
+
+      if (!result.canceled && result.assets) {
+        const allowedFormats = ["jpeg", "png", "gif"];
+        const maxSizeInBytes = 5 * 1024 * 1024; // 5 MB
+
+        const newImages: IPostImg[] = result.assets
+          .map((asset, index) => {
+            const type = asset.mimeType?.split("/")[1]?.toLowerCase() || "";
+            if (!asset.base64 || !allowedFormats.includes(type)) {
+              console.error(`[ChangePostModal] Некоректний формат зображення: ${type}`);
+              return null;
+            }
+            const base64String = asset.base64;
+            const estimatedSizeInBytes = (base64String.length * 3) / 4;
+            if (estimatedSizeInBytes > maxSizeInBytes) {
+              console.error(`[ChangePostModal] Зображення занадто велике: ${Math.round(estimatedSizeInBytes / 1024 / 1024)} МБ`);
+              return null;
+            }
+            const url = `data:image/${type};base64,${base64String}`;
+            console.log(`[ChangePostModal] Додано зображення: ${url.slice(0, 20)}...`);
+            return {
+              id: Date.now() + index,
+              url,
+              rawUrl: url,
+              userPostId: postData?.id || 0,
+            } as IPostImg;
+          })
+          .filter((img): img is IPostImg => img !== null);
+
+        if (images.length + newImages.length > 10) {
+          Alert.alert("Увага", "Максимальна кількість зображень - 10");
+          return;
+        }
+
+        setImages((prev) => [...prev, ...newImages]);
+      } else if (result.canceled) {
+        Alert.alert("Скасовано", "Вибір зображень було скасовано");
+      }
+    } catch (error) {
+      console.error("[ChangePostModal] Помилка вибору зображення:", error);
+      Alert.alert("Помилка", `Не вдалося вибрати зображення: ${error instanceof Error ? error.message : "Невідома помилка"}`);
     }
   };
 
-  // Видалення зображення
   const removeImage = (index: number) => {
     setImages((prev) => prev.filter((_, i) => i !== index));
   };
 
-  // Валідація URL
   const isValidUrl = (url: string): boolean => {
     const urlPattern = /^(https?:\/\/)([\w.-]+)\.([a-z]{2,})(\/.*)?$/i;
     return urlPattern.test(url);
   };
 
-  // Рендеринг зображень
   const renderImages = () => {
     if (images.length === 0) {
       return <Text style={styles.noImagesText}>Додайте зображення</Text>;
@@ -284,26 +301,37 @@ export function ChangePostModal({ modalVisible, changeVisibility, postData }: Pr
 
     return (
       <View style={styles.imageGrid}>
-        {images.map((img, idx) => (
-          <View key={`image-${img.id}-${idx}`} style={styles.imageContainer}>
-            <Image
-              source={{ uri: img.url }}
-              style={styles.imageAdded}
-              resizeMode="cover"
-              onError={(e) => {
-                console.error(`Помилка завантаження зображення: ${img.url}`, e.nativeEvent.error);
-                Alert.alert("Помилка", `Не вдалося завантажити зображення: ${img.url}`);
-              }}
-              onLoad={() => console.log(`Зображення завантажено: ${img.url}`)}
-            />
-            <TouchableOpacity
-              style={styles.removeImageButton}
-              onPress={() => removeImage(idx)}
-            >
-              <Text style={styles.removeImageText}>×</Text>
-            </TouchableOpacity>
-          </View>
-        ))}
+        {images.map((img, idx) => {
+          const isValidImage = img.url.startsWith("data:image/") || img.url.startsWith("http");
+          if (!isValidImage) {
+            console.error(`[ChangePostModal] Некоректний URL зображення: ${img.url}`);
+            return null;
+          }
+          return (
+            <View key={`image-${img.id}-${idx}`} style={styles.imageContainer}>
+              <Image
+                source={{ uri: img.url }}
+                style={styles.imageAdded}
+                resizeMode="cover"
+                onError={(e) => {
+                  console.error(`[ChangePostModal] Помилка завантаження зображення: ${img.url}`, e.nativeEvent);
+                }}
+                onLoad={() => console.log(`[ChangePostModal] Зображення завантажено: ${img.url.slice(0, 20)}...`)}
+              />
+              <TouchableOpacity style={styles.removeImageButton} onPress={() => removeImage(idx)}>
+                <Image
+                  source={require("../../../../shared/ui/images/trash.png")}
+                  width={20}
+                  height={20}
+                  style={{
+                    width: 22,
+                    height: 22
+                  }}
+                />
+              </TouchableOpacity>
+            </View>
+          );
+        })}
       </View>
     );
   };
@@ -313,12 +341,7 @@ export function ChangePostModal({ modalVisible, changeVisibility, postData }: Pr
   }
 
   return (
-    <Modal
-      animationType="slide"
-      transparent={true}
-      visible={modalVisible}
-      onRequestClose={changeVisibility}
-    >
+    <Modal animationType="slide" transparent={true} visible={modalVisible} onRequestClose={changeVisibility}>
       <View style={styles.centeredView}>
         <View style={styles.modalView}>
           <View style={styles.header}>
@@ -328,30 +351,22 @@ export function ChangePostModal({ modalVisible, changeVisibility, postData }: Pr
             </Pressable>
           </View>
 
-          <ScrollView
-            style={styles.scrollArea}
-            contentContainerStyle={{ paddingBottom: 20 }}
-            keyboardShouldPersistTaps="handled"
-          >
-            <View style={{ gap: 15 }}>
+          <ScrollView style={styles.scrollArea} contentContainerStyle={{ paddingBottom: 20 }} keyboardShouldPersistTaps="handled">
+            <View style={{ gap: 15, alignItems: "center", justifyContent: "center" }}>
               <Input
-                width={343}
-                label="Назва*"
+                label="Назва"
                 placeholder="Введіть назву публікації"
                 value={name}
                 onChangeText={setName}
                 maxLength={100}
               />
-
               <Input
-                width={343}
-                label="Тема*"
+                label="Тема"
                 placeholder="Введіть тему публікації"
                 value={theme}
                 onChangeText={setTheme}
                 maxLength={60}
               />
-
               <TextInput
                 style={{
                   minHeight: 120,
@@ -360,6 +375,7 @@ export function ChangePostModal({ modalVisible, changeVisibility, postData }: Pr
                   borderRadius: 10,
                   padding: 12,
                   fontSize: 16,
+                  width: "100%",
                   backgroundColor: "#f9f9f9",
                 }}
                 placeholder="Опис публікації*"
@@ -369,65 +385,58 @@ export function ChangePostModal({ modalVisible, changeVisibility, postData }: Pr
                 textAlignVertical="top"
                 maxLength={2000}
               />
-
               <Input
-                width={343}
                 label="Посилання"
                 placeholder="https://example.com"
                 value={links}
                 onChangeText={setLinks}
                 keyboardType="url"
               />
-
-              <View style={{ width: 343, zIndex: 1000, marginTop: 10 }}>
+              <View style={{ width: "100%", zIndex: 1000 }}>
                 <DropDownPicker
                   open={open}
                   value={value}
                   items={items}
                   setOpen={setOpen}
-                  setValue={(callback) => {
-                    const newValue = typeof callback === "function" ? callback(value) : callback;
-                    const uniqueValues = Array.from(new Set(newValue))
-                      .map(String)
-                      .filter((tag) => tag.trim() !== "");
-                    if (uniqueValues.length > 5) {
-                      Alert.alert("Помилка", "Максимум 5 тегів");
-                      return;
-                    }
-                    console.log("Оновлені теги:", uniqueValues);
-                    setValue(uniqueValues);
-                  }}
+                  setValue={setValue}
                   setItems={setItems}
                   multiple={true}
                   min={0}
-                  max={5}
+                  max={10}
                   mode="BADGE"
-                  badgeDotColors={["#e76f51", "#00b4d8", "#e9c46a", "#e76f51", "#8ac926"]}
+                  badgeDotColors={["#543C52"]}
+                  badgeStyle={{ backgroundColor: "#E9E5EE", padding: 4, borderRadius: 8, minHeight: 20 }}
                   placeholder="Оберіть або додайте теги"
                   searchable={true}
                   searchPlaceholder="Пошук або створення тегу..."
                   listMode="SCROLLVIEW"
-                  scrollViewProps={{
-                    nestedScrollEnabled: true,
-                  }}
+                  scrollViewProps={{ nestedScrollEnabled: true }}
                   addCustomItem={true}
+                  maxHeight={200}
+                  zIndex={1000}
+                  dropDownContainerStyle={{
+                    maxHeight: 250,
+                    borderColor: "#543C52",
+                    zIndex: 1000,
+                    flex: 1,
+                  }}
+                  onChangeValue={(newValue) => {
+                    console.log("[ChangePostModal] Selected tags:", newValue);
+                  }}
                   onChangeSearchText={(text) => {
-                    if (text && !items.some((item) => item.value === text)) {
-                      setItems((prev) => [
-                        ...prev,
-                        { label: text, value: text },
-                      ]);
+                    const sanitizedText = text.trim();
+                    if (sanitizedText && !items.some((item) => item.value === sanitizedText) && sanitizedText.length <= 50) {
+                      setItems((prev) => [...prev, { label: sanitizedText, value: sanitizedText }]);
                     }
                   }}
                 />
               </View>
-
               <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8, marginTop: 5 }}>
                 {value.map((tag, index) => (
                   <View
                     key={`${tag}-${index}`}
                     style={{
-                      backgroundColor: "#e0f2fe",
+                      backgroundColor: "#E9E5EE",
                       paddingHorizontal: 12,
                       paddingVertical: 6,
                       borderRadius: 15,
@@ -436,26 +445,16 @@ export function ChangePostModal({ modalVisible, changeVisibility, postData }: Pr
                       gap: 8,
                     }}
                   >
-                    <Text style={{ color: "#0369a1", fontSize: 14 }}>{tag}</Text>
-                    <TouchableOpacity
-                      onPress={() => setValue((prev) => prev.filter((_, i) => i !== index))}
-                    >
-                      <Text style={{ color: "#0369a1", fontSize: 14 }}>×</Text>
+                    <Text style={{ color: "#543C52", fontSize: 14 }}>{tag}</Text>
+                    <TouchableOpacity onPress={() => setValue((prev) => prev.filter((_, i) => i !== index))}>
+                      <Text style={{ color: "#543C52", fontSize: 14 }}>×</Text>
                     </TouchableOpacity>
                   </View>
                 ))}
               </View>
             </View>
 
-            <Text
-              style={{
-                fontSize: 16,
-                fontWeight: "600",
-                marginTop: 20,
-                marginBottom: 10,
-                color: "#333",
-              }}
-            >
+            <Text style={{ fontSize: 16, fontWeight: "600", marginTop: 20, marginBottom: 10, color: "#333" }}>
               Зображення ({images.length}/10)
             </Text>
             {renderImages()}
@@ -474,11 +473,10 @@ export function ChangePostModal({ modalVisible, changeVisibility, postData }: Pr
               >
                 <Text style={{ color: "#333", fontWeight: "500" }}>+ Додати зображення</Text>
               </TouchableOpacity>
-
               <TouchableOpacity
                 style={[
                   {
-                    backgroundColor: "#3b82f6",
+                    backgroundColor: "#543C52",
                     padding: 15,
                     borderRadius: 8,
                     flexDirection: "row",
@@ -495,9 +493,7 @@ export function ChangePostModal({ modalVisible, changeVisibility, postData }: Pr
                   <ActivityIndicator color="#fff" />
                 ) : (
                   <>
-                    <Text style={{ color: "white", fontWeight: "bold", fontSize: 16 }}>
-                      Оновити публікацію
-                    </Text>
+                    <Text style={{ color: "white", fontWeight: "bold", fontSize: 16 }}>Оновити публікацію</Text>
                     <SendArrow style={{ width: 20, height: 20 }} />
                   </>
                 )}

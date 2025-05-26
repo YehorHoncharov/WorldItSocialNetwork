@@ -1,17 +1,22 @@
-import { StyleSheet } from "react-native";
+import { Dimensions, StyleSheet } from "react-native"
+
+const { width } = Dimensions.get("window");
+const modalWidth = Math.min(width * 0.9, 343);
 
 export const styles = StyleSheet.create({
   centeredView: {
     flex: 1,
-    justifyContent: "center",
+    justifyContent: "flex-end",
     backgroundColor: "rgba(0, 0, 0, 0.5)",
+    paddingHorizontal: 10,
   },
   modalView: {
     width: "100%",
-    maxHeight: "80%",
+    maxHeight: "90%",
     backgroundColor: "white",
-    borderRadius: 20,
-    padding: 20,
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    padding: 13,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.25,
@@ -36,7 +41,7 @@ export const styles = StyleSheet.create({
     justifyContent: "center",
   },
   textArea: {
-    width: 343,
+    width: modalWidth, // Адаптивна ширина
     minHeight: 100,
     padding: 16,
     borderWidth: 1,
@@ -72,52 +77,57 @@ export const styles = StyleSheet.create({
     fontWeight: "600",
   },
   scrollArea: {
-    flexGrow: 0,
+    flexGrow: 1,
   },
   imageGrid: {
     flexDirection: "column",
     gap: 8,
-    alignItems: "center",
-    justifyContent: "center",
   },
   imageContainer: {
-    position: 'relative',
+    position: "relative",
+    alignItems: "center",
+    justifyContent: "center"
   },
   imageAdded: {
-    width: 343,
+    width: "100%",
     height: 225,
     borderRadius: 16,
   },
   removeImageButton: {
-    position: 'absolute',
+    position: "absolute",
     top: 10,
     right: 10,
-    backgroundColor: 'rgba(0,0,0,0.5)',
+    backgroundColor: "white",
     width: 30,
     height: 30,
     borderRadius: 15,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
+    borderWidth: 1,
+    borderColor: "#543C52",
   },
   removeImageText: {
-    color: 'white',
+    color: "white",
     fontSize: 20,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   selectedTagsContainer: {
     flexDirection: "row",
     flexWrap: "wrap",
-    marginTop: 10,
+    marginTop: 5,
     gap: 8,
   },
   tag: {
-    backgroundColor: "#EEE",
-    borderRadius: 12,
-    paddingHorizontal: 10,
-    paddingVertical: 4,
+    backgroundColor: "#e0f2fe", // Синхронізовано з компонентом
+    borderRadius: 15,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
   },
   tagText: {
-    color: "#333",
+    color: "#0369a1", // Синхронізовано з компонентом
     fontSize: 14,
   },
   errorText: {
@@ -129,5 +139,16 @@ export const styles = StyleSheet.create({
     color: "#333",
     fontSize: 14,
     textAlign: "center",
+  },
+  dropDownPicker: {
+    borderColor: "#CDCED2",
+    borderRadius: 10,
+    backgroundColor: "#f9f9f9",
+  },
+  dropDownContainer: {
+    borderColor: "#CDCED2",
+    borderRadius: 10,
+    maxHeight: 200,
+    zIndex: 1000,
   },
 });

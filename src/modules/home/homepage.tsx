@@ -3,7 +3,6 @@ import { FlatList, RefreshControl, View, Text } from "react-native";
 import Post from "../post/ui/main-page/main.page";
 import { usePosts } from "../post/hooks/use-get-post";
 import { useUserContext } from "../auth/context/user-context";
-import { RegStepTwoModal } from "../../app/(auth)/registration/step-two";
 
 export function Homepage() {
   const { posts, refetch } = usePosts();
@@ -12,9 +11,7 @@ export function Homepage() {
 
   useEffect(() => {
     if (showWelcomeModal) {
-      const timer = setTimeout(() => {
-        setShowWelcomeModal(false);
-      }, 3000);
+      const timer = setTimeout(() => setShowWelcomeModal(false), 3000);
       return () => clearTimeout(timer);
     }
   }, [showWelcomeModal]);
@@ -34,32 +31,21 @@ export function Homepage() {
     <>
       <FlatList
         data={posts}
-        keyExtractor={(item) => item.id.toString()}
-        style={{
-          gap: 5,
-          alignContent: "space-between",
-        }}
+        keyExtractor={(item) => `${item.id}`}
+        contentContainerStyle={{ gap: 5 }}
         renderItem={({ item }) => (
-          <View
-            style={{
-              gap: 5,
-              alignContent: "space-between",
-              justifyContent: "space-between",
-            }}
-          >
-            <Post
-              id={item.id}
-              name={item.name}
-              text={item.text}
-              images={item.images}
-              theme={item.theme}
-              links={item.links}
-              tags={item.tags}
-              authorId={item.authorId}
-              likes={item.likes}
-              views={item.views}
-            />
-          </View>
+          <Post
+            id={item.id}
+            name={item.name}
+            text={item.text}
+            images={item.images}
+            theme={item.theme}
+            links={item.links}
+            tags={item.tags}
+            authorId={item.authorId}
+            likes={item.likes}
+            views={item.views}
+          />
         )}
         refreshControl={
           <RefreshControl
@@ -70,16 +56,11 @@ export function Homepage() {
           />
         }
         ListEmptyComponent={
-          <View>
+          <View style={{ padding: 20 }}>
             <Text>Немає постів для відображення</Text>
           </View>
         }
       />
-
-      {/* <RegStepTwoModal
-        modalVisible={!showWelcomeModal}
-        changeVisibility={() => setShowWelcomeModal(false)}
-      /> */}
     </>
   );
 }

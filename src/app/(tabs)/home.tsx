@@ -1,10 +1,7 @@
 import React from 'react';
 import { View } from 'react-native';
-
-
 import { Providers } from '../providers';
 import { Homepage } from '../../modules/home/homepage';
-import { Header } from '../../shared/ui/header';
 import { StyleSheet } from 'react-native';
 
 
