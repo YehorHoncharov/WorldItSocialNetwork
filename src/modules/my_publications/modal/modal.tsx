@@ -15,7 +15,10 @@ import {
 import Cross from "../../../shared/ui/icons/cross";
 import SendArrow from "../../../shared/ui/icons/send-arrow";
 import { Input } from "../../../shared/ui/input";
-import { launchImageLibraryAsync, requestMediaLibraryPermissionsAsync } from "expo-image-picker";
+import {
+	launchImageLibraryAsync,
+	requestMediaLibraryPermissionsAsync,
+} from "expo-image-picker";
 import { POST } from "../../../shared/api/post";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useUserContext } from "../../auth/context/user-context";
@@ -44,7 +47,9 @@ export function MyPublicationModal({ modalVisible, changeVisibility }: Props) {
 	const [text, setText] = useState("");
 	const [links, setLinks] = useState("");
 	const [images, setImages] = useState<IPostImg[]>([]);
-	const [imageDimensions, setImageDimensions] = useState<{ [key: string]: { width: number; height: number } }>({});
+	const [imageDimensions, setImageDimensions] = useState<{
+		[key: string]: { width: number; height: number };
+	}>({});
 	const [tokenUser, setTokenUser] = useState<string>("");
 	const [isLoading, setIsLoading] = useState(false);
 	const { user } = useUserContext();
@@ -78,11 +83,17 @@ export function MyPublicationModal({ modalVisible, changeVisibility }: Props) {
 	const handleSubmit = async () => {
 		console.log("[refetch] Начало обработки submit");
 		if (!name.trim() || !theme.trim() || !text.trim()) {
-			Alert.alert("Помилка", "Будь ласка, заповніть усі обов'язкові поля");
+			Alert.alert(
+				"Помилка",
+				"Будь ласка, заповніть усі обов'язкові поля"
+			);
 			return;
 		}
 		if (!user) {
-			Alert.alert("Упс...", "Схоже, ви не авторизовані 😞, тому не можете створити пост 🙄");
+			Alert.alert(
+				"Упс...",
+				"Схоже, ви не авторизовані 😞, тому не можете створити пост 🙄"
+			);
 			return;
 		}
 		if (value.length > 10) {
@@ -103,7 +114,10 @@ export function MyPublicationModal({ modalVisible, changeVisibility }: Props) {
 			return;
 		}
 
-		const formattedImages = images.length > 0 ? { create: images.map((img) => ({ url: img.url })) } : undefined;
+		const formattedImages =
+			images.length > 0
+				? { create: images.map((img) => ({ url: img.url })) }
+				: undefined;
 
 		setIsLoading(true);
 		try {
@@ -157,11 +171,19 @@ export function MyPublicationModal({ modalVisible, changeVisibility }: Props) {
 				console.log("Публикацию успешно создано");
 				Alert.alert("Успіх", "Публікацію успішно створено");
 			} else {
-				Alert.alert("Помилка", response.message || "Не вдалося створити публікацію");
+				Alert.alert(
+					"Помилка",
+					response.message || "Не вдалося створити публікацію"
+				);
 			}
 		} catch (err) {
 			console.error("[refetch] Ошибка в процессе создания поста:", err);
-			Alert.alert("Помилка", `Не вдалося створити публікацію: ${err instanceof Error ? err.message : "Невідома помилка"}`);
+			Alert.alert(
+				"Помилка",
+				`Не вдалося створити публікацію: ${
+					err instanceof Error ? err.message : "Невідома помилка"
+				}`
+			);
 		} finally {
 			setIsLoading(false);
 		}
@@ -169,16 +191,25 @@ export function MyPublicationModal({ modalVisible, changeVisibility }: Props) {
 
 	const handleSubmitWithRefetch = async () => {
 		await handleSubmit();
-		console.log("[refetch] Запрос на создание стал успешным, запуск refetch");
+		console.log(
+			"[refetch] Запрос на создание стал успешным, запуск refetch"
+		);
 		const updatedPosts = await refetch();
-		console.log(`[refetch] Обновленный список содержит ${updatedPosts?.length || 0} постов`);
+		console.log(
+			`[refetch] Обновленный список содержит ${
+				updatedPosts?.length || 0
+			} постов`
+		);
 	};
 
 	async function onSearch() {
 		try {
 			const { status } = await requestMediaLibraryPermissionsAsync();
 			if (status !== "granted") {
-				Alert.alert("Дозвіл не надано", "Для додавання зображень необхідно надати доступ до галереї");
+				Alert.alert(
+					"Дозвіл не надано",
+					"Для додавання зображень необхідно надати доступ до галереї"
+				);
 				return;
 			}
 
@@ -197,26 +228,45 @@ export function MyPublicationModal({ modalVisible, changeVisibility }: Props) {
 				const newImages = await Promise.all(
 					result.assets
 						.filter((asset) => {
-							const type = asset.mimeType?.split("/")[1]?.toLowerCase() || "";
-							return asset.base64 && allowedFormats.includes(type);
+							const type =
+								asset.mimeType?.split("/")[1]?.toLowerCase() ||
+								"";
+							return (
+								asset.base64 && allowedFormats.includes(type)
+							);
 						})
 						.map(async (asset, index) => {
 							const base64String = asset.base64!;
-							const estimatedSizeInBytes = (base64String.length * 3) / 4;
+							const estimatedSizeInBytes =
+								(base64String.length * 3) / 4;
 							if (estimatedSizeInBytes > maxSizeInBytes) {
-								Alert.alert("Помилка", `Зображення занадто велике (макс. 5 МБ)`);
+								Alert.alert(
+									"Помилка",
+									`Зображення занадто велике (макс. 5 МБ)`
+								);
 								return null;
 							}
-							const imageUrl = `data:image/${asset.mimeType?.split("/")[1] || "jpeg"};base64,${base64String}`;
-							console.log("[MyPublicationModal] Додано зображення:", imageUrl.slice(0, 50), "...");
+							const imageUrl = `data:image/${
+								asset.mimeType?.split("/")[1] || "jpeg"
+							};base64,${base64String}`;
+							console.log(
+								"[MyPublicationModal] Додано зображення:",
+								imageUrl.slice(0, 50),
+								"..."
+							);
 
-							// Отримуємо розміри зображення
-							const dimensions = await new Promise<{ width: number; height: number }>((resolve) => {
+							const dimensions = await new Promise<{
+								width: number;
+								height: number;
+							}>((resolve) => {
 								Image.getSize(
 									imageUrl,
-									(width, height) => resolve({ width, height }),
+									(width, height) =>
+										resolve({ width, height }),
 									(error) => {
-										console.error(`[MyPublicationModal] Помилка визначення розмірів: ${error}`);
+										console.error(
+											`[MyPublicationModal] Помилка визначення розмірів: ${error}`
+										);
 										resolve({ width: 150, height: 150 }); // Запасний варіант
 									}
 								);
@@ -236,24 +286,40 @@ export function MyPublicationModal({ modalVisible, changeVisibility }: Props) {
 						})
 				);
 
-				const filteredImages = newImages.filter((img): img is IPostImg => img !== null);
+				const filteredImages = newImages.filter(
+					(img): img is IPostImg => img !== null
+				);
 
 				if (images.length + filteredImages.length > 10) {
-					Alert.alert("Увага", "Максимальна кількість зображень - 10");
+					Alert.alert(
+						"Увага",
+						"Максимальна кількість зображень - 10"
+					);
 					return;
 				}
 
 				setImages((prev) => {
 					const updatedImages = [...prev, ...filteredImages];
-					console.log("[MyPublicationModal] Оновлений список зображень:", updatedImages);
+					console.log(
+						"[MyPublicationModal] Оновлений список зображень:",
+						updatedImages
+					);
 					return updatedImages;
 				});
 			} else if (result.canceled) {
 				Alert.alert("Скасовано", "Вибір зображень було скасовано");
 			}
 		} catch (error) {
-			console.error("[MyPublicationModal] Помилка вибору зображення:", error);
-			Alert.alert("Помилка", `Не вдалося вибрати зображення: ${error instanceof Error ? error.message : "Невідома помилка"}`);
+			console.error(
+				"[MyPublicationModal] Помилка вибору зображення:",
+				error
+			);
+			Alert.alert(
+				"Помилка",
+				`Не вдалося вибрати зображення: ${
+					error instanceof Error ? error.message : "Невідома помилка"
+				}`
+			);
 		}
 	}
 
@@ -274,30 +340,50 @@ export function MyPublicationModal({ modalVisible, changeVisibility }: Props) {
 		return (
 			<View style={styles.imageGrid}>
 				{images.map((img, idx) => {
-					const isValidImage = img.url.startsWith("data:image/") || img.url.startsWith("http");
+					const isValidImage =
+						img.url.startsWith("data:image/") ||
+						img.url.startsWith("http");
 					if (!isValidImage) {
-						console.error(`[ChangePostModal] Некоректний URL зображення: ${img.url}`);
+						console.error(
+							`[ChangePostModal] Некоректний URL зображення: ${img.url}`
+						);
 						return null;
 					}
 					return (
-						<View key={`image-${img.id}-${idx}`} style={styles.imageContainer}>
+						<View
+							key={`image-${img.id}-${idx}`}
+							style={styles.imageContainer}
+						>
 							<Image
 								source={{ uri: img.url }}
 								style={styles.imageAdded}
 								resizeMode="cover"
 								onError={(e) => {
-									console.error(`[ChangePostModal] Помилка завантаження зображення: ${img.url}`, e.nativeEvent);
+									console.error(
+										`[ChangePostModal] Помилка завантаження зображення: ${img.url}`,
+										e.nativeEvent
+									);
 								}}
-								onLoad={() => console.log(`[ChangePostModal] Зображення завантажено: ${img.url.slice(0, 20)}...`)}
+								onLoad={() =>
+									console.log(
+										`[ChangePostModal] Зображення завантажено: ${img.url.slice(
+											0,
+											20
+										)}...`
+									)
+								}
 							/>
-							<TouchableOpacity style={styles.removeImageButton} onPress={() => removeImage(idx)}>
+							<TouchableOpacity
+								style={styles.removeImageButton}
+								onPress={() => removeImage(idx)}
+							>
 								<Image
 									source={require("../../../shared/ui/images/trash.png")}
 									width={20}
 									height={20}
 									style={{
 										width: 22,
-										height: 22
+										height: 22,
 									}}
 								/>
 							</TouchableOpacity>
@@ -309,16 +395,26 @@ export function MyPublicationModal({ modalVisible, changeVisibility }: Props) {
 	};
 
 	return (
-		<Modal animationType="fade" transparent={true} visible={modalVisible} onRequestClose={changeVisibility}>
+		<Modal
+			animationType="fade"
+			transparent={true}
+			visible={modalVisible}
+			onRequestClose={changeVisibility}
+		>
 			<View style={styles.centeredView}>
 				<View style={styles.modalView}>
 					<View style={styles.header}>
-						<Text style={styles.modalTitle}>Створення публікації</Text>
+						<Text style={styles.modalTitle}>
+							Створення публікації
+						</Text>
 						<Pressable onPress={changeVisibility}>
 							<Cross style={{ width: 15, height: 15 }} />
 						</Pressable>
 					</View>
-					<ScrollView style={styles.scrollArea} keyboardShouldPersistTaps="handled">
+					<ScrollView
+						style={styles.scrollArea}
+						keyboardShouldPersistTaps="handled"
+					>
 						<View style={styles.form}>
 							<Input
 								style={{ width: "100%" }}
@@ -369,12 +465,19 @@ export function MyPublicationModal({ modalVisible, changeVisibility }: Props) {
 									max={10}
 									mode="BADGE"
 									badgeDotColors={["#543C52"]}
-									badgeStyle={{ backgroundColor: "#E9E5EE", padding: 4, borderRadius: 8, minHeight: 20 }}
+									badgeStyle={{
+										backgroundColor: "#E9E5EE",
+										padding: 4,
+										borderRadius: 8,
+										minHeight: 20,
+									}}
 									placeholder="Оберіть або додайте теги"
 									searchable={true}
 									searchPlaceholder="Пошук або створення тегу..."
 									listMode="SCROLLVIEW"
-									scrollViewProps={{ nestedScrollEnabled: true }}
+									scrollViewProps={{
+										nestedScrollEnabled: true,
+									}}
 									addCustomItem={true}
 									maxHeight={200}
 									zIndex={1000}
@@ -385,17 +488,40 @@ export function MyPublicationModal({ modalVisible, changeVisibility }: Props) {
 										flex: 1,
 									}}
 									onChangeValue={(newValue) => {
-										console.log("[ChangePostModal] Selected tags:", newValue);
+										console.log(
+											"[ChangePostModal] Selected tags:",
+											newValue
+										);
 									}}
 									onChangeSearchText={(text) => {
 										const sanitizedText = text.trim();
-										if (sanitizedText && !items.some((item) => item.value === sanitizedText) && sanitizedText.length <= 50) {
-											setItems((prev) => [...prev, { label: sanitizedText, value: sanitizedText }]);
+										if (
+											sanitizedText &&
+											!items.some(
+												(item) =>
+													item.value === sanitizedText
+											) &&
+											sanitizedText.length <= 50
+										) {
+											setItems((prev) => [
+												...prev,
+												{
+													label: sanitizedText,
+													value: sanitizedText,
+												},
+											]);
 										}
 									}}
 								/>
 							</View>
-							<View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8, marginTop: 5 }}>
+							<View
+								style={{
+									flexDirection: "row",
+									flexWrap: "wrap",
+									gap: 8,
+									marginTop: 5,
+								}}
+							>
 								{value.map((tag, index) => (
 									<View
 										key={`${tag}-${index}`}
@@ -409,22 +535,63 @@ export function MyPublicationModal({ modalVisible, changeVisibility }: Props) {
 											gap: 8,
 										}}
 									>
-										<Text style={{ color: "#543C52", fontSize: 14 }}>{tag}</Text>
-										<TouchableOpacity onPress={() => setValue((prev) => prev.filter((_, i) => i !== index))}>
-											<Text style={{ color: "#543C52", fontSize: 14 }}>×</Text>
+										<Text
+											style={{
+												color: "#543C52",
+												fontSize: 14,
+											}}
+										>
+											{tag}
+										</Text>
+										<TouchableOpacity
+											onPress={() =>
+												setValue((prev) =>
+													prev.filter(
+														(_, i) => i !== index
+													)
+												)
+											}
+										>
+											<Text
+												style={{
+													color: "#543C52",
+													fontSize: 14,
+												}}
+											>
+												×
+											</Text>
 										</TouchableOpacity>
 									</View>
 								))}
 							</View>
 						</View>
-						<Text style={styles.imageSectionTitle}>Зображення ({images.length}/10)</Text>
+						<Text style={styles.imageSectionTitle}>
+							Зображення ({images.length}/10)
+						</Text>
 						{renderImages()}
 						<View style={styles.actions}>
-							<TouchableOpacity style={styles.addImageButton} onPress={onSearch}>
-								<Text style={styles.addImageText}>+ Додати зображення</Text>
+							<TouchableOpacity
+								style={{
+									alignItems: "center",
+								}}
+								onPress={onSearch}
+							>
+								<Image
+									source={require("../../../shared/ui/images/pictures-modal.png")}
+									style={styles.icon}
+								/>
+							</TouchableOpacity>
+							<TouchableOpacity>
+								<Image
+									source={require("../../../shared/ui/images/smile-modal.png")}
+									style={styles.icon}
+								/>
 							</TouchableOpacity>
 							<TouchableOpacity
-								style={[styles.submitButton, isLoading && { opacity: 0.7 }]}
+								style={[
+									styles.submitButton,
+									isLoading && { opacity: 0.7 },
+								]}
 								onPress={handleSubmitWithRefetch}
 								disabled={isLoading}
 							>
@@ -432,8 +599,12 @@ export function MyPublicationModal({ modalVisible, changeVisibility }: Props) {
 									<ActivityIndicator color="#fff" />
 								) : (
 									<>
-										<Text style={styles.submitText}>Публікація</Text>
-										<SendArrow style={{ width: 20, height: 20 }} />
+										<Text style={styles.submitText}>
+											Публікація
+										</Text>
+										<SendArrow
+											style={{ width: 20, height: 20 }}
+										/>
 									</>
 								)}
 							</TouchableOpacity>
@@ -494,6 +665,7 @@ const styles = StyleSheet.create({
 	actions: {
 		gap: 16,
 		marginTop: 20,
+		flexDirection: "row",
 	},
 	addImageButton: {
 		backgroundColor: "#f0f0f0",
@@ -516,6 +688,8 @@ const styles = StyleSheet.create({
 		padding: 15,
 		borderRadius: 1234,
 		gap: 8,
+		width: 130,
+		height: 40,
 	},
 	submitText: {
 		color: "white",
@@ -532,7 +706,7 @@ const styles = StyleSheet.create({
 	imageContainer: {
 		position: "relative",
 		alignItems: "center",
-		justifyContent: "center"
+		justifyContent: "center",
 	},
 	imageAdded: {
 		width: "100%",
@@ -587,5 +761,9 @@ const styles = StyleSheet.create({
 	removeTagText: {
 		color: "#333",
 		fontSize: 14,
+	},
+	icon: {
+		width: 40,
+		height: 40,
 	},
 });

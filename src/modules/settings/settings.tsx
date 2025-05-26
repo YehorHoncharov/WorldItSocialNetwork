@@ -1,4 +1,4 @@
-import { View, Text, Image, TouchableOpacity, ScrollView } from "react-native";
+import { View, Text, Image, TouchableOpacity, ScrollView, Alert } from "react-native";
 import { Input } from "../../shared/ui/input";
 import { styles } from "./settings.styles";
 import { useUserContext } from "../auth/context/user-context";
@@ -10,6 +10,7 @@ import PencilIcon from "../../shared/ui/icons/pencil";
 import { Controller, useForm } from "react-hook-form";
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { Platform, Pressable } from 'react-native';
+import { launchImageLibraryAsync, requestMediaLibraryPermissionsAsync } from "expo-image-picker";
 interface IUserForm{
     id: number,
     name?: string,
@@ -20,20 +21,22 @@ interface IUserForm{
     password: string,
     signature?: string,
 }
+
+interface IUserImg {
+	id: number;
+	url: string;
+	userPostId: number;
+}
 export function Settings() {
+	const [image, setImage] = useState<string>("");
 	const { control, handleSubmit, reset  } = useForm<IUserForm>({
   defaultValues: {
     dateOfBirth: new Date(),
   }})
+	const [imageDimensions, setImageDimensions] = useState<{
+			[key: string]: { width: number; height: number };
+		}>({});
 	const { user } = useUserContext();
-	// const [name, setName] = useState("");
-	// const [username, setUsername] = useState("");
-	// const [surname, setSurname] = useState("");
-	// const [dateOfBirth, setDateOfBirth] = useState<Date>(new Date());
-	// const [email, setEmail] = useState("");
-	// const [password, setPassword] = useState("");
-	// const [signature, setSignature] = useState("");
-	// const [tokenUser, setTokenUser] = useState("");
 
 	const [isEditing, setIsEditing] = useState(false);
 
@@ -104,6 +107,127 @@ export function Settings() {
 		loadData();
 	}, [user]);
 
+	async function onSearch() {
+		try {
+			const { status } = await requestMediaLibraryPermissionsAsync();
+			if (status !== "granted") {
+				Alert.alert(
+					"Дозвіл не надано",
+					"Для додавання зображень необхідно надати доступ до галереї"
+				);
+				return;
+			}
+
+			const result = await launchImageLibraryAsync({
+				mediaTypes: ["images"],
+				quality: 0.8,
+				allowsEditing: false,
+				base64: true,
+			});
+
+			if (!result.canceled && result.assets) {
+				const allowedFormats = ["jpeg", "png", "gif"];
+				const maxSizeInBytes = 5 * 1024 * 1024; // 5 MB
+
+				const newImages = await Promise.all(
+					result.assets
+						.filter((asset) => {
+							const type =
+								asset.mimeType?.split("/")[1]?.toLowerCase() ||
+								"";
+							return (
+								asset.base64 && allowedFormats.includes(type)
+							);
+						})
+						.map(async (asset, index) => {
+							const base64String = asset.base64!;
+							const estimatedSizeInBytes =
+								(base64String.length * 3) / 4;
+							if (estimatedSizeInBytes > maxSizeInBytes) {
+								Alert.alert(
+									"Помилка",
+									`Зображення занадто велике (макс. 5 МБ)`
+								);
+								return null;
+							}
+							const imageUrl = `data:image/${
+								asset.mimeType?.split("/")[1] || "jpeg"
+							};base64,${base64String}`;
+							console.log(
+								"[MyPublicationModal] Додано зображення:",
+								imageUrl.slice(0, 50),
+								"..."
+							);
+
+							// Отримуємо розміри зображення
+							const dimensions = await new Promise<{
+								width: number;
+								height: number;
+							}>((resolve) => {
+								Image.getSize(
+									imageUrl,
+									(width, height) =>
+										resolve({ width, height }),
+									(error) => {
+										console.error(
+											`[MyPublicationModal] Помилка визначення розмірів: ${error}`
+										);
+										resolve({ width: 150, height: 150 }); // Запасний варіант
+									}
+								);
+							});
+
+							const imageKey = `${Date.now() + index}`;
+							setImageDimensions((prev) => ({
+								...prev,
+								[imageKey]: dimensions,
+							}));
+
+							return {
+								id: Date.now() + index,
+								url: imageUrl,
+								userPostId: 0,
+							};
+						})
+				);
+
+				const filteredImages = newImages.filter(
+					(img): img is IUserImg => img !== null
+				);
+
+				if (images.length + filteredImages.length > 10) {
+					Alert.alert(
+						"Увага",
+						"Максимальна кількість зображень - 10"
+					);
+					return;
+				}
+
+				setImage((prev) => {
+					const updatedImages = [...prev, ...filteredImages];
+					console.log(
+						"[MyPublicationModal] Оновлений список зображень:",
+						updatedImages
+					);
+					return updatedImages;
+				});
+			} else if (result.canceled) {
+				Alert.alert("Скасовано", "Вибір зображень було скасовано");
+			}
+		} catch (error) {
+			console.error(
+				"[MyPublicationModal] Помилка вибору зображення:",
+				error
+			);
+			Alert.alert(
+				"Помилка",
+				`Не вдалося вибрати зображення: ${
+					error instanceof Error ? error.message : "Невідома помилка"
+				}`
+			);
+		}
+	}
+
 	if (!user) {
 		return (
 			<View
@@ -144,17 +268,42 @@ export function Settings() {
 				<View style={styles.container}>
 					<View style={styles.userInfoFirst}>
 						<Text style={styles.userInfoText}>Картка профілю</Text>
-						<Image
-							source={require("../../shared/ui/images/pencil-in-circle.png")}
-							style={styles.pencilImage}
-						/>
+						<TouchableOpacity
+							onPress={
+								isEditing
+									? handleSubmit(handleSave)
+									: handleEditToggle
+							}
+						>
+							{isEditing ? (
+								<View style={styles.buttonSave}>
+
+									<PencilIcon width={15} height={15} />
+									<Text
+										style={{
+											color: "#543C52",
+											fontWeight: "500",
+										}}
+									>
+										Зберегти
+									</Text>
+								</View>
+							) : (
+								<Image
+									source={require("../../shared/ui/images/pencil-in-circle.png")}
+									style={styles.pencilImage}
+								/>
+							)}
+						</TouchableOpacity>
 					</View>
 
 					<View style={{ gap: 24, alignItems: "center" }}>
-						<Image
-							source={require("../../shared/ui/images/avatar.png")}
-							style={{ width: 96, height: 96 }}
-						/>
+						<TouchableOpacity onPress={onSearch} disabled={!isEditing}>
+							<Image
+								source={image ? { uri: image } : require("../../shared/ui/images/avatar.png")}
+								style={{ width: 96, height: 96, borderRadius: 48 }}
+							/>
+						</TouchableOpacity>
 						<View style={{ gap: 10, padding: 16 }}>
 							<Text
 								style={{
@@ -163,18 +312,39 @@ export function Settings() {
 									fontWeight: "700",
 								}}
 							>
-								Lina Li
+								{user.name} {user.surname}
 							</Text>
 							{/* <Text style={{ fontSize: 24, color: "#070A1C", fontWeight: "700" }}>{user.name}</Text>  */}
-							<Text
+							{isEditing ? (
+							<Controller
+								control={control}
+								name="username"
+								render={({ field }) => (
+								<Input
+									width={343}
+									label="Юзернейм"
+									placeholder="Введіть ваш юзер"
+									value={field.value}
+									onChange={field.onChange}
+									onChangeText={field.onChange}
+									editable={isEditing}
+								/>
+								)}
+							/>
+							) : (
+							<TouchableOpacity onPress={() => setIsEditing(true)}>
+								<Text
 								style={{
 									fontSize: 16,
 									color: "#070A1C",
 									fontWeight: "500",
+									alignSelf: "center",
 								}}
-							>
-								@thelili
-							</Text>
+								>
+								@{user.username}
+								</Text>
+							</TouchableOpacity>
+							)}
 							{/* <Text style={{ fontSize: 16, color: "#070A1C", fontWeight: "500" }}>{user.username}</Text>  */}
 						</View>
 					</View>
@@ -195,10 +365,7 @@ export function Settings() {
 						>
 							{isEditing ? (
 								<View style={styles.buttonSave}>
-									{/* <Image
-									source={require("../../shared/ui/images/pencil-in-circle.png")}
-									style={styles.pencilImage}
-									/> */}
+
 									<PencilIcon width={15} height={15} />
 									<Text
 										style={{
