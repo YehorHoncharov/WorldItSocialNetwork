@@ -456,6 +456,7 @@ export function ChangePostModal({
 					</View>
 
 					<ScrollView
+						overScrollMode="never"
 						style={styles.scrollArea}
 						contentContainerStyle={{ paddingBottom: 20 }}
 						keyboardShouldPersistTaps="handled"
@@ -636,14 +637,13 @@ export function ChangePostModal({
 						<View
 							style={{
 								marginTop: 20,
-								gap: 15,
-								flexDirection: "column",
+								gap: 10,
+								flexDirection: "row",
+								alignItems: "center",
+								justifyContent: "flex-end"
 							}}
 						>
 							<TouchableOpacity
-								style={{
-									alignItems: "center",
-								}}
 								onPress={onSearch}
 							>
 								<Image
@@ -651,25 +651,17 @@ export function ChangePostModal({
 									style={styles.icon}
 								/>
 							</TouchableOpacity>
+
 							<TouchableOpacity>
 								<Image
 									source={require("../../../../shared/ui/images/smile-modal.png")}
 									style={styles.icon}
 								/>
 							</TouchableOpacity>
+
 							<TouchableOpacity
 								style={[
-									{
-										backgroundColor: "#543C52",
-										padding: 15,
-										borderRadius: 8,
-										flexDirection: "row",
-										justifyContent: "center",
-										alignItems: "center",
-										gap: 10,
-                    width: 130,
-                    height: 40
-									},
+									styles.submitButton,
 									isLoading && { opacity: 0.7 },
 								]}
 								onPress={handleSubmit}
@@ -682,8 +674,8 @@ export function ChangePostModal({
 										<Text
 											style={{
 												color: "white",
-												fontWeight: "bold",
-												fontSize: 16,
+												fontWeight: "500",
+												fontSize: 14,
 											}}
 										>
 											Оновити публікацію

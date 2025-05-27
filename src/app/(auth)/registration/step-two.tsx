@@ -16,6 +16,7 @@ import { Input } from "../../../shared/ui/input";
 import { POST } from "../../../shared/api/post";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useUserContext } from "../../../modules/auth/context/user-context";
+import { useLocalSearchParams } from "expo-router";
 
 interface Props {
 	modalVisible: boolean;
@@ -27,10 +28,14 @@ export function RegStepTwoModal({ modalVisible, changeVisibility }: Props) {
 	const [surname, setSurname] = useState("");
 	const [username, setUsername] = useState("");
 	const [tokenUser, setTokenUser] = useState<string>("");
-	const { user } = useUserContext();
-	// const [open, setOpen] = useState(false);
+	const { register, setShowWelcomeModal, showWelcomeModal } = useUserContext();
 
-	// const { refetch } = usePosts();
+
+	const params = useLocalSearchParams<{
+		email: string;
+		password: string;
+		code: string
+	}>();
 
 	const getToken = async (): Promise<string> => {
 		const token = await AsyncStorage.getItem("token");
@@ -42,68 +47,22 @@ export function RegStepTwoModal({ modalVisible, changeVisibility }: Props) {
 	}, []);
 
 	const handleSubmit = async () => {
-		console.log("[refetch] Начало обработки submit");
 		if (!name || !surname || !username) {
 			Alert.alert("Помилка", "Будь ласка, заповніть обов'язкові поля");
 			return;
 		}
 
-		if (!user) {
-            console.log("[refetch] Пользователь не найден, выход из функции");
-			return;
+		register(params.email, params.password, params.code, name, surname, username)
 
-		}
-
-		try {
-
-			console.log("[refetch] Отправка запроса на создание поста");
-			await POST({
-				endpoint: "http://192.168.1.104:3000/user/reg",
-				headers: {
-					"Content-Type": "application/json",
-					Authorization: `Bearer ${tokenUser}`,
-				},
-				token: tokenUser,
-				body: {
-					name,
-					surname,
-					username
-				},
-			});
-
-			setName("");
-			setSurname("");
-			setUsername("");
-			changeVisibility();
-
-
-			Alert.alert("заєбок");
-		} catch (err) {
-			console.error("[refetch] Ошибка в процессе создания поста:", err);
-			console.error("Помилка при регістрації:", err);
-			Alert.alert("Помилка", "Не вдалося зареєструватися. Спробуйте ще раз.");
-		}
+		setShowWelcomeModal(false)
 	};
 
-	// async function handleSubmitWithRefetch() {
-	// 	handleSubmit();
-	// 	console.log(
-	// 		"[refetch] Запрос на создание поста успешен, запуск refetch"
-	// 	);
-	// 	// const updatedPosts = await refetch();
-	// 	console.log(
-	// 		`[refetch] Обновленный список содержит ${
-	// 			updatedPosts?.length || 0
-	// 		} постов`
-	// 	);
-	// 	// refetch();
-	// }
 
 	return (
 		<Modal
 			animationType="fade"
 			transparent={true}
-			visible={modalVisible}
+			visible={showWelcomeModal}
 			onRequestClose={changeVisibility}
 		>
 			<View style={styles.centeredView}>

@@ -1,28 +1,65 @@
-import { SafeAreaView, ScrollView, View } from "react-native";
+import { View } from "react-native";
 import { Author } from "../author/author";
 import { Content } from "../content/content";
 import { Providers } from "../../../../app/providers";
 import { IPost } from "../../types/post";
+import { StyleSheet } from "react-native";
 
 export default function Post(props: IPost) {
-
-	const {id, name, text, theme, images, likes, views, tags, links, authorId} = props
+	const {
+		id,
+		name,
+		text,
+		theme,
+		images,
+		likes,
+		views,
+		tags,
+		links,
+		authorId,
+	} = props;
 
 	return (
 		<Providers>
-			<SafeAreaView
-				style={{
-					height: 725,
-					flex: 1,
-					borderWidth: 1,
-					borderColor: "#CDCED2",
-					borderRadius: 30,
-					backgroundColor: "#ffffff",
-				}}
-			>
-				<Author id={id} name={name} text={text} theme={theme} images={images} likes={likes} links={links} authorId={authorId} views={views} tags={tags}></Author>
-				<Content id={id} name={name} text={text} theme={theme} likes={likes} links={links} authorId={authorId} views={views} tags={tags} images={images} ></Content>
-			</SafeAreaView>
+			<View style={styles.container}>
+				<Author
+					id={id}
+					name={name}
+					text={text}
+					theme={theme}
+					images={images}
+					likes={likes}
+					links={links}
+					authorId={authorId}
+					views={views}
+					tags={tags}
+				/>
+				<Content
+					id={id}
+					name={name}
+					text={text}
+					theme={theme}
+					likes={likes}
+					links={links}
+					authorId={authorId}
+					views={views}
+					tags={tags}
+					images={images}
+				/>
+			</View>
 		</Providers>
 	);
 }
+
+const styles = StyleSheet.create({
+	container: {
+		flex: 1,
+		borderWidth: 1,
+		borderColor: "#CDCED2",
+		borderRadius: 30,
+		backgroundColor: "#ffffff",
+		marginBottom: 16,
+		overflow: "hidden",
+		marginTop: 10,
+	},
+});

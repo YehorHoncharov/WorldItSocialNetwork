@@ -18,7 +18,7 @@ const CELL_COUNT = 6;
 export function RegFormThree() {
 	const { handleSubmit } = useForm<IRegCode>();
 	const router = useRouter();
-	const { register, setShowWelcomeModal } = useUserContext();
+	const { setShowWelcomeModal } = useUserContext();
 
 	const params = useLocalSearchParams<{
 		email: string;
@@ -37,12 +37,11 @@ export function RegFormThree() {
 	}
 
 	function onSubmit() {
-		register(params.email, params.password, code);
 		if (code) {
 			router.navigate({
 			pathname: "/home",
+			params: { email: params.email, password: params.password, code }
 		});
-
 		setShowWelcomeModal(true)
 		}
 	}

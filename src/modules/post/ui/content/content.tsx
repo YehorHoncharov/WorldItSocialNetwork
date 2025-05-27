@@ -106,12 +106,8 @@ export function Content(props: IPost) {
 		return <ActivityIndicator size="large" />;
 	}
 
-	if (!props.images || props.images.length === 0) {
-		return (
-			<View style={styles.container}>
-				<Text>Немає зображень для відображення</Text>
-			</View>
-		);
+	if (!props.images){
+		return 
 	}
 
 	const groupedImages = groupImages(props.images);
@@ -119,9 +115,10 @@ export function Content(props: IPost) {
 	return (
 		<View style={styles.container}>
 			<View style={styles.textContainer}>
-				<Text>{props.name}</Text>
+				<Text style={{fontSize: 18}}>{props.name}</Text>
+				<Text/>
 				{props.theme && <Text>{props.theme}</Text>}
-				{props.links && <Text selectable>{props.links}</Text>}
+				{/* {props.links && <Text selectable>{props.links}</Text>} */}
 				<Text style={styles.text}>{props.text}</Text>
 				{props.tags && props.tags.length > 0 && (
 					<View style={styles.tagsContainer}>
@@ -138,14 +135,15 @@ export function Content(props: IPost) {
 					</View>
 				)}
 			</View>
-
-			<FlatList
-				data={groupedImages}
-				renderItem={renderRow}
-				keyExtractor={(item, index) => `row-${index}`}
-				scrollEnabled={false}
-				contentContainerStyle={styles.gridContainer}
-			/>
+			{props.images && props.images.length > 0 ? (
+				<FlatList
+					data={groupedImages}
+					renderItem={renderRow}
+					keyExtractor={(item, index) => `row-${index}`}
+					scrollEnabled={false}
+					contentContainerStyle={styles.gridContainer}
+				/>
+			) : <Text>Немає зображень для відображення</Text>}
 
 			<View style={styles.postStatsContainer}>
 				<View style={styles.postButs}>

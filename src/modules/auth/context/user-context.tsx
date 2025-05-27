@@ -11,12 +11,15 @@ interface IUserContext {
 	register: (
 		email: string,
 		password: string,
-		code: string
+		code: string,
+		name: string,
+		surname: string,
+		username: string
 	) => void;
 	isAuthenticated: () => boolean;
 	updateUser: (updatedUser: IUser) => void;
 	setShowWelcomeModal: (value: boolean) => void,
-	showWelcomeModal: boolean | null; 
+	showWelcomeModal: boolean | undefined; 
 
 }
 
@@ -26,12 +29,15 @@ const initialValue: IUserContext = {
 	register: (
 		email: string,
 		password: string,
-		code: string
+		code: string,
+		name: string,
+		surname: string,
+		username: string
 	) => {},
 	isAuthenticated: () => false,
 	updateUser: (updatedUser: IUser) => {},
 	setShowWelcomeModal: (value: boolean) => {},
-	showWelcomeModal: null 
+	showWelcomeModal: undefined 
 };
 
 const userContext = createContext<IUserContext>(initialValue);
@@ -94,7 +100,10 @@ export function UserContextProvider(props: IUserContextProviderProps) {
 	async function register(
 		email: string,
 		password: string,
-		code: string
+		code: string,
+		name: string,
+		surname: string,
+		username: string
 	) {
 		try {
 			console.log("111111")
@@ -105,6 +114,9 @@ export function UserContextProvider(props: IUserContextProviderProps) {
 					email: email,
 					password: password,
 					code: code,
+					name: name,
+					surname: surname,
+					username: username
 				}),
 			});
 

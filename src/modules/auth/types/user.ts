@@ -1,3 +1,4 @@
+import { IUserImg } from "../../settings/settings";
 
 export interface IUser{
     id: number,
@@ -8,4 +9,5 @@ export interface IUser{
     email: string,
     password: string,
     signature?: string,
+    image?: IUserImg
 }

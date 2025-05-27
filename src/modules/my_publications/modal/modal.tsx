@@ -396,6 +396,7 @@ export function MyPublicationModal({ modalVisible, changeVisibility }: Props) {
 
 	return (
 		<Modal
+		
 			animationType="fade"
 			transparent={true}
 			visible={modalVisible}
@@ -412,6 +413,7 @@ export function MyPublicationModal({ modalVisible, changeVisibility }: Props) {
 						</Pressable>
 					</View>
 					<ScrollView
+						overScrollMode="never"
 						style={styles.scrollArea}
 						keyboardShouldPersistTaps="handled"
 					>
@@ -666,6 +668,8 @@ const styles = StyleSheet.create({
 		gap: 16,
 		marginTop: 20,
 		flexDirection: "row",
+		alignItems: "center",
+		justifyContent: "flex-end",
 	},
 	addImageButton: {
 		backgroundColor: "#f0f0f0",
@@ -685,16 +689,17 @@ const styles = StyleSheet.create({
 		alignItems: "center",
 		justifyContent: "center",
 		backgroundColor: "#543C52",
-		padding: 15,
+		paddingHorizontal: 15,
+		paddingVertical: 10,
 		borderRadius: 1234,
 		gap: 8,
-		width: 130,
-		height: 40,
+		minWidth: 130,
 	},
 	submitText: {
 		color: "white",
-		fontSize: 16,
-		fontWeight: "600",
+		fontSize: 14,
+		fontWeight: "500",
+		flexShrink: 1,
 	},
 	scrollArea: {
 		flexGrow: 1,

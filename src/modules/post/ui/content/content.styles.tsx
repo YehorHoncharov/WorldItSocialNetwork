@@ -71,13 +71,13 @@ export const styles = StyleSheet.create({
 		gap: 8,
 	},
 	tag: {
-		backgroundColor: "#e0f2fe",
+		backgroundColor: "#E9E5EE",
 		paddingHorizontal: 12,
 		paddingVertical: 6,
 		borderRadius: 15,
 	},
 	tagText: {
-		color: "#0369a1",
+		color: "#543C52",
 		fontSize: 14,
 	},
 });
