@@ -22,16 +22,15 @@ export async function PUT<T>(params: IPutRequestParams): Promise<Result<T>> {
             method: "PUT",
         });
 
-        console.log("HTTP статус:", response.status);
 
         const text = await response.text();
-        console.log("Сира відповідь сервера:", text);
+
 
         let responseData: any;
         try {
             responseData = text ? JSON.parse(text) : {};
         } catch (e) {
-            console.error("Помилка парсингу JSON:", e);
+
             return {
                 status: "error",
                 message: "Некоректний формат відповіді сервера",
@@ -40,7 +39,7 @@ export async function PUT<T>(params: IPutRequestParams): Promise<Result<T>> {
         }
 
         if (!response.ok) {
-            console.error("HTTP помилка:", response.status, responseData);
+
             return {
                 status: "error",
                 message: responseData.message || `HTTP помилка: ${response.status}`,
@@ -66,14 +65,14 @@ export async function PUT<T>(params: IPutRequestParams): Promise<Result<T>> {
             };
         }
 
-        console.error("Невідома структура відповіді:", responseData);
+
         return {
             status: "error",
             message: "Невідомий формат відповіді сервера",
             code: 500,
         };
-    } catch (err) {
-        console.error("Помилка в PUT:", err);
+    } catch (err) {        console.error("Помилка в PUT:", err);
+
         return {
             status: "error",
             message: err instanceof Error ? err.message : "Мережева помилка",

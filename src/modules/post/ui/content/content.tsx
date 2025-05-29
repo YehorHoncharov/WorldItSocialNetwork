@@ -23,10 +23,8 @@ export function Content(props: IPost) {
 	const checkServerAvailability = async () => {
 		try {
 			const response = await fetch(BASE_URL);
-			console.log("Server status:", response.status);
 			setIsLoading(false);
 		} catch (error) {
-			console.error("Server error:", error);
 			setIsLoading(false);
 		}
 	};
@@ -43,7 +41,7 @@ export function Content(props: IPost) {
 		}
 
 		const fullUrl = `${BASE_URL}${correctedPath}`;
-		console.log("Image URL:", fullUrl);
+
 		return fullUrl;
 	};
 
@@ -88,12 +86,7 @@ export function Content(props: IPost) {
 								style={styles.image}
 								source={{ uri: imageUrl }}
 								resizeMode="cover"
-								onError={(e) =>
-									console.log(
-										"Image error:",
-										e.nativeEvent.error
-									)
-								}
+							
 							/>
 						</View>
 					);

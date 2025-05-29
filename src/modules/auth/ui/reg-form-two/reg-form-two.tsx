@@ -39,7 +39,7 @@ export function RegFormTwo() {
 			...params,
 		};
 
-		console.log(fullParams + " 111");
+
 		sendCode(params.email);
 		router.navigate({
 			pathname: "/registration/step-three",

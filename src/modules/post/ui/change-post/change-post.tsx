@@ -80,6 +80,7 @@ export function ChangePostModal({
 	const API_BASE_URL = "http://192.168.1.104:3000";
 
 	useEffect(() => {
+
 		const loadData = async () => {
 			const token = await AsyncStorage.getItem("token");
 			setTokenUser(token || "");
@@ -97,7 +98,7 @@ export function ChangePostModal({
 							.filter((tag): tag is string => tag !== null) || []
 					)
 				);
-				console.log("[ChangePostModal] Loaded tags:", tagsFromPost);
+
 				setValue(tagsFromPost);
 
 				const loadedImages = postData.images
@@ -108,9 +109,7 @@ export function ChangePostModal({
 							const normalizedUrl = img.url.startsWith("http")
 								? img.url
 								: `${API_BASE_URL}/uploads/${relativeUrl}`;
-							console.log(
-								`[ChangePostModal] Normalized image URL: ${normalizedUrl}`
-							);
+
 							return {
 								...img,
 								url: normalizedUrl,
@@ -118,7 +117,7 @@ export function ChangePostModal({
 							};
 					  })
 					: [];
-				console.log("[ChangePostModal] Loaded images:", loadedImages);
+
 				setImages(loadedImages);
 
 				const additionalTags = tagsFromPost
@@ -176,15 +175,13 @@ export function ChangePostModal({
 		};
 
 		const existingImages = postData.images || [];
-		console.log("[ChangePostModal] Existing images:", existingImages);
-		console.log("[ChangePostModal] Current images state:", images);
+
 
 		const persistedImages = images.filter((img) =>
 			existingImages.some(
 				(pi) => pi.id === img.id && pi.url === img.rawUrl
 			)
 		);
-		console.log("[ChangePostModal] Persisted images:", persistedImages);
 
 		const newImages = images
 			.filter((img) => img.url.startsWith("data:image"))
@@ -196,23 +193,12 @@ export function ChangePostModal({
 					!matches ||
 					!["jpeg", "png", "gif"].includes(matches[1].toLowerCase())
 				) {
-					console.error(
-						`[ChangePostModal] Непідтримуваний формат зображення: ${img.url.slice(
-							0,
-							20
-						)}...`
-					);
 					return null;
 				}
 				const base64Data = matches[2];
 				const estimatedSizeInBytes = (base64Data.length * 3) / 4;
 				if (estimatedSizeInBytes > 5 * 1024 * 1024) {
-					console.error(
-						`[ChangePostModal] Зображення занадто велике: ${img.url.slice(
-							0,
-							20
-						)}...`
-					);
+
 					return null;
 				}
 				return { url: img.url };
@@ -222,7 +208,7 @@ export function ChangePostModal({
 		const deletedImages = existingImages
 			.filter((pi) => !persistedImages.some((img) => img.id === pi.id))
 			.map((pi) => ({ id: pi.id }));
-		console.log("[ChangePostModal] Images to delete:", deletedImages);
+
 
 		if (newImages.length + persistedImages.length > 10) {
 			Alert.alert("Помилка", "Максимум 10 зображень дозволено");
@@ -238,10 +224,6 @@ export function ChangePostModal({
 
 		setIsLoading(true);
 		try {
-			console.log(
-				"[ChangePostModal] Відправка запиту:",
-				JSON.stringify(updatedData, null, 2)
-			);
 			const response = await PUT<IPost>({
 				endpoint: `${API_BASE_URL}/posts/${postData.id}`,
 				headers: {
@@ -251,7 +233,7 @@ export function ChangePostModal({
 				body: updatedData,
 			});
 
-			console.log("[ChangePostModal] Відповідь:", response);
+
 
 			if (response.status === "success") {
 				Alert.alert("Успіх", "Пост успішно оновлено");
@@ -264,7 +246,7 @@ export function ChangePostModal({
 				);
 			}
 		} catch (error) {
-			console.error("[ChangePostModal] Помилка:", error);
+
 			Alert.alert(
 				"Помилка",
 				`Не вдалося оновити пост: ${
@@ -304,29 +286,18 @@ export function ChangePostModal({
 						const type =
 							asset.mimeType?.split("/")[1]?.toLowerCase() || "";
 						if (!asset.base64 || !allowedFormats.includes(type)) {
-							console.error(
-								`[ChangePostModal] Некоректний формат зображення: ${type}`
-							);
+
 							return null;
 						}
 						const base64String = asset.base64;
 						const estimatedSizeInBytes =
 							(base64String.length * 3) / 4;
 						if (estimatedSizeInBytes > maxSizeInBytes) {
-							console.error(
-								`[ChangePostModal] Зображення занадто велике: ${Math.round(
-									estimatedSizeInBytes / 1024 / 1024
-								)} МБ`
-							);
+
 							return null;
 						}
 						const url = `data:image/${type};base64,${base64String}`;
-						console.log(
-							`[ChangePostModal] Додано зображення: ${url.slice(
-								0,
-								20
-							)}...`
-						);
+
 						return {
 							id: Date.now() + index,
 							url,
@@ -349,10 +320,7 @@ export function ChangePostModal({
 				Alert.alert("Скасовано", "Вибір зображень було скасовано");
 			}
 		} catch (error) {
-			console.error(
-				"[ChangePostModal] Помилка вибору зображення:",
-				error
-			);
+
 			Alert.alert(
 				"Помилка",
 				`Не вдалося вибрати зображення: ${
@@ -383,9 +351,7 @@ export function ChangePostModal({
 						img.url.startsWith("data:image/") ||
 						img.url.startsWith("http");
 					if (!isValidImage) {
-						console.error(
-							`[ChangePostModal] Некоректний URL зображення: ${img.url}`
-						);
+
 						return null;
 					}
 					return (
@@ -393,24 +359,13 @@ export function ChangePostModal({
 							key={`image-${img.id}-${idx}`}
 							style={styles.imageContainer}
 						>
+
 							<Image
 								source={{ uri: img.url }}
 								style={styles.imageAdded}
 								resizeMode="cover"
-								onError={(e) => {
-									console.error(
-										`[ChangePostModal] Помилка завантаження зображення: ${img.url}`,
-										e.nativeEvent
-									);
-								}}
-								onLoad={() =>
-									console.log(
-										`[ChangePostModal] Зображення завантажено: ${img.url.slice(
-											0,
-											20
-										)}...`
-									)
-								}
+		
+								
 							/>
 							<TouchableOpacity
 								style={styles.removeImageButton}
@@ -543,10 +498,7 @@ export function ChangePostModal({
 										flex: 1,
 									}}
 									onChangeValue={(newValue) => {
-										console.log(
-											"[ChangePostModal] Selected tags:",
-											newValue
-										);
+
 									}}
 									onChangeSearchText={(text) => {
 										const sanitizedText = text.trim();

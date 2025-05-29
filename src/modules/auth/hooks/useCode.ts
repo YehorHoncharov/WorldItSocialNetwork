@@ -11,9 +11,9 @@ export async function sendCode(email: string) {
 			}
 		);
 		const result: Response<string> = await response.json();
-		console.log(result);
+
 		if (result.status === "error") {
-			console.log(result.message);
+
 			return;
 		}
 	} catch (error) {

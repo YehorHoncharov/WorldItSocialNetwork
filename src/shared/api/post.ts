@@ -25,7 +25,6 @@ export async function POST<T>(params: IPostRequestParams): Promise<Result<T>> {
 		if (responseData.status === "error"){
 			return { ...responseData, code: response.status }
 		}
-        console.log(1111)
         return responseData
 	} catch (err) {
 		console.log(err)

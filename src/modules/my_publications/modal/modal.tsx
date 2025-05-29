@@ -81,7 +81,7 @@ export function MyPublicationModal({ modalVisible, changeVisibility }: Props) {
 	}, []);
 
 	const handleSubmit = async () => {
-		console.log("[refetch] Начало обработки submit");
+
 		if (!name.trim() || !theme.trim() || !text.trim()) {
 			Alert.alert(
 				"Помилка",
@@ -168,7 +168,6 @@ export function MyPublicationModal({ modalVisible, changeVisibility }: Props) {
 					{ label: "Подорожі", value: "#подорожі" },
 				]);
 				changeVisibility();
-				console.log("Публикацию успешно создано");
 				Alert.alert("Успіх", "Публікацію успішно створено");
 			} else {
 				Alert.alert(

@@ -78,7 +78,7 @@ export function ModalPost({
   const currentPost = posts.find((post: IPost) => post.id === postId);
 
   if (!currentPost) {
-    console.warn(`Post with ID ${postId} not found`);
+
     return null;
   }
 
