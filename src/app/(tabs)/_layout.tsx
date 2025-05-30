@@ -71,11 +71,23 @@ export default function TabsLayout() {
 				/>
 				<Tabs.Screen
 					name="friends"
+					listeners={{
+						tabPress: () => {
+							setIsHomeActive(false);
+							setIsMyPostsActive(false);
+							setIsFriendsActive(true);
+							setIsChatsActive(false);
+						},
+					}}
 					options={{
 						tabBarIcon: () => (
 							<Image
 								style={styles.friends}
-								source={require("../../shared/ui/images/friends.png")}
+								source={
+									isFriendsActive
+										? require("../../shared/ui/images/friends-with-line.png")
+										: require("../../shared/ui/images/friends.png")
+								}
 							/>
 						),
 						header: () => <Header />,
@@ -83,11 +95,23 @@ export default function TabsLayout() {
 				/>
 				<Tabs.Screen
 					name="chats"
+					listeners={{
+						tabPress: () => {
+							setIsHomeActive(false);
+							setIsMyPostsActive(false);
+							setIsFriendsActive(false);
+							setIsChatsActive(true);
+						},
+					}}
 					options={{
 						tabBarIcon: () => (
 							<Image
 								style={styles.chats}
-								source={require("../../shared/ui/images/chats.png")}
+								source={
+									isChatsActive
+										? require("../../shared/ui/images/chats.png")// тут дрлжен быть chats-with-line.png
+										: require("../../shared/ui/images/chats.png")
+								}
 							/>
 						),
 						header: () => <Header />,

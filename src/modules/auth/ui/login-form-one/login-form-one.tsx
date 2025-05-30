@@ -1,10 +1,8 @@
-import { View, Image, Text, Switch } from "react-native";
+import { View, Text } from "react-native";
 import { Input } from "../../../../shared/ui/input";
 import { Controller, useForm } from "react-hook-form";
 import { Button } from "../../../../shared/ui/button";
 import { styles } from "./login-form-one.styles";
-import { useState } from "react";
-import { router } from "expo-router";
 import { ILogin } from "./login-form-one.types";
 import { useUserContext } from "../../context/user-context";
 
@@ -12,8 +10,8 @@ import { useUserContext } from "../../context/user-context";
 export function LoginFormOne() {
 	const { control, handleSubmit } = useForm<ILogin>();
 
-	const [isEnabled, setIsEnabled] = useState(false);
-	const toggleSwitch = () => setIsEnabled((previousState) => !previousState);
+	// const [isEnabled, setIsEnabled] = useState(false);
+	// const toggleSwitch = () => setIsEnabled((previousState) => !previousState);
 	const { login } = useUserContext();
 
 	function onNext(data: ILogin) {
