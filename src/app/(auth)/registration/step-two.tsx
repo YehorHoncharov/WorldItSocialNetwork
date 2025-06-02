@@ -62,7 +62,7 @@ export function RegStepTwoModal({ modalVisible, changeVisibility }: Props) {
 		<Modal
 			animationType="fade"
 			transparent={true}
-			visible={showWelcomeModal}
+			visible={modalVisible}
 			onRequestClose={changeVisibility}
 		>
 			<View style={styles.centeredView}>

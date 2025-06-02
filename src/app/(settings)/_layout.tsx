@@ -5,7 +5,7 @@ import { Header } from "../../shared/ui/header";
 
 export default function SettingsLayout() {
 	return (
-		<SafeAreaView style={{flex: 1}} edges={["top",]}>
+		<SafeAreaView style={{flex: 1, backgroundColor: "#ffffff"}} edges={["top",]}>
 			<Header/>
 			<Stack
 				screenOptions={{

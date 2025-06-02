@@ -52,8 +52,8 @@ export const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#CDCED2",
     borderRadius: 10,
-    marginHorizontal: 16,
-    paddingBottom: 16
+    paddingBottom: 16,
+    alignSelf: 'center'
   },
   userInfoFirst: {
     flexDirection: "row",

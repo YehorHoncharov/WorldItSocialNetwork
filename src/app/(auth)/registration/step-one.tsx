@@ -21,7 +21,7 @@ const screenWidth = Dimensions.get("window").width;
 export default function Register() {
 	const [isRegister, setIsRegister] = useState(true);
 	const translateX = useRef(new Animated.Value(0)).current;
-	const insets = useSafeAreaInsets();
+	// const insets = useSafeAreaInsets();
 
 	useEffect(() => {
 		translateX.setValue(0);

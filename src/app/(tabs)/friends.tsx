@@ -1,24 +1,3 @@
-// import { ScrollView, View } from "react-native";
-// import { FriendsHeader } from "../../modules/friends/ui/friends-header/friends-header";
-// import { RequestsFriends } from "../../modules/friends/ui/requests/requests";
-// import { RecomendFriends } from "../../modules/friends/ui/recomend/recomend";
-// import { AllFriends } from "../../modules/friends/ui/all/all";
-
-// export default function Friends() {
-//     return (
-//         <ScrollView
-//             style={{ flex: 1 }} overScrollMode="never"
-//             contentContainerStyle={{ gap: 20, alignItems: "center" }}
-//         >
-//             <FriendsHeader />
-//             <RequestsFriends />
-//             <RecomendFriends />
-//             <AllFriends/>
-            
-//         </ScrollView>
-//     );
-// }
-
 import { ScrollView, View, Animated, Dimensions } from "react-native";
 import { useRef, useState } from "react";
 import { FriendsHeader } from "../../modules/friends/ui/friends-header/friends-header";

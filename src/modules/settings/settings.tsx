@@ -219,6 +219,7 @@ export function Settings() {
 			contentContainerStyle={{ paddingBottom: 30 }}
 			scrollEnabled={!isDrawing}
 			keyboardShouldPersistTaps="handled"
+			overScrollMode="never"
 		>
 			<View style={{ gap: 8 }}>
 				{/* Profile Card Section */}
@@ -330,7 +331,7 @@ export function Settings() {
 					</View>
 				</View>
 
-				{/* Personal Information Section */}
+
 				<View style={styles.container}>
 					<View style={styles.userInfoFirst}>
 						<Text style={styles.userInfoText}>
@@ -484,7 +485,7 @@ export function Settings() {
 					</View>
 				</View>
 
-				{/* Signature Options Section */}
+
 				<View style={styles.container}>
 					<View style={styles.userInfoFirst}>
 						<Text style={styles.userInfoText}>
