@@ -1,16 +1,18 @@
-import { TouchableOpacity, View, Text, Animated, Dimensions, StyleSheet, ScrollView } from "react-native";
+import { TouchableOpacity, View, Text, Animated, Dimensions, StyleSheet, ScrollView, FlatList } from "react-native";
 import { useRef, useState, useEffect } from "react";
-import { Settings } from "../../../settings/settings";
-import { My } from "./my";
-import { Album } from "../album/album";
-import { NoAlbums } from "../no-albums/no-albums";
-
+import { useAlbums } from "../../../hooks/useAlbums";
+import { Settings } from "../../../../settings";
+import { My } from "../my";
+import { FriendsForm } from "../../../../friends/ui/friends-form/friends-form";
+import { Album } from "../../album/album";
+import { NoAlbums } from "../../no-albums/no-albums";
 
 const screenWidth = Dimensions.get("window").width;
 
 export function ProfileHeader() {
     const [activeTab, setActiveTab] = useState('personal');
     const translateX = useRef(new Animated.Value(0)).current;
+    const { albums } = useAlbums()
 
     useEffect(() => {
         translateX.setValue(0);
@@ -71,9 +73,30 @@ export function ProfileHeader() {
                     </View>
                     
                     <ScrollView overScrollMode="never" contentContainerStyle={{gap : 8 }} style={{ width: screenWidth, flex: 1,}}>
-                        <My />
-                        <Album />
-                        <NoAlbums/>
+                        <My albums={albums}/>
+                        <FlatList
+                            data={albums}
+                            keyExtractor={(item) => `${item.id}`}
+                            contentContainerStyle={{ gap: 10, paddingBottom: 20 }}
+                            renderItem={({ item }) => (
+                                <FriendsForm
+                                    id={item.id}
+                                    name={item.name}
+                                    surname={item.surname}
+                                    username={item.username}
+                                    email={item.email}
+                                    image={`http://192.168.1.104:3000/${item.image}`}
+                                    password={item.password}
+                                />
+                            )}
+                            ListEmptyComponent={
+                                <View>
+                                    <NoAlbums/>
+                                </View>
+                            }
+                        />
+                     
+                        
                     </ScrollView>
                     
                 </Animated.View>

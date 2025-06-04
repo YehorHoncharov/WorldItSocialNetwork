@@ -12,20 +12,24 @@ import {
   requestMediaLibraryPermissionsAsync,
 } from "expo-image-picker";
 import { useEffect, useState } from "react";
-import { IAlbumImg } from "../../types/albums.types";
+import { IAlbum, IAlbumImg } from "../../types/albums.types";
 import { useUserContext } from "../../../auth/context/user-context";
 import { PUT } from "../../../../shared/api/put";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-export function My() {
+interface IAlbumProps {
+  albums: IAlbum[]
+}
+
+export function My(props: IAlbumProps) {
   const [images, setImages] = useState<IAlbumImg[]>([]);
   const [imageDimensions, setImageDimensions] = useState<{
     [key: string]: { width: number; height: number };
   }>({});
   const [tokenUser, setTokenUser] = useState<string>("");
   const { user } = useUserContext();
-
-  console.log(user);
+  const [changeImage, setChangeImage] = useState<boolean>(false)
+  const { albums } = props
 
   const API_BASE_URL = "http://192.168.1.104:3000";
 
@@ -78,9 +82,8 @@ export function My() {
                 );
                 return null;
               }
-              const imageUrl = `data:image/${
-                asset.mimeType?.split("/")[1] || "jpeg"
-              };base64,${base64String}`;
+              const imageUrl = `data:image/${asset.mimeType?.split("/")[1] || "jpeg"
+                };base64,${base64String}`;
               console.log(
                 "[MyPublicationModal] Додано зображення:",
                 imageUrl.slice(0, 50),
@@ -95,7 +98,7 @@ export function My() {
               return {
                 id: Date.now() + index,
                 url: imageUrl,
-                userPostId: 0,
+                albumId: 0,
               };
             })
         );
@@ -113,6 +116,7 @@ export function My() {
           const updatedImages = [...prev, ...filteredImages];
           return updatedImages;
         });
+        setChangeImage(true)
       } else if (result.canceled) {
         Alert.alert("Скасовано", "Вибір зображень було скасовано");
       }
@@ -120,8 +124,7 @@ export function My() {
       console.error("Помилка вибору зображення:", error);
       Alert.alert(
         "Помилка",
-        `Не вдалося вибрати зображення: ${
-          error instanceof Error ? error.message : "Невідома помилка"
+        `Не вдалося вибрати зображення: ${error instanceof Error ? error.message : "Невідома помилка"
         }`
       );
     }
@@ -163,8 +166,10 @@ export function My() {
 
   async function save() {
     try {
-      const response = await PUT({
-        endpoint: `${API_BASE_URL}/posts/create`,
+      const response = await PUT<IAlbumImg>({
+        endpoint: `${API_BASE_URL}/albums/${albums.map((album) => {
+          return (album.id)
+        })}`,
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${tokenUser}`,
@@ -195,8 +200,6 @@ export function My() {
     );
   }
 
-  console.log(user?.image + "pisun");
-
   return (
     <View style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContainer}>
@@ -213,6 +216,29 @@ export function My() {
         </View>
 
         <View style={styles.imageContainer}>
+          <View style={styles.imageWrapper}>
+            <Image
+              source={{ uri: normalizeImageUrl(user.image) }}
+              style={styles.avatar}
+            />
+            <View style={styles.actionButtons}>
+              <TouchableOpacity style={styles.actionButton}>
+                <Image
+                  source={require("../../../../shared/ui/images/eye-my-publication.png")}
+                  style={styles.actionIcon}
+                />
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.actionButton}
+                onPress={handleUserImageRemoval}
+              >
+                <Image
+                  source={require("../../../../shared/ui/images/trash.png")}
+                  style={styles.actionIcon}
+                />
+              </TouchableOpacity>
+            </View>
+          </View>
           {images.length > 0 ? (
             images.map((image) => (
               <View key={image.id} style={styles.imageWrapper}>
@@ -239,46 +265,22 @@ export function My() {
                 </View>
               </View>
             ))
-          ) : user.image ? (
-            <View style={styles.imageWrapper}>
-              <Image
-                source={{ uri: normalizeImageUrl(user.image) }}
-                style={styles.avatar}
-              />
-              <View style={styles.actionButtons}>
-                <TouchableOpacity style={styles.actionButton}>
-                  <Image
-                    source={require("../../../../shared/ui/images/eye-my-publication.png")}
-                    style={styles.actionIcon}
-                  />
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={styles.actionButton}
-                  onPress={handleUserImageRemoval}
-                >
-                  <Image
-                    source={require("../../../../shared/ui/images/trash.png")}
-                    style={styles.actionIcon}
-                  />
-                </TouchableOpacity>
-              </View>
-            </View>
-          ) : (
-            <Text>Немає завантажених фото</Text>
-          )}
+          ) : null}
         </View>
+        {changeImage == true ? (
+          <View
+            style={{
+              width: "100%",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <TouchableOpacity style={styles.addButton} onPress={save}>
+              <Text style={styles.addButtonText}>Зберегти</Text>
+            </TouchableOpacity>
+          </View>
+        ) : null}
 
-        <View
-          style={{
-            width: "100%",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
-          <TouchableOpacity style={styles.addButton} onPress={save}>
-            <Text style={styles.addButtonText}>Зберегти</Text>
-          </TouchableOpacity>
-        </View>
       </ScrollView>
     </View>
   );

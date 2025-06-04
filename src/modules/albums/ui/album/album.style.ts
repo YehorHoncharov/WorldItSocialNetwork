@@ -66,4 +66,40 @@ export const styles = StyleSheet.create({
 		justifyContent: "center",
 		paddingRight: 0.6
 	},
+	photoGrid: {
+		flexDirection: "row",
+		flexWrap: "wrap",
+		gap: 19,
+	},
+  
+  photo: {
+    width: 162,
+    height: 162,
+    borderRadius: 10,
+  },
+  deleteBtn: {
+    position: "absolute",
+    bottom: 10,
+    right: 10,
+	backgroundColor: "#FFFFFF",
+	borderRadius: 190,
+	borderWidth: 1,
+	borderColor: "#543C52",
+	width: 40,
+	height: 40,
+	justifyContent: "center",
+	alignItems: "center"
+  },
+  
+  submitBtn: {
+    marginTop: 24,
+    backgroundColor: "#7E5BC2",
+    borderRadius: 10,
+    paddingVertical: 12,
+    alignItems: "center",
+  },
+  submitText: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "600",}
 });

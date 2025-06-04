@@ -286,15 +286,19 @@ export function Settings() {
 							)}
 						/>
 						<View style={{ gap: 10, padding: 16 }}>
-							<Text
-								style={{
-									fontSize: 24,
-									color: "#070A1C",
-									fontWeight: "700",
-								}}
-							>
-								{user.name} {user.surname}
-							</Text>
+							
+							{!isEditing?  
+								<Text
+									style={{
+										fontSize: 24,
+										color: "#070A1C",
+										fontWeight: "700",
+									}}
+								>
+									{user.name} {user.surname}
+									</Text>
+									: null}
+							
 							{isEditing ? (
 								<Controller
 									control={control}

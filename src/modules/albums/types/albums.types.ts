@@ -2,5 +2,14 @@
 export interface IAlbumImg {
 	id: number;
 	url: string;
-	userPostId: number;
+	albumId: number;
+}
+
+export interface IAlbum {
+	id: number;
+	name: string;
+	theme: string;
+	year: string;
+	image: IAlbumImg[]
+	authorId: number;
 }

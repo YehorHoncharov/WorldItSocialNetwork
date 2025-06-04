@@ -32,7 +32,7 @@ export function RecomendFriends() {
                         surname={item.surname}
                         username={item.username}
                         email={item.email}
-                        image={item.image}
+                        image={`http://192.168.1.104:3000/${item.image}`}
                         password={item.password}
                     />
                 )}
