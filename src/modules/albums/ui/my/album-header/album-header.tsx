@@ -15,6 +15,7 @@ export function AlbumHeader() {
 
     useEffect(() => {
         translateX.setValue(0);
+        
     }, []);
 
     const handleTabPress = (tab: string) => {
@@ -74,7 +75,7 @@ export function AlbumHeader() {
                     <ScrollView overScrollMode="never" contentContainerStyle={{ gap: 8 }} style={{ width: screenWidth, flex: 1, }}>
                         <My albums={albums} />
                         <FlatList
-                            data={albums}
+                            data={albums.slice(1)}
                             keyExtractor={(item) => `${item.id}`}
                             contentContainerStyle={{ gap: 10, paddingBottom: 20 }}
                             renderItem={({ item }) => (
@@ -84,7 +85,7 @@ export function AlbumHeader() {
                                     theme={item.theme}
                                     year={item.year}
                                     authorId={item.authorId}
-                                    image={item.image}
+                                    images={item.images}
                                 />
                             )}
                             ListEmptyComponent={

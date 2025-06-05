@@ -10,6 +10,11 @@ export interface IAlbum {
 	name: string;
 	theme: string;
 	year: string;
-	image: IAlbumImg[]
+	images: IAlbumImg[]
 	authorId: number;
+}
+
+export interface IAlbumStart {
+	name: string
+	images: IAlbumImg[]
 }

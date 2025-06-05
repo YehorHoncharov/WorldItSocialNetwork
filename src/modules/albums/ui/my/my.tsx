@@ -16,6 +16,7 @@ import { IAlbum, IAlbumImg } from "../../types/albums.types";
 import { useUserContext } from "../../../auth/context/user-context";
 import { PUT } from "../../../../shared/api/put";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { API_BASE_URL } from "../../../../settings";
 
 interface IAlbumProps {
   albums: IAlbum[]
@@ -30,8 +31,7 @@ export function My(props: IAlbumProps) {
   const { user } = useUserContext();
   const [changeImage, setChangeImage] = useState<boolean>(false)
   const { albums } = props
-
-  const API_BASE_URL = "http://192.168.1.104:3000";
+  
 
   const getToken = async (): Promise<string> => {
     const token = await AsyncStorage.getItem("tokenStorage");

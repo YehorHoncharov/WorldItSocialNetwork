@@ -3,34 +3,38 @@ import { styles } from "./album.style";
 import Dots from "../../../../shared/ui/icons/dots";
 import { useEffect, useState } from "react";
 import { launchImageLibraryAsync, requestMediaLibraryPermissionsAsync } from "expo-image-picker";
-import { POST } from "../../../../shared/api/post";
 import { useUserContext } from "../../../auth/context/user-context";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { IAlbum, IAlbumImg } from "../../types/albums.types";
 import { PUT } from "../../../../shared/api/put";
+import { API_BASE_URL } from "../../../../settings";
 
 
 
 export function Album(props: IAlbum) {
-    const [images, setImages] = useState<IAlbumImg[]>([]);
-    const [imageDimensions, setImageDimensions] = useState<{
+	const [images, setImages] = useState<IAlbumImg[]>([]);
+	const [imageDimensions, setImageDimensions] = useState<{
 		[key: string]: { width: number; height: number };
 	}>({});
-    const API_BASE_URL = "http://192.168.1.104:3000";
-    const { user } = useUserContext();
-    const [tokenUser, setTokenUser] = useState<string>("");
-    const getToken = async (): Promise<string> => {
+	const { user } = useUserContext();
+	const [tokenUser, setTokenUser] = useState<string>("");
+	const getToken = async (): Promise<string> => {
 		const token = await AsyncStorage.getItem("tokenStorage");
 		return token || "";
 	};
 
 	useEffect(() => {
-	getToken().then(setTokenUser);
-	if (props.image && Array.isArray(props.image)) {
-		setImages(props.image);
-	}
-}, []);
-    async function onSearch() {
+		getToken().then(setTokenUser);
+		console.log(props)
+		console.log("-----------------")
+		if (props.images && Array.isArray(props.images)) {
+			console.log("proooooooops")
+			console.log(props.images)
+			console.log("++++++++++++++++++++")
+			setImages(props.images);
+		}
+	}, []);
+	async function onSearch() {
 		try {
 			const { status } = await requestMediaLibraryPermissionsAsync();
 			if (status !== "granted") {
@@ -74,9 +78,8 @@ export function Album(props: IAlbum) {
 								);
 								return null;
 							}
-							const imageUrl = `data:image/${
-								asset.mimeType?.split("/")[1] || "jpeg"
-							};base64,${base64String}`;
+							const imageUrl = `data:image/${asset.mimeType?.split("/")[1] || "jpeg"
+								};base64,${base64String}`;
 							console.log(
 								"[MyPublicationModal] Додано зображення:",
 								imageUrl.slice(0, 50),
@@ -93,7 +96,7 @@ export function Album(props: IAlbum) {
 										resolve({ width, height }),
 									(error) => {
 										console.error(
-											`[MyPublicationModal] Помилка визначення розмірів: ${error}`
+											` Помилка визначення розмірів: ${error}`
 										);
 										resolve({ width: 150, height: 150 }); // Запасний варіант
 									}
@@ -129,7 +132,7 @@ export function Album(props: IAlbum) {
 				setImages((prev) => {
 					const updatedImages = [...prev, ...filteredImages];
 					console.log(
-						"[MyPublicationModal] Оновлений список зображень:",
+						" Оновлений список зображень:",
 						updatedImages
 					);
 					return updatedImages;
@@ -139,21 +142,18 @@ export function Album(props: IAlbum) {
 			}
 		} catch (error) {
 			console.error(
-				"[MyPublicationModal] Помилка вибору зображення:",
+				" Помилка вибору зображення:",
 				error
 			);
 			Alert.alert(
 				"Помилка",
-				`Не вдалося вибрати зображення: ${
-					error instanceof Error ? error.message : "Невідома помилка"
+				`Не вдалося вибрати зображення: ${error instanceof Error ? error.message : "Невідома помилка"
 				}`
 			);
 		}
 	}
 
-    const handleSubmit = async () => {
-
-
+	const handleSubmit = async () => {
 
 		const formattedImages =
 			images.length > 0
@@ -161,9 +161,9 @@ export function Album(props: IAlbum) {
 				: undefined;
 
 		try {
-			console.log("[refetch] Отправка запроса на создание поста", {	
-				images: formattedImages,
-			});
+	
+
+
 			const response = await PUT({
 				endpoint: `${API_BASE_URL}/albums/${props.id}`,
 				headers: {
@@ -178,7 +178,7 @@ export function Album(props: IAlbum) {
 
 			if (response.status === "success") {
 				setImages([]);
-		
+
 			} else {
 				Alert.alert(
 					"Помилка"
@@ -186,71 +186,71 @@ export function Album(props: IAlbum) {
 			}
 		} catch (err) {
 			console.error(err);
-		} 
+		}
 	};
 	return (
 		<View style={styles.container}>
 			<ScrollView contentContainerStyle={styles.scrollContainer}>
-                <View style={{gap:27}}>
-                    <View style={{gap: 16}}>
-                        <View style={styles.mainBox}>
-                            <Text style={styles.title}>{props.name}</Text>
+				<View style={{ gap: 27 }}>
+					<View style={{ gap: 16 }}>
+						<View style={styles.mainBox}>
+							<Text style={styles.title}>{props.name}</Text>
 
-                            <View style={styles.actionButtons}>
-                                <TouchableOpacity style={styles.actionButton}>
-                                    <Image
-                                        source={require("../../../../shared/ui/images/eye-my-publication.png")}
-                                        style={styles.actionIcon}
-                                    />
-                                </TouchableOpacity>
+							<View style={styles.actionButtons}>
+								<TouchableOpacity style={styles.actionButton}>
+									<Image
+										source={require("../../../../shared/ui/images/eye-my-publication.png")}
+										style={styles.actionIcon}
+									/>
+								</TouchableOpacity>
 
-                                <TouchableOpacity style={{alignItems: "center", justifyContent: "center"}}>
-                                    <Dots width={20} height={20} />
-                                </TouchableOpacity>
-                            </View>
-                        </View>
+								<TouchableOpacity style={{ alignItems: "center", justifyContent: "center" }}>
+									<Dots width={20} height={20} />
+								</TouchableOpacity>
+							</View>
+						</View>
 
-                        <View style={styles.theme}>
-                            <Text style={{fontSize: 16}}>{props.theme}</Text>
-                            <Text style={{fontSize: 16}}>{props.year}</Text>
-                        </View>
-                        <View style={styles.separator} />
-                    </View>
+						<View style={styles.theme}>
+							<Text style={{ fontSize: 16 }}>{props.theme}</Text>
+							<Text style={{ fontSize: 16 }}>{props.year}</Text>
+						</View>
+						<View style={styles.separator} />
+					</View>
 
-                    <View style={{ gap: 16 }}>
-                        <Text style={styles.title}>Фотографії</Text>
-                        <View style={styles.photoGrid}>
-                            {images.map((img, index) => (
-                            <View key={index}>
-                                <Image source={{ uri: img.url }} style={styles.photo} />
-                                <TouchableOpacity
-                                onPress={() => {
-                                    const updated = images.filter((_, i) => i !== index);
-                                    setImages(updated);
-                                    }}
-                                style={styles.deleteBtn}
-                                >
-                                <Image
-                                    source={require("../../../../shared/ui/images/trash.png")}
-                                    style={{width: 20, height: 20}}
-                                    />
-                                </TouchableOpacity>
-                            </View>
-                            ))}
-                            {images.length < 10 && (
-                            <TouchableOpacity style={styles.addImage} onPress={onSearch}>
-                                <Image
-                                style={{ width: 40.6, height: 40 }}
-                                source={require('../../../../shared/ui/images/plus-in-circle.png')}
-                                />
-                            </TouchableOpacity>
-                            )}
-                        </View>
-                    </View>
-                    <TouchableOpacity onPress={handleSubmit} style={styles.submitBtn}>
-                        <Text style={styles.submitText}>Зберегти</Text>
-                    </TouchableOpacity>
-                </View>
+					<View style={{ gap: 16 }}>
+						<Text style={styles.title}>Фотографії</Text>
+						<View style={styles.photoGrid}>
+							{images.map((img, index) => (
+								<View key={index}>
+									<Image source={{ uri: `http://192.168.1.104:3000/${img.url}` }} style={styles.photo} />
+									<TouchableOpacity
+										onPress={() => {
+											const updated = images.filter((_, i) => i !== index);
+											setImages(updated);
+										}}
+										style={styles.deleteBtn}
+									>
+										<Image
+											source={require("../../../../shared/ui/images/trash.png")}
+											style={{ width: 20, height: 20 }}
+										/>
+									</TouchableOpacity>
+								</View>
+							))}
+							{images.length < 10 && (
+								<TouchableOpacity style={styles.addImage} onPress={onSearch}>
+									<Image
+										style={{ width: 40.6, height: 40 }}
+										source={require('../../../../shared/ui/images/plus-in-circle.png')}
+									/>
+								</TouchableOpacity>
+							)}
+						</View>
+					</View>
+					<TouchableOpacity onPress={handleSubmit} style={styles.submitBtn}>
+						<Text style={styles.submitText}>Зберегти</Text>
+					</TouchableOpacity>
+				</View>
 			</ScrollView>
 		</View>
 	);

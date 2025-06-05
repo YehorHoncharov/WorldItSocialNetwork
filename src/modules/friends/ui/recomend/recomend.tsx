@@ -8,7 +8,6 @@ export function RecomendFriends() {
     const { users } = useUsers();
     const { user } = useUserContext();
 
-    // const image = `${API_BASE_URL}/${user.image}` || "",
 
     return (
         <View style={styles.container}>

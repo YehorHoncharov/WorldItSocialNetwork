@@ -25,6 +25,7 @@ import SendArrow from "../../../../shared/ui/icons/send-arrow";
 import { styles } from "./change-post.styles";
 import { IPost, IPostImg } from "../../types/post";
 import { TrashIcon } from "../../../../shared/ui/icons/trash-icon";
+import { API_BASE_URL } from "../../../../settings";
 
 interface TagItem {
 	label: string;
@@ -76,8 +77,6 @@ export function ChangePostModal({
 		{ label: "Фільми", value: "#фільми" },
 		{ label: "Подорожі", value: "#подорожі" },
 	]);
-
-	const API_BASE_URL = "http://192.168.1.104:3000";
 
 	useEffect(() => {
 

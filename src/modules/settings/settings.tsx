@@ -21,6 +21,7 @@ import {
 	launchImageLibraryAsync,
 	requestMediaLibraryPermissionsAsync,
 } from "expo-image-picker";
+import { API_BASE_URL } from "../../settings";
 
 
 interface IUserForm {
@@ -95,16 +96,9 @@ export function Settings() {
 	const handleSignatureSave = (signature: string) => {
 		console.log("");
 	};
-  const API_BASE_URL = "http://192.168.1.104:3000";
 	useEffect(() => {
 		async function loadData() {
-      console.log("egoooooooor")
-      console.log("egoooooooor")
       console.log(user)
-      console.log("egoooooooor")
-      console.log("egoooooooor")
-      console.log("egoooooooor")
-      console.log("egoooooooor")
 			if (user) {
 				reset({
 					name: user.name || "",

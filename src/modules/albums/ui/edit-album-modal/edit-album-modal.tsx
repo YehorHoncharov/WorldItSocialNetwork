@@ -1,24 +1,24 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Modal,
   View,
   Text,
+  StyleSheet,
   TouchableOpacity,
   ScrollView,
   Alert,
 } from "react-native";
 import DropDownPicker from "react-native-dropdown-picker";
 import { Input } from "../../../../shared/ui/input";
-import { styles } from "./add-album-modal.styles";
 import { POST } from "../../../../shared/api/post";
 import { API_BASE_URL } from "../../../../settings";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { useUserContext } from "../../../auth/context/user-context";
+import { styles } from "./edit-album-modal.style";
 
 interface Props {
   modalVisible: boolean;
-  onClose: () => void;
   changeVisibility: () => void;
+  onClose: () => void;
 }
 
 interface YearItem {
@@ -31,11 +31,10 @@ interface ThemeItem {
   value: string;
 }
 
-export function AddAlbumModal({ modalVisible, onClose }: Props) {
+export function AddAlbumModal({ modalVisible, changeVisibility, onClose }: Props) {
   const [name, setName] = useState("");
   const [theme, setTheme] = useState("");
   const [year, setYear] = useState("");
-  const { user } = useUserContext()
   const [openTheme, setOpenTheme] = useState(false);
   const [openYear, setOpenYear] = useState(false);
   const [themeItems, setThemeItems] = useState<ThemeItem[]>([
@@ -75,7 +74,6 @@ export function AddAlbumModal({ modalVisible, onClose }: Props) {
       return;
     }
 
-    if (!user) return
     try {
       const token = await AsyncStorage.getItem("token");
       if (!token) {
@@ -97,17 +95,17 @@ export function AddAlbumModal({ modalVisible, onClose }: Props) {
         },
       });
 
-
-      console.log(response)
+      if (response.status === "success") {
+        Alert.alert("Успіх", "Альбом успішно створено");
+        resetForm();
+        onClose();
+      } else {
+        Alert.alert("Помилка", "Не вдалося створити альбом");
+      }
     } catch (err) {
       console.error(err);
       Alert.alert("Помилка", "Сталася помилка при створенні альбому");
     }
-  };
-
-  const handleCancel = () => {
-    resetForm();
-    onClose();
   };
 
   return (
@@ -115,7 +113,10 @@ export function AddAlbumModal({ modalVisible, onClose }: Props) {
       animationType="fade"
       transparent={true}
       visible={modalVisible}
-      onRequestClose={handleCancel}
+      onRequestClose={() => {
+        resetForm();
+        onClose();
+      }}
     >
       <View style={styles.centeredView}>
         <View style={styles.modalView}>
@@ -156,6 +157,22 @@ export function AddAlbumModal({ modalVisible, onClose }: Props) {
                     borderColor: "#543C52",
                     zIndex: 2000,
                   }}
+                  onChangeSearchText={(text) => {
+                    const sanitizedText = text.trim();
+                    if (
+                      sanitizedText &&
+                      !themeItems.some((item) => item.value === sanitizedText) &&
+                      sanitizedText.length <= 50
+                    ) {
+                      setThemeItems((prev) => [
+                        ...prev,
+                        {
+                          label: sanitizedText,
+                          value: sanitizedText,
+                        },
+                      ]);
+                    }
+                  }}
                 />
               </View>
 
@@ -182,6 +199,22 @@ export function AddAlbumModal({ modalVisible, onClose }: Props) {
                     borderColor: "#543C52",
                     zIndex: 1000,
                   }}
+                  onChangeSearchText={(text) => {
+                    const sanitizedText = text.trim();
+                    if (
+                      sanitizedText &&
+                      !yearItems.some((item) => item.value === sanitizedText) &&
+                      sanitizedText.length <= 50
+                    ) {
+                      setYearItems((prev) => [
+                        ...prev,
+                        {
+                          label: sanitizedText,
+                          value: sanitizedText,
+                        },
+                      ]);
+                    }
+                  }}
                 />
               </View>
             </View>
@@ -190,7 +223,10 @@ export function AddAlbumModal({ modalVisible, onClose }: Props) {
               <View style={styles.iconRow}>
                 <TouchableOpacity
                   style={styles.cancelButton}
-                  onPress={handleCancel}
+                  onPress={() => {
+                    resetForm();
+                    onClose();
+                  }}
                 >
                   <Text style={styles.submitTextCancel}>Скасувати</Text>
                 </TouchableOpacity>

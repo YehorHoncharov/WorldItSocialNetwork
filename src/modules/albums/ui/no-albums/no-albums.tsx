@@ -34,7 +34,7 @@ export function NoAlbums() {
         </TouchableOpacity>
         <AddAlbumModal
           modalVisible={modalVisible}
-          changeVisibility={() => {}}
+          changeVisibility={() => setModalVisible(true)}
           onClose={() => setModalVisible(false)}
         />
       </View>

@@ -24,6 +24,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useUserContext } from "../../auth/context/user-context";
 import DropDownPicker from "react-native-dropdown-picker";
 import { usePosts } from "../../post/hooks/use-get-post";
+import { API_BASE_URL } from "../../../settings";
 
 interface Props {
 	modalVisible: boolean;
@@ -68,8 +69,6 @@ export function MyPublicationModal({ modalVisible, changeVisibility }: Props) {
 		{ label: "Подорожі", value: "#подорожі" },
 	]);
 	const { refetch } = usePosts();
-
-	const API_BASE_URL = "http://192.168.1.104:3000";
 
 	const getToken = async (): Promise<string> => {
 		const token = await AsyncStorage.getItem("tokenStorage");

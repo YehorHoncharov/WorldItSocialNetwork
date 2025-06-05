@@ -17,6 +17,8 @@ import { POST } from "../../../shared/api/post";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useUserContext } from "../../../modules/auth/context/user-context";
 import { useLocalSearchParams } from "expo-router";
+import { IAlbumStart } from "../../../modules/albums/types/albums.types";
+import { API_BASE_URL } from "../../../settings";
 
 interface Props {
 	modalVisible: boolean;
@@ -28,7 +30,7 @@ export function RegStepTwoModal({ modalVisible, changeVisibility }: Props) {
 	const [surname, setSurname] = useState("");
 	const [username, setUsername] = useState("");
 	const [tokenUser, setTokenUser] = useState<string>("");
-	const { register, setShowWelcomeModal, showWelcomeModal } = useUserContext();
+	const { register, setShowWelcomeModal, showWelcomeModal, user } = useUserContext();
 
 
 	const params = useLocalSearchParams<{
@@ -96,7 +98,7 @@ export function RegStepTwoModal({ modalVisible, changeVisibility }: Props) {
 								value={username}
 								onChangeText={setUsername}
 							/>
-                            <Text style={{fontSize: 12}}>Або оберіть:<Text style={{fontSize: 12, color: "green"}}>(Запропоновані варіанти відповідно до Ім’я та Прізвища)</Text></Text>
+							<Text style={{ fontSize: 12 }}>Або оберіть:<Text style={{ fontSize: 12, color: "green" }}>(Запропоновані варіанти відповідно до Ім’я та Прізвища)</Text></Text>
 						</View>
 
 						<View style={styles.actions}>
