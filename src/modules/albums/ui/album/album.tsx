@@ -25,12 +25,7 @@ export function Album(props: IAlbum) {
 
 	useEffect(() => {
 		getToken().then(setTokenUser);
-		console.log(props)
-		console.log("-----------------")
 		if (props.images && Array.isArray(props.images)) {
-			console.log("proooooooops")
-			console.log(props.images)
-			console.log("++++++++++++++++++++")
 			setImages(props.images);
 		}
 	}, []);
@@ -80,11 +75,6 @@ export function Album(props: IAlbum) {
 							}
 							const imageUrl = `data:image/${asset.mimeType?.split("/")[1] || "jpeg"
 								};base64,${base64String}`;
-							console.log(
-								"[MyPublicationModal] Додано зображення:",
-								imageUrl.slice(0, 50),
-								"..."
-							);
 
 							const dimensions = await new Promise<{
 								width: number;
@@ -131,10 +121,6 @@ export function Album(props: IAlbum) {
 
 				setImages((prev) => {
 					const updatedImages = [...prev, ...filteredImages];
-					console.log(
-						" Оновлений список зображень:",
-						updatedImages
-					);
 					return updatedImages;
 				});
 			} else if (result.canceled) {
@@ -161,7 +147,7 @@ export function Album(props: IAlbum) {
 				: undefined;
 
 		try {
-	
+
 
 
 			const response = await PUT({

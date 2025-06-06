@@ -5,13 +5,17 @@ import { Settings } from "../../../../settings";
 import { My } from "../my";
 import { Album } from "../../album/album";
 import { NoAlbums } from "../../no-albums/no-albums";
+import { useUserContext } from "../../../../auth/context/user-context";
+import { IAlbum } from "../../../types/albums.types";
 
 const screenWidth = Dimensions.get("window").width;
 
 export function AlbumHeader() {
     const [activeTab, setActiveTab] = useState('personal');
     const translateX = useRef(new Animated.Value(0)).current;
+    const {user} = useUserContext()
     const { albums } = useAlbums()
+    const [userAlbums, setUserAlbums] = useState<IAlbum[]>([])
 
     useEffect(() => {
         translateX.setValue(0);
@@ -29,7 +33,12 @@ export function AlbumHeader() {
 
         setActiveTab(tab);
     };
-
+    useEffect(() => {
+        if (!user) return
+        const myAlbums = albums.filter(album => album.authorId === user.id) 
+        setUserAlbums(myAlbums)
+    }, [albums, user])
+    
     return (
         <View style={{ flex: 1 }}>
             <View style={[styles.tabContainer]}>
@@ -72,10 +81,12 @@ export function AlbumHeader() {
                         <Settings />
                     </View>
 
+                    
                     <ScrollView overScrollMode="never" contentContainerStyle={{ gap: 8 }} style={{ width: screenWidth, flex: 1, }}>
+
                         <My albums={albums} />
                         <FlatList
-                            data={albums.slice(1)}
+                            data={userAlbums.slice(1)}
                             keyExtractor={(item) => `${item.id}`}
                             contentContainerStyle={{ gap: 10, paddingBottom: 20 }}
                             renderItem={({ item }) => (

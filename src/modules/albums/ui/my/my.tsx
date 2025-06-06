@@ -31,7 +31,16 @@ export function My(props: IAlbumProps) {
   const { user } = useUserContext();
   const [changeImage, setChangeImage] = useState<boolean>(false)
   const { albums } = props
-  
+  const [correctAlbum, setCorrectAlbum] = useState()
+
+  const correctAlbums = albums.filter(album => album.authorId === user?.id);
+
+  const minAlbum: IAlbum | null = correctAlbums.reduce((min: IAlbum | null, album: IAlbum) => {
+    if (!min || album.id < min.id) {
+      return album;
+    }
+    return min;
+  }, null);
 
   const getToken = async (): Promise<string> => {
     const token = await AsyncStorage.getItem("tokenStorage");
@@ -84,11 +93,7 @@ export function My(props: IAlbumProps) {
               }
               const imageUrl = `data:image/${asset.mimeType?.split("/")[1] || "jpeg"
                 };base64,${base64String}`;
-              console.log(
-                "[MyPublicationModal] Додано зображення:",
-                imageUrl.slice(0, 50),
-                "..."
-              );
+
 
               const imageKey = `${Date.now() + index}`;
               setImageDimensions((prev) => ({
@@ -165,20 +170,33 @@ export function My(props: IAlbumProps) {
   }
 
   async function save() {
+    const formattedImages =
+      images.length > 0
+        ? { create: images.map((img) => ({ url: img.url })) }
+        : undefined;
     try {
-      const response = await PUT<IAlbumImg>({
-        endpoint: `${API_BASE_URL}/albums/${albums.map((album) => {
-          return (album.id)
-        })}`,
+      const response = await PUT({
+        endpoint: `${API_BASE_URL}/albums/${minAlbum?.id}`,
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${tokenUser}`,
         },
         token: tokenUser,
-        body: {},
+        body: {
+          images: formattedImages,
+        },
       });
-    } catch (error) {
-      console.log(error);
+
+      if (response.status === "success") {
+        setImages([]);
+
+      } else {
+        Alert.alert(
+          "Помилка"
+        );
+      }
+    } catch (err) {
+      console.error(err);
     }
   }
 
@@ -243,7 +261,7 @@ export function My(props: IAlbumProps) {
             images.map((image) => (
               <View key={image.id} style={styles.imageWrapper}>
                 <Image
-                  source={{ uri: image.url }}
+                  source={{ uri: API_BASE_URL + "/" + image.url }}
                   style={styles.avatar}
                 />
                 <View style={styles.actionButtons}>

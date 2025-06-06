@@ -5,6 +5,7 @@ import { Button } from "../../../../shared/ui/button";
 import { styles } from "./login-form-one.styles";
 import { ILogin } from "./login-form-one.types";
 import { useUserContext } from "../../context/user-context";
+import { useRouter } from "expo-router";
 
 
 export function LoginFormOne() {
@@ -13,10 +14,12 @@ export function LoginFormOne() {
 	// const [isEnabled, setIsEnabled] = useState(false);
 	// const toggleSwitch = () => setIsEnabled((previousState) => !previousState);
 	const { login } = useUserContext();
+	const router = useRouter()
 
 	function onNext(data: ILogin) {
 		const { password, ...email } = data;
 		login(email.email, password);
+		router.navigate({pathname: "/home"})
 	}
 
 

@@ -97,8 +97,6 @@ export function AddAlbumModal({ modalVisible, onClose }: Props) {
         },
       });
 
-
-      console.log(response)
     } catch (err) {
       console.error(err);
       Alert.alert("Помилка", "Сталася помилка при створенні альбому");

@@ -14,8 +14,6 @@ export function useUsers() {
 					console.log(result)
 					return;
 				}
-				console.log("=========")
-				console.log(result)
 				setUsers(result)
 			} catch (err) {
 				console.error(err);}

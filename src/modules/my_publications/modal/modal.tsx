@@ -120,15 +120,6 @@ export function MyPublicationModal({ modalVisible, changeVisibility }: Props) {
 
 		setIsLoading(true);
 		try {
-			console.log("[refetch] Отправка запроса на создание поста", {
-				name: name.trim(),
-				theme: theme.trim(),
-				text: text.trim(),
-				links: links.trim() || undefined,
-				tags: sanitizedTags,
-				images: formattedImages,
-				authorId: user.id,
-			});
 			const response = await POST({
 				endpoint: `${API_BASE_URL}/posts/create`,
 				headers: {
@@ -247,11 +238,6 @@ export function MyPublicationModal({ modalVisible, changeVisibility }: Props) {
 							const imageUrl = `data:image/${
 								asset.mimeType?.split("/")[1] || "jpeg"
 							};base64,${base64String}`;
-							console.log(
-								"[MyPublicationModal] Додано зображення:",
-								imageUrl.slice(0, 50),
-								"..."
-							);
 
 							const dimensions = await new Promise<{
 								width: number;
@@ -362,14 +348,7 @@ export function MyPublicationModal({ modalVisible, changeVisibility }: Props) {
 										e.nativeEvent
 									);
 								}}
-								onLoad={() =>
-									console.log(
-										`[ChangePostModal] Зображення завантажено: ${img.url.slice(
-											0,
-											20
-										)}...`
-									)
-								}
+
 							/>
 							<TouchableOpacity
 								style={styles.removeImageButton}
