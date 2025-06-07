@@ -206,23 +206,30 @@ export function Album(props: IAlbum) {
 					<View style={{ gap: 16 }}>
 						<Text style={styles.title}>Фотографії</Text>
 						<View style={styles.photoGrid}>
-							{images.map((img, index) => (
-								<View key={index}>
-									<Image source={{ uri: `http://192.168.1.104:3000/${img.url}` }} style={styles.photo} />
-									<TouchableOpacity
-										onPress={() => {
-											const updated = images.filter((_, i) => i !== index);
-											setImages(updated);
-										}}
-										style={styles.deleteBtn}
-									>
-										<Image
-											source={require("../../../../shared/ui/images/trash.png")}
-											style={{ width: 20, height: 20 }}
-										/>
-									</TouchableOpacity>
-								</View>
-							))}
+							{images.length > 0 ? (
+								images.map((img, index) => {
+									return img.url ? (
+										<View key={img.id}>
+											<Image
+												source={{ uri: img.url.startsWith("data:image") ? img.url : `${API_BASE_URL}/${img.url}` }}
+												style={styles.photo}
+											/>
+											<TouchableOpacity
+												onPress={() => {
+													const updated = images.filter((_, i) => i !== index);
+													setImages(updated);
+												}}
+												style={styles.deleteBtn}
+											>
+												<Image
+													source={require("../../../../shared/ui/images/trash.png")}
+													style={{ width: 20, height: 20 }}
+												/>
+											</TouchableOpacity>
+										</View>
+									) : null;
+								})
+							) : null}
 							{images.length < 10 && (
 								<TouchableOpacity style={styles.addImage} onPress={onSearch}>
 									<Image

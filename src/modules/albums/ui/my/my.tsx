@@ -19,7 +19,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { API_BASE_URL } from "../../../../settings";
 
 interface IAlbumProps {
-  albums: IAlbum[]
+  albums: IAlbum[];
 }
 
 export function My(props: IAlbumProps) {
@@ -29,18 +29,20 @@ export function My(props: IAlbumProps) {
   }>({});
   const [tokenUser, setTokenUser] = useState<string>("");
   const { user } = useUserContext();
-  const [changeImage, setChangeImage] = useState<boolean>(false)
-  const { albums } = props
-  const [correctAlbum, setCorrectAlbum] = useState()
+  const [changeImage, setChangeImage] = useState<boolean>(false);
+  const { albums } = props;
 
-  const correctAlbums = albums.filter(album => album.authorId === user?.id);
+  const correctAlbums = albums.filter((album) => album.authorId === user?.id);
 
-  const minAlbum: IAlbum | null = correctAlbums.reduce((min: IAlbum | null, album: IAlbum) => {
-    if (!min || album.id < min.id) {
-      return album;
-    }
-    return min;
-  }, null);
+  const minAlbum: IAlbum | null = correctAlbums.reduce(
+    (min: IAlbum | null, album: IAlbum) => {
+      if (!min || album.id < min.id) {
+        return album;
+      }
+      return min;
+    },
+    null
+  );
 
   const getToken = async (): Promise<string> => {
     const token = await AsyncStorage.getItem("tokenStorage");
@@ -49,7 +51,10 @@ export function My(props: IAlbumProps) {
 
   useEffect(() => {
     getToken().then(setTokenUser);
-  }, []);
+    if (minAlbum?.images && Array.isArray(minAlbum.images)) {
+      setImages(minAlbum.images);
+    }
+  }, [minAlbum]);
 
   async function onSearch() {
     try {
@@ -65,7 +70,7 @@ export function My(props: IAlbumProps) {
       const result = await launchImageLibraryAsync({
         mediaTypes: ["images"],
         allowsMultipleSelection: true,
-        quality: 0.8,
+        quality: 0.5,
         allowsEditing: false,
         base64: true,
       });
@@ -77,8 +82,7 @@ export function My(props: IAlbumProps) {
         const newImages = await Promise.all(
           result.assets
             .filter((asset) => {
-              const type =
-                asset.mimeType?.split("/")[1]?.toLowerCase() || "";
+              const type = asset.mimeType?.split("/")[1]?.toLowerCase() || "";
               return asset.base64 && allowedFormats.includes(type);
             })
             .map(async (asset, index) => {
@@ -94,16 +98,16 @@ export function My(props: IAlbumProps) {
               const imageUrl = `data:image/${asset.mimeType?.split("/")[1] || "jpeg"
                 };base64,${base64String}`;
 
-
               const imageKey = `${Date.now() + index}`;
               setImageDimensions((prev) => ({
                 ...prev,
+                [imageKey]: { width: 150, height: 150 },
               }));
 
               return {
                 id: Date.now() + index,
                 url: imageUrl,
-                albumId: 0,
+                albumId: minAlbum?.id || 0,
               };
             })
         );
@@ -117,11 +121,8 @@ export function My(props: IAlbumProps) {
           return;
         }
 
-        setImages((prev) => {
-          const updatedImages = [...prev, ...filteredImages];
-          return updatedImages;
-        });
-        setChangeImage(true)
+        setImages((prev) => [...prev, ...filteredImages]);
+        setChangeImage(true);
       } else if (result.canceled) {
         Alert.alert("Скасовано", "Вибір зображень було скасовано");
       }
@@ -145,6 +146,7 @@ export function My(props: IAlbumProps) {
       delete updatedDimensions[id];
       return updatedDimensions;
     });
+    setChangeImage(true);
   }
 
   function handleUserImageRemoval() {
@@ -189,23 +191,22 @@ export function My(props: IAlbumProps) {
 
       if (response.status === "success") {
         setImages([]);
-
+        setChangeImage(false);
       } else {
-        Alert.alert(
-          "Помилка"
-        );
+        Alert.alert("Помилка", "Не вдалося зберегти зображення");
       }
     } catch (err) {
-      console.error(err);
+      console.error("Помилка збереження:", err);
+      Alert.alert("Помилка", "Не вдалося зберегти зображення");
     }
   }
 
   const normalizeImageUrl = (url: string | undefined): string => {
     if (!url) return "https://via.placeholder.com/162";
-    if (url.startsWith("http://") || url.startsWith("https://")) return url;
-    const relativeUrl = url
-      .replace(/\\/g, "/")
-      .replace(/^\/?uploads\/*/i, "");
+    if (url.startsWith("data:image") || url.startsWith("http://") || url.startsWith("https://")) {
+      return url;
+    }
+    const relativeUrl = url.replace(/\\/g, "/").replace(/^\/?uploads\/*/i, "");
     return `${API_BASE_URL}/uploads/${relativeUrl}`;
   };
 
@@ -257,11 +258,16 @@ export function My(props: IAlbumProps) {
               </TouchableOpacity>
             </View>
           </View>
+
           {images.length > 0 ? (
             images.map((image) => (
               <View key={image.id} style={styles.imageWrapper}>
                 <Image
-                  source={{ uri: API_BASE_URL + "/" + image.url }}
+                  source={{
+                    uri: image.url.startsWith("data:image")
+                      ? image.url
+                      : normalizeImageUrl(image.url),
+                  }}
                   style={styles.avatar}
                 />
                 <View style={styles.actionButtons}>
@@ -283,9 +289,12 @@ export function My(props: IAlbumProps) {
                 </View>
               </View>
             ))
-          ) : null}
+          ) : (
+            null
+          )}
         </View>
-        {changeImage == true ? (
+
+        {changeImage && (
           <View
             style={{
               width: "100%",
@@ -297,8 +306,7 @@ export function My(props: IAlbumProps) {
               <Text style={styles.addButtonText}>Зберегти</Text>
             </TouchableOpacity>
           </View>
-        ) : null}
-
+        )}
       </ScrollView>
     </View>
   );

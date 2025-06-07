@@ -4,12 +4,15 @@ import Dots from "../../../../shared/ui/icons/dots";
 import { styles } from "./author.styles";
 import { IPost } from "../../types/post";
 import { ModalPost } from "../modal-post/modal-post";
+import { useUserContext } from "../../../auth/context/user-context";
+import { useUserByID } from "../../hooks/use-user-by-id";
 
 export function Author({ scrollOffset = 0, ...props }: IPost & { scrollOffset?: number }) {
   const [modalVisible, setModalVisible] = useState(false);
   const [dotsPosition, setDotsPosition] = useState({ x: 150, y: 78 });
   const containerRef = useRef<View>(null);
   const dotsRef = useRef<ElementRef<typeof TouchableOpacity>>(null);
+  const {user} = useUserByID(props.authorId)
   const [containerSize, setContainerSize] = useState({
     width: 400,
     height: 725,
@@ -54,7 +57,7 @@ export function Author({ scrollOffset = 0, ...props }: IPost & { scrollOffset?: 
           <View style={{ position: "relative" }}>
             <Image
               style={{ width: 46, height: 46 }}
-              source={require("../../../../shared/ui/images/karen.png")}
+              source={{uri: user?.image}}
             />
             <Image
               style={{
@@ -67,7 +70,7 @@ export function Author({ scrollOffset = 0, ...props }: IPost & { scrollOffset?: 
               source={require("../../../../shared/ui/images/avatar-indicator.png")}
             />
           </View>
-          <Text>X_AE_A-13</Text>
+          <Text>{user?.name} {user?.surname}</Text>
         </View>
 
         <Image
