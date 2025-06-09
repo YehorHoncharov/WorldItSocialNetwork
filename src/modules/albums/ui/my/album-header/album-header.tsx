@@ -13,13 +13,13 @@ const screenWidth = Dimensions.get("window").width;
 export function AlbumHeader() {
     const [activeTab, setActiveTab] = useState('personal');
     const translateX = useRef(new Animated.Value(0)).current;
-    const {user} = useUserContext()
+    const { user } = useUserContext()
     const { albums } = useAlbums()
     const [userAlbums, setUserAlbums] = useState<IAlbum[]>([])
 
     useEffect(() => {
         translateX.setValue(0);
-        
+
     }, []);
 
     const handleTabPress = (tab: string) => {
@@ -35,10 +35,10 @@ export function AlbumHeader() {
     };
     useEffect(() => {
         if (!user) return
-        const myAlbums = albums.filter(album => album.authorId === user.id) 
+        const myAlbums = albums.filter(album => album.authorId === user.id)
         setUserAlbums(myAlbums)
     }, [albums, user])
-    
+
     return (
         <View style={{ flex: 1 }}>
             <View style={[styles.tabContainer]}>
@@ -81,9 +81,8 @@ export function AlbumHeader() {
                         <Settings />
                     </View>
 
-                    
-                    <ScrollView overScrollMode="never" contentContainerStyle={{ gap: 8 }} style={{ width: screenWidth, flex: 1, }}>
 
+                    <View style={{ flex: 1, gap: 8 }}>
                         <My albums={albums} />
                         <FlatList
                             data={userAlbums.slice(1)}
@@ -105,8 +104,8 @@ export function AlbumHeader() {
                                 </View>
                             }
                         />
-                        
-                    </ScrollView>
+
+                    </View>
 
                 </Animated.View>
             </View>

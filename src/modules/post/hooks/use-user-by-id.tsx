@@ -8,25 +8,22 @@ export function useUserByID(id: number) {
             try {
                 const response = await fetch(`http://192.168.1.104:3000/user/${id}`)
                 const user = await response.json()
-
-                setUser(user)
-                console.log("=====================")
-                console.log(user)
-
+                if (user.status === "error"){
+                    return
+                }
+                setUser(user.data)
             }
             catch (error) {
 
                 if (error instanceof Error) {
-                    console.log("=====================")
+                    
                     console.log(error)
                 }
-
             }
-
         }
         getUser()
 
-    }, [])
+    }, [id])
     return {user: user}
 }
 

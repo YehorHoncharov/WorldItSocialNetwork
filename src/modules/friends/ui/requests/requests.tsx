@@ -1,11 +1,13 @@
-import { ScrollView, View, Text, TouchableOpacity } from "react-native";
+import { ScrollView, View, Text, TouchableOpacity, FlatList } from "react-native";
 import { styles } from "./requests.style";
 import { FriendsForm } from "../friends-form/friends-form";
 import { useUserContext } from "../../../auth/context/user-context";
+import { useUsers } from "../../hooks/useUsers";
 
 export function RequestsFriends() {
+	const { users } = useUsers();
+    const { user } = useUserContext();
 
-const { user } = useUserContext()
 
 	return (
 		<View style={styles.container}>
@@ -19,17 +21,35 @@ const { user } = useUserContext()
 					</Text>
 				</TouchableOpacity>
 			</View>
-			<ScrollView style={{ flexGrow: 1 }} overScrollMode="never">
+			<View style={{ flexGrow: 1 }}>
 				<View style={{ gap: 10 }}>
 					{!user ? <Text>None</Text> :
 					<View>
-						<FriendsForm id={user.id} email={user.email} password={user.password}/>
-						<FriendsForm id={user.id} email={user.email} password={user.password}/>
-						<FriendsForm id={user.id} email={user.email} password={user.password}/> 
+						<FlatList
+							data={users}
+							keyExtractor={(item) => `${item.id}`}
+							contentContainerStyle={{ gap: 10, paddingBottom: 20 }}
+							renderItem={({ item }) => (
+								<FriendsForm
+									id={item.id}
+									name={item.name}
+									surname={item.surname}
+									username={item.username}
+									email={item.email}
+									image={`http://192.168.1.104:3000/${item.image}`}
+									password={item.password}
+										/>
+									)}
+									ListEmptyComponent={
+										<View>
+											<Text>Немає друзів</Text>
+										</View>
+									}
+							/>
 					</View>}
 					
 				</View>
-			</ScrollView>
+			</View>
 		</View>
 	);
 }

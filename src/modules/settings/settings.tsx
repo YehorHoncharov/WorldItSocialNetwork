@@ -94,11 +94,10 @@ export function Settings() {
 	}
 
 	const handleSignatureSave = (signature: string) => {
-		console.log("");
+		console.log("")
 	};
 	useEffect(() => {
 		async function loadData() {
-      console.log(user)
 			if (user) {
 				reset({
 					name: user.name || "",

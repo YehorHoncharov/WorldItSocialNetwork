@@ -135,7 +135,7 @@ import {
   useBlurOnFulfill,
   useClearByFocusCell,
 } from "react-native-confirmation-code-field";
-import { RegStepTwoModal } from "../../../../app/(auth)/registration/step-two";
+import  RegStepTwoModal  from "../../../../app/(auth)/registration/step-two";
 
 const CELL_COUNT = 6;
 
@@ -162,7 +162,7 @@ export function RegFormThree() {
 
   function onSubmit() {
     if (code) {
-      setShowWelcomeModal(true); // Відкриваємо модалку
+      setShowWelcomeModal(true); 
     }
   }
 

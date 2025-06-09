@@ -11,17 +11,14 @@ export function Homepage() {
   const { user } = useUserContext();
 
   const onRefresh = useCallback(async () => {
-    console.log("[Homepage] Инициализация обновления страницы");
     setRefreshing(true);
     try {
       await refetch()
-      console.log("[Homepage] Обновление постов и данных пользователя завершено");
     } catch (error) {
       console.error("[Homepage] Ошибка при обновлении:", error);
       Alert.alert("Ошибка", "Не удалось обновить данные. Попробуйте снова.");
     } finally {
       setRefreshing(false);
-      console.log("[Homepage] Обновление завершено");
     }
   }, [refetch]);
 

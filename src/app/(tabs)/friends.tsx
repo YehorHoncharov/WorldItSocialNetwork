@@ -38,15 +38,13 @@ export default function Friends() {
       <FriendsHeader activeTab={activeTab} onTabPress={handleTabPress} />
       
       {activeTab === 'main' ? (
-        <ScrollView
-          style={{ flex: 1 }}
-          overScrollMode="never"
-          contentContainerStyle={{ gap: 20, alignItems: "center" }}
+        <View
+          style={{ flex: 1,  gap: 20, alignItems: "center"  }}
         >
           <RequestsFriends />
           <RecomendFriends />
           <AllFriends />
-        </ScrollView>
+        </View>
       ) : (
         <View style={{ flex: 1, overflow: 'hidden' }}>
           <Animated.View style={{

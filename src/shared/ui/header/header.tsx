@@ -21,9 +21,7 @@ function Header() {
 
 	function Logout() {
 		try {
-
 			const deleteToken = AsyncStorage.removeItem("token");
-            console.log("token удален", deleteToken);
 		} catch {
 			console.log("ошибки выхода");
 		}

@@ -1,7 +1,6 @@
 import { View } from "react-native";
 import { Author } from "../author/author";
 import { Content } from "../content/content";
-import { Providers } from "../../../../app/providers";
 import { IPost } from "../../types/post";
 import { StyleSheet } from "react-native";
 
@@ -20,7 +19,7 @@ export default function Post(props: IPost) {
 	} = props;
 
 	return (
-		<Providers>
+		
 			<View style={styles.container}>
 				<Author
 					id={id}
@@ -47,7 +46,7 @@ export default function Post(props: IPost) {
 					images={images}
 				/>
 			</View>
-		</Providers>
+
 	);
 }
 

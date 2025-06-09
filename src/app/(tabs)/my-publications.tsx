@@ -1,5 +1,5 @@
 import { SafeAreaView, ScrollView, StatusBar, View } from "react-native";
-import { Providers } from "../providers";
+import  Providers from "../providers";
 import { AlbumHeader } from "../../modules/albums/ui/my/album-header/album-header";
 
 

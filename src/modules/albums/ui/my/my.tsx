@@ -163,7 +163,7 @@ export function My(props: IAlbumProps) {
           text: "Видалити",
           style: "destructive",
           onPress: () => {
-            console.log("[MyPublicationModal] Зображення профілю видалено");
+
             Alert.alert("Успіх", "Зображення профілю видалено");
           },
         },
@@ -190,7 +190,7 @@ export function My(props: IAlbumProps) {
       });
 
       if (response.status === "success") {
-        setImages([]);
+        // setImages([]);
         setChangeImage(false);
       } else {
         Alert.alert("Помилка", "Не вдалося зберегти зображення");
@@ -201,23 +201,28 @@ export function My(props: IAlbumProps) {
     }
   }
 
-  const normalizeImageUrl = (url: string | undefined): string => {
-    if (!url) return "https://via.placeholder.com/162";
+  function normalizeImageUrl(url: string | undefined): { uri: string } {
+    if (!url) return { uri: "https://via.placeholder.com/162" };
     if (url.startsWith("data:image") || url.startsWith("http://") || url.startsWith("https://")) {
-      return url;
+      return { uri: url };
     }
     const relativeUrl = url.replace(/\\/g, "/").replace(/^\/?uploads\/*/i, "");
-    return `${API_BASE_URL}/uploads/${relativeUrl}`;
-  };
+    return { uri: `${API_BASE_URL}/uploads/${relativeUrl}` };
+  }
 
   if (!user) {
-    console.log("Немає юзера!");
+
     return (
       <View style={styles.container}>
         <Text>Користувач не авторизований</Text>
       </View>
     );
   }
+
+  const userImageSource = user.image
+    ? {uri: API_BASE_URL+"/"+user.image}
+    : require("../../../../shared/ui/images/user.png");
+  console.log(userImageSource)
 
   return (
     <View style={styles.container}>
@@ -237,7 +242,7 @@ export function My(props: IAlbumProps) {
         <View style={styles.imageContainer}>
           <View style={styles.imageWrapper}>
             <Image
-              source={{ uri: normalizeImageUrl(user.image) }}
+              source={userImageSource}
               style={styles.avatar}
             />
             <View style={styles.actionButtons}>
@@ -263,11 +268,7 @@ export function My(props: IAlbumProps) {
             images.map((image) => (
               <View key={image.id} style={styles.imageWrapper}>
                 <Image
-                  source={{
-                    uri: image.url.startsWith("data:image")
-                      ? image.url
-                      : normalizeImageUrl(image.url),
-                  }}
+                  source={normalizeImageUrl(image.url)}
                   style={styles.avatar}
                 />
                 <View style={styles.actionButtons}>

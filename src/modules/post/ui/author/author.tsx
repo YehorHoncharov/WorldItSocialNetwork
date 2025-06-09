@@ -6,6 +6,7 @@ import { IPost } from "../../types/post";
 import { ModalPost } from "../modal-post/modal-post";
 import { useUserContext } from "../../../auth/context/user-context";
 import { useUserByID } from "../../hooks/use-user-by-id";
+import { API_BASE_URL } from "../../../../settings";
 
 export function Author({ scrollOffset = 0, ...props }: IPost & { scrollOffset?: number }) {
   const [modalVisible, setModalVisible] = useState(false);
@@ -56,8 +57,8 @@ export function Author({ scrollOffset = 0, ...props }: IPost & { scrollOffset?: 
         <View style={styles.contant}>
           <View style={{ position: "relative" }}>
             <Image
-              style={{ width: 46, height: 46 }}
-              source={{uri: user?.image}}
+              style={{ width: 50, height: 50, borderRadius: 200 }}
+              source={{uri: `${API_BASE_URL}/${user?.image}`}}
             />
             <Image
               style={{

@@ -8,12 +8,8 @@ import {
 	TouchableOpacity,
 	View,
 	StyleSheet,
-	Platform,
 } from "react-native";
-import { Providers } from "../../providers";
-import { Header } from "../../../shared/ui/header";
 import { useRef, useState, useEffect } from "react";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
 const screenWidth = Dimensions.get("window").width;

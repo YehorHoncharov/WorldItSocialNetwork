@@ -11,7 +11,6 @@ export function useUsers() {
 				const response = await fetch("http://192.168.1.104:3000/user/all");
 				const result = await response.json();
 				if (result.status === "error") {
-					console.log(result)
 					return;
 				}
 				setUsers(result)
@@ -21,7 +20,6 @@ export function useUsers() {
 			}
 		fetchUsers();
 	}, [])
-	console.log(users)
 
 	return { users};
 }

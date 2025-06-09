@@ -5,8 +5,6 @@ export const styles = StyleSheet.create({
 		width: "100%",
 		height: 127,
 		flexDirection: "row",
-		justifyContent: "center",
-		alignItems: "flex-start",
 		gap: 8,
 		padding: 16,
 		borderBottomColor: "#CDCED2",
@@ -20,8 +18,6 @@ export const styles = StyleSheet.create({
 	main: {
 		width: 315,
 		height: 95,
-		alignItems: "flex-start",
-		justifyContent: "flex-start",
 	},
 	
 });

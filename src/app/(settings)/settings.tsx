@@ -1,5 +1,5 @@
 import { SafeAreaView, ScrollView, StatusBar, View } from "react-native";
-import { Providers } from "../providers";
+import  Providers  from "../providers";
 import { Header } from "../../shared/ui/header/header";
 import { Settings } from "../../modules/settings/settings";
 
