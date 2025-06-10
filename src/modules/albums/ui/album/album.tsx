@@ -5,19 +5,19 @@ import { useEffect, useState } from "react";
 import { launchImageLibraryAsync, requestMediaLibraryPermissionsAsync } from "expo-image-picker";
 import { useUserContext } from "../../../auth/context/user-context";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { IAlbum, IAlbumImg } from "../../types/albums.types";
+import { IAlbum, IAlbumImg, IPutResponse } from "../../types/albums.types";
 import { PUT } from "../../../../shared/api/put";
 import { API_BASE_URL } from "../../../../settings";
 
-
-
 export function Album(props: IAlbum) {
 	const [images, setImages] = useState<IAlbumImg[]>([]);
+	const [imagesToDelete, setImagesToDelete] = useState<number[]>([]);
 	const [imageDimensions, setImageDimensions] = useState<{
 		[key: string]: { width: number; height: number };
 	}>({});
 	const { user } = useUserContext();
 	const [tokenUser, setTokenUser] = useState<string>("");
+
 	const getToken = async (): Promise<string> => {
 		const token = await AsyncStorage.getItem("tokenStorage");
 		return token || "";
@@ -28,7 +28,8 @@ export function Album(props: IAlbum) {
 		if (props.images && Array.isArray(props.images)) {
 			setImages(props.images);
 		}
-	}, []);
+	}, [props.images]);
+
 	async function onSearch() {
 		try {
 			const { status } = await requestMediaLibraryPermissionsAsync();
@@ -50,27 +51,19 @@ export function Album(props: IAlbum) {
 
 			if (!result.canceled && result.assets) {
 				const allowedFormats = ["jpeg", "png", "gif"];
-				const maxSizeInBytes = 5 * 1024 * 1024; // 5 MB
+				const maxSizeInBytes = 5 * 1024 * 1024;
 
 				const newImages = await Promise.all(
 					result.assets
 						.filter((asset) => {
-							const type =
-								asset.mimeType?.split("/")[1]?.toLowerCase() ||
-								"";
-							return (
-								asset.base64 && allowedFormats.includes(type)
-							);
+							const type = asset.mimeType?.split("/")[1]?.toLowerCase() || "";
+							return asset.base64 && allowedFormats.includes(type);
 						})
 						.map(async (asset, index) => {
 							const base64String = asset.base64!;
-							const estimatedSizeInBytes =
-								(base64String.length * 3) / 4;
+							const estimatedSizeInBytes = (base64String.length * 3) / 4;
 							if (estimatedSizeInBytes > maxSizeInBytes) {
-								Alert.alert(
-									"Помилка",
-									`Зображення занадто велике (макс. 5 МБ)`
-								);
+								Alert.alert("Помилка", `Зображення занадто велике (макс. 5 МБ)`);
 								return null;
 							}
 							const imageUrl = `data:image/${asset.mimeType?.split("/")[1] || "jpeg"
@@ -82,13 +75,10 @@ export function Album(props: IAlbum) {
 							}>((resolve) => {
 								Image.getSize(
 									imageUrl,
-									(width, height) =>
-										resolve({ width, height }),
+									(width, height) => resolve({ width, height }),
 									(error) => {
-										console.error(
-											` Помилка визначення розмірів: ${error}`
-										);
-										resolve({ width: 150, height: 150 }); // Запасний варіант
+										console.error(`Помилка визначення розмірів: ${error}`);
+										resolve({ width: 150, height: 150 });
 									}
 								);
 							});
@@ -102,7 +92,7 @@ export function Album(props: IAlbum) {
 							return {
 								id: Date.now() + index,
 								url: imageUrl,
-								albumId: 0,
+								albumId: props.id,
 							};
 						})
 				);
@@ -111,26 +101,17 @@ export function Album(props: IAlbum) {
 					(img): img is IAlbumImg => img !== null
 				);
 
-				if (images.length + filteredImages.length > 10) {
-					Alert.alert(
-						"Увага",
-						"Максимальна кількість зображень - 10"
-					);
+				if (images.length + filteredImages.length - imagesToDelete.length > 10) {
+					Alert.alert("Увага", "Максимальна кількість зображень - 10");
 					return;
 				}
 
-				setImages((prev) => {
-					const updatedImages = [...prev, ...filteredImages];
-					return updatedImages;
-				});
+				setImages((prev) => [...prev, ...filteredImages]);
 			} else if (result.canceled) {
 				Alert.alert("Скасовано", "Вибір зображень було скасовано");
 			}
 		} catch (error) {
-			console.error(
-				" Помилка вибору зображення:",
-				error
-			);
+			console.error("Помилка вибору зображення:", error);
 			Alert.alert(
 				"Помилка",
 				`Не вдалося вибрати зображення: ${error instanceof Error ? error.message : "Невідома помилка"
@@ -139,18 +120,35 @@ export function Album(props: IAlbum) {
 		}
 	}
 
-	const handleSubmit = async () => {
+	function deleteImage(id: number) {
+		const imageToDelete = images.find((image) => image.id === id);
+		if (!imageToDelete) {
+			Alert.alert("Помилка", "Зображення не знайдено");
+			return;
+		}
 
-		const formattedImages =
-			images.length > 0
-				? { create: images.map((img) => ({ url: img.url })) }
-				: undefined;
+		if (!imageToDelete.url.startsWith("data:image")) {
+			setImagesToDelete((prev) => [...prev, id]);
+		}
 
+		setImages((prev) => prev.filter((image) => image.id !== id));
+		setImageDimensions((prev) => {
+			const updatedDimensions = { ...prev };
+			delete updatedDimensions[id];
+			return updatedDimensions;
+		});
+	}
+
+	async function handleSubmit() {
 		try {
+			const formattedImages = {
+				create: images
+					.filter((img) => img.url.startsWith("data:image"))
+					.map((img) => ({ url: img.url })),
+				delete: imagesToDelete.map((id) => ({ id })),
+			};
 
-
-
-			const response = await PUT({
+			const response: IPutResponse = await PUT({
 				endpoint: `${API_BASE_URL}/albums/${props.id}`,
 				headers: {
 					"Content-Type": "application/json",
@@ -158,22 +156,25 @@ export function Album(props: IAlbum) {
 				},
 				token: tokenUser,
 				body: {
-					images: formattedImages,
+					images:
+						formattedImages.create.length > 0 ||
+							formattedImages.delete.length > 0
+							? formattedImages
+							: undefined,
 				},
 			});
 
-			if (response.status === "success") {
-				setImages([]);
-
-			} else {
-				Alert.alert(
-					"Помилка"
-				);
+			if (response.status === "success" && response.data) {
+				setImages(response.data.images || []);
+				setImagesToDelete([]);
+				Alert.alert("Успіх", "Зміни успішно збережено");
 			}
+			Alert.alert("Успіх", "Зміни успішно збережено");
 		} catch (err) {
-			console.error(err);
+			console.error("Помилка збереження:", err);
 		}
-	};
+	}
+
 	return (
 		<View style={styles.container}>
 			<ScrollView contentContainerStyle={styles.scrollContainer}>
@@ -181,7 +182,6 @@ export function Album(props: IAlbum) {
 					<View style={{ gap: 16 }}>
 						<View style={styles.mainBox}>
 							<Text style={styles.title}>{props.name}</Text>
-
 							<View style={styles.actionButtons}>
 								<TouchableOpacity style={styles.actionButton}>
 									<Image
@@ -189,52 +189,48 @@ export function Album(props: IAlbum) {
 										style={styles.actionIcon}
 									/>
 								</TouchableOpacity>
-
 								<TouchableOpacity style={{ alignItems: "center", justifyContent: "center" }}>
 									<Dots width={20} height={20} />
 								</TouchableOpacity>
 							</View>
 						</View>
-
 						<View style={styles.theme}>
 							<Text style={{ fontSize: 16 }}>{props.theme}</Text>
 							<Text style={{ fontSize: 16 }}>{props.year}</Text>
 						</View>
 						<View style={styles.separator} />
 					</View>
-
 					<View style={{ gap: 16 }}>
 						<Text style={styles.title}>Фотографії</Text>
 						<View style={styles.photoGrid}>
-							{images.length > 0 ? (
-								images.map((img, index) => {
-									return img.url ? (
-										<View key={img.id}>
+							{images.length > 0
+								? images.map((img) => (
+									<View key={img.id}>
+										<Image
+											source={{
+												uri: img.url.startsWith("data:image")
+													? img.url
+													: `${API_BASE_URL}/${img.url.replace(/^\/?uploads\/*/i, "uploads/")}`,
+											}}
+											style={styles.photo}
+										/>
+										<TouchableOpacity
+											onPress={() => deleteImage(img.id)}
+											style={styles.deleteBtn}
+										>
 											<Image
-												source={{ uri: img.url.startsWith("data:image") ? img.url : `${API_BASE_URL}/${img.url}` }}
-												style={styles.photo}
+												source={require("../../../../shared/ui/images/trash.png")}
+												style={{ width: 20, height: 20 }}
 											/>
-											<TouchableOpacity
-												onPress={() => {
-													const updated = images.filter((_, i) => i !== index);
-													setImages(updated);
-												}}
-												style={styles.deleteBtn}
-											>
-												<Image
-													source={require("../../../../shared/ui/images/trash.png")}
-													style={{ width: 20, height: 20 }}
-												/>
-											</TouchableOpacity>
-										</View>
-									) : null;
-								})
-							) : null}
+										</TouchableOpacity>
+									</View>
+								))
+								: null}
 							{images.length < 10 && (
 								<TouchableOpacity style={styles.addImage} onPress={onSearch}>
 									<Image
 										style={{ width: 40.6, height: 40 }}
-										source={require('../../../../shared/ui/images/plus-in-circle.png')}
+										source={require("../../../../shared/ui/images/plus-in-circle.png")}
 									/>
 								</TouchableOpacity>
 							)}

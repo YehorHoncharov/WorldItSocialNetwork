@@ -16,30 +16,30 @@ export default function Friends() {
       setActiveTab('main');
       return;
     }
-    
+
     let toValue = 0;
-    switch(tab) {
+    switch (tab) {
       case 'requests': toValue = 0; break;
       case 'recommendations': toValue = -screenWidth; break;
       case 'all': toValue = -screenWidth * 2; break;
     }
-    
+
     Animated.timing(translateX, {
       toValue,
       duration: 300,
       useNativeDriver: true,
     }).start();
-    
+
     setActiveTab(tab);
   };
 
   return (
     <View style={{ flex: 1 }}>
       <FriendsHeader activeTab={activeTab} onTabPress={handleTabPress} />
-      
+
       {activeTab === 'main' ? (
         <View
-          style={{ flex: 1,  gap: 20, alignItems: "center"  }}
+          style={{ flex: 1, gap: 20, alignItems: "center" }}
         >
           <RequestsFriends />
           <RecomendFriends />

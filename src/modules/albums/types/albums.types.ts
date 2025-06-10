@@ -18,3 +18,13 @@ export interface IAlbumStart {
 	name: string
 	images: IAlbumImg[]
 }
+
+export interface IAlbumProps {
+  albums: IAlbum[];
+}
+
+export interface IPutResponse {
+  status: "success" | "error";
+  data?: IAlbum;
+  message?: string;
+}
