@@ -150,9 +150,13 @@ import T from "../icons/logo/t";
 import { styles } from "./header.styles";
 import { useRouter } from "expo-router";
 import { useState } from "react";
-import { IInputPasswordProps } from "../input/input.type";
 import { MyPublicationModal } from "../../../modules/my_publications/modal/modal";
 import { useUserContext } from "../../../modules/auth/context/user-context";
+import { AddAlbumModal } from "../../../modules/albums/ui/add-album-modal/add-album-modal";
+
+interface HeaderProps {
+  actionType?: 1 | 2; // 1 пости, 2 фльбоми
+}
 
 function Header() { 
   const router = useRouter();

@@ -42,7 +42,7 @@ export default function TabsLayout() {
 								}
 							/>
 						),
-						header: () => <Header />,
+						header: () => <Header actionType={1}/>,
 					}}
 				/>
 				<Tabs.Screen
@@ -66,7 +66,7 @@ export default function TabsLayout() {
 								}
 							/>
 						),
-						header: () => <Header />,
+						header: () => <Header actionType={2}/>,
 					}}
 				/>
 				<Tabs.Screen
