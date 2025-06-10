@@ -7,7 +7,7 @@ import { POST } from "../../../shared/api/post";
 
 interface IUserContext {
   user: IUser | null;
-  login: (email: string, password: string) => Promise<void>;
+  login: (email: string, password: string) => void;
   register: (
     email: string,
     password: string,
@@ -16,14 +16,15 @@ interface IUserContext {
     surname: string,
     username: string,
     image: string
-  ) => Promise<void>;
+  ) => void;
   isAuthenticated: () => boolean;
-  updateUser: (updatedUser: IUser) => Promise<void>;
-  refreshUser: () => Promise<void>;
+  updateUser: (updatedUser: IUser) => void;
+  refreshUser: () => void;
   setShowWelcomeModal: (value: boolean) => void;
   showWelcomeModal: boolean;
-  logout: () => Promise<void>;
+  logout: () => void;
   refetchLogin: (email: string, password: string) => Promise<IUser | null>;
+  refetchLogout: () => Promise<void>;
 }
 
 const initialValue: IUserContext = {
@@ -37,6 +38,7 @@ const initialValue: IUserContext = {
   showWelcomeModal: false,
   logout: async () => { },
   refetchLogin: async () => null,
+  refetchLogout: async () => {},
 };
 
 const userContext = createContext<IUserContext>(initialValue);
@@ -58,7 +60,7 @@ export function UserContextProvider({ children }: IUserContextProviderProps) {
       const response = await fetch("http://192.168.1.104:3000/user/me", {
         headers: {
           Authorization: `Bearer ${token}`,
-          "Cache-Control": "no-cache",
+          // "Cache-Control": "no-cache",
         },
       });
       const result: Response<IUser> = await response.json();
@@ -80,7 +82,7 @@ export function UserContextProvider({ children }: IUserContextProviderProps) {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Cache-Control": "no-cache",
+          // "Cache-Control": "no-cache",
         },
         body: JSON.stringify({ email, password }),
       });
@@ -92,7 +94,6 @@ export function UserContextProvider({ children }: IUserContextProviderProps) {
       await getData(result.data);
     } catch (error) {
       console.error("[login] Error:", error);
-      throw error;
     }
   }
 
@@ -110,7 +111,7 @@ export function UserContextProvider({ children }: IUserContextProviderProps) {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Cache-Control": "no-cache",
+          // "Cache-Control": "no-cache",
         },
         body: JSON.stringify({ email, password, code, name, surname, username, image }),
       });
@@ -155,7 +156,7 @@ export function UserContextProvider({ children }: IUserContextProviderProps) {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
+            // Authorization: `Bearer ${token}`,
           },
         });
         const result: Response<any> = await response.json();
@@ -163,6 +164,7 @@ export function UserContextProvider({ children }: IUserContextProviderProps) {
           console.error("[logout] Server error:", result.message);
         }
       }
+      // Clear all session-related data
       await AsyncStorage.multiRemove(["token", "user"]);
       setUser(null);
     } catch (error) {
@@ -173,13 +175,12 @@ export function UserContextProvider({ children }: IUserContextProviderProps) {
 
   async function refetchLogin(email: string, password: string): Promise<IUser | null> {
     try {
-      await AsyncStorage.removeItem("token");
-      const response = await fetch(`http://192.168.1.104:3000/user/log?timestamp=${Date.now()}`, {
+      await AsyncStorage.multiRemove(["token", "user"]); 
+      const response = await fetch("http://192.168.1.104:3000/user/log", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Cache-Control": "no-cache",
-          "X-Unique-Request": `${Date.now()}`,
+          // "Cache-Control": "no-cache",
         },
         body: JSON.stringify({ email, password }),
       });
@@ -195,13 +196,32 @@ export function UserContextProvider({ children }: IUserContextProviderProps) {
     }
   }
 
+  async function refetchLogout(): Promise<void> {
+    try {
+      const token = await AsyncStorage.getItem("token");
+      if (token) {
+        await fetch("http://192.168.1.104:3000/user/logout", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            // "Cache-Control": "no-cache",
+          },
+        });
+      }
+      await AsyncStorage.multiRemove(["token", "user"]);
+      setUser(null);
+    } catch (error) {
+      console.error(error)
+
+    }
+  }
+
   async function updateUser(updatedUser: IUser) {
     try {
       setUser(updatedUser);
       await AsyncStorage.setItem("user", JSON.stringify(updatedUser));
     } catch (error) {
       console.error("[updateUser] Error:", error);
-      throw error;
     }
   }
 
@@ -245,6 +265,7 @@ export function UserContextProvider({ children }: IUserContextProviderProps) {
         setShowWelcomeModal,
         logout,
         refetchLogin,
+        refetchLogout,
       }}
     >
       {children}

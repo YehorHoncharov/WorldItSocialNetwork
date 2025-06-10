@@ -40,7 +40,7 @@ export function Settings() {
 	const { control, handleSubmit, reset } = useForm<IUserForm>({
 		defaultValues: {
 			dateOfBirth: new Date(),
-			image: "", // Начальное значение для image
+			image: "", 
 		},
 	});
 	const { user } = useUserContext();

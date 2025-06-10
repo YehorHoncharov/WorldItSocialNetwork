@@ -698,3 +698,164 @@ const styles = StyleSheet.create({
     height: 40,
   },
 });
+
+// const styles = StyleSheet.create({
+//   centeredView: {
+//     flex: 1,
+//     justifyContent: "center",
+//     backgroundColor: "rgba(0, 0, 0, 0.5)",
+//     alignItems: "center", 
+//   },
+//   modalView: {
+//     width: "90%", 
+//     maxHeight: "80%",
+//     backgroundColor: "white",
+//     borderRadius: 20,
+//     padding: 15,
+//     shadowColor: "#000",
+//     shadowOffset: { width: 0, height: 2 },
+//     shadowOpacity: 0.25,
+//     shadowRadius: 4,
+//     elevation: 5,
+//   },
+//   header: {
+//     flexDirection: "row",
+//     justifyContent: "space-between",
+//     alignItems: "center",
+//     marginBottom: 16,
+//   },
+//   modalTitle: {
+//     fontSize: 24,
+//     fontWeight: "500",
+//     color: "#070A1C",
+//     textAlign: "center", // Center the title
+//     flex: 1, // Allow title to take space
+//   },
+//   form: {
+//     width: "100%",
+//     gap: 10,
+//     alignItems: "center", // Center-align all inputs
+//     justifyContent: "center",
+//   },
+//   textArea: {
+//     width: "100%", 
+//     minHeight: 120,
+//     padding: 16,
+//     borderWidth: 1,
+//     borderColor: "#CDCED2",
+//     borderRadius: 10,
+//     fontSize: 16,
+//     backgroundColor: "#f9f9f9",
+//     textAlign: "center", // Center text within textarea
+//   },
+//   actions: {
+//     gap: 16,
+//     marginTop: 20,
+//     flexDirection: "row",
+//     alignItems: "center",
+//     justifyContent: "center", // Center the action buttons
+//   },
+//   addImageButton: {
+//     backgroundColor: "#f0f0f0",
+//     padding: 12,
+//     borderRadius: 8,
+//     alignItems: "center",
+//     borderWidth: 1,
+//     borderColor: "#ddd",
+//   },
+//   addImageText: {
+//     color: "#333",
+//     fontWeight: "500",
+//     fontSize: 16,
+//   },
+//   submitButton: {
+//     flexDirection: "row",
+//     alignItems: "center",
+//     justifyContent: "center",
+//     backgroundColor: "#543C52",
+//     paddingHorizontal: 15,
+//     paddingVertical: 10,
+//     borderRadius: 1234,
+//     gap: 8,
+//     minWidth: 130,
+//   },
+//   submitText: {
+//     color: "white",
+//     fontSize: 14,
+//     fontWeight: "500",
+//     flexShrink: 1,
+//   },
+//   scrollArea: {
+//     flexGrow: 1,
+//   },
+//   imageGrid: {
+//     flexDirection: "column",
+//     gap: 8,
+//     alignItems: "center", // Center the image grid
+//   },
+//   imageContainer: {
+//     position: "relative",
+//     alignItems: "center",
+//     justifyContent: "center",
+//   },
+//   imageAdded: {
+//     width: 225, // Standardized size
+//     height: 225, // Standardized size
+//     borderRadius: 16,
+//   },
+//   removeImageButton: {
+//     position: "absolute",
+//     top: 10,
+//     right: 10,
+//     backgroundColor: "white",
+//     width: 30,
+//     height: 30,
+//     borderRadius: 15,
+//     justifyContent: "center",
+//     alignItems: "center",
+//     borderWidth: 1,
+//     borderColor: "#543C52",
+//   },
+//   noImagesText: {
+//     fontSize: 16,
+//     color: "#666",
+//     textAlign: "center",
+//     marginVertical: 10,
+//   },
+//   imageSectionTitle: {
+//     fontSize: 16,
+//     fontWeight: "600",
+//     marginTop: 20,
+//     marginBottom: 10,
+//     color: "#333",
+//     textAlign: "center", // Center the title
+//   },
+//   selectedTagsContainer: {
+//     flexDirection: "row",
+//     flexWrap: "wrap",
+//     marginTop: 10,
+//     gap: 8,
+//     justifyContent: "center", // Center tags
+//   },
+//   tag: {
+//     backgroundColor: "#E9E5EE",
+//     paddingHorizontal: 12,
+//     paddingVertical: 6,
+//     borderRadius: 15,
+//     flexDirection: "row",
+//     alignItems: "center",
+//     gap: 8,
+//   },
+//   tagText: {
+//     color: "#543C52",
+//     fontSize: 14,
+//   },
+//   removeTagText: {
+//     color: "#543C52",
+//     fontSize: 14,
+//   },
+//   icon: {
+//     width: 40,
+//     height: 40,
+//   },
+// });
