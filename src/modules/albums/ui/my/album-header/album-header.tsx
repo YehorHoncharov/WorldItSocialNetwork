@@ -87,6 +87,7 @@ export function AlbumHeader() {
                     <View style={{ width: screenWidth, flex: 1, marginBottom: 60 }}>
                         <Settings />
                     </View>
+                    
                     <FlatList
                         style={{ width: screenWidth, flex: 1 }}
                         contentContainerStyle={{ gap: 8, paddingBottom: 60 }}

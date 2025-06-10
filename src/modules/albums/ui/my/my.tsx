@@ -55,7 +55,6 @@ export function My(props: IAlbumProps) {
     if (minAlbum?.images && Array.isArray(minAlbum.images)) {
       setImages(minAlbum.images);
     }
-    // Встановлюємо userImageSource на основі user.image
     if (user?.image) {
       setUserImageSource({
         uri: `${API_BASE_URL}/${user.image.replace(/^\/?uploads\/*/i, "uploads/")}`,

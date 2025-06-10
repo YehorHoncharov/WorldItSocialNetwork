@@ -1,4 +1,4 @@
-import { ScrollView, View, Image, Text, FlatList } from "react-native";
+import { ScrollView, View, Image, Text, FlatList, TouchableOpacity } from "react-native";
 import { useUserContext } from "../../../auth/context/user-context";
 import OfflineIcon from "../../../../shared/ui/icons/offline-circle";
 import { Button } from "../../../../shared/ui/button";
@@ -12,7 +12,7 @@ export function FriendProfile(props: IUser) {
 	const { albums } = useAlbums();
 
 	return (
-		<ScrollView style={styles.scrollView}>
+		<ScrollView style={styles.scrollView} overScrollMode="never">
 			<View style={styles.container}>
 				<View style={styles.profileContainer}>
 					<View style={styles.profileImageContainer}>
@@ -57,13 +57,13 @@ export function FriendProfile(props: IUser) {
 					<View style={styles.buttonContainer}>
 						<Button
 							label="Підтвердити"
-							style={styles.confirmButton}
+							style={[styles.confirmButton]}
 						>
 							<Text style={styles.buttonText}>Підтвердити</Text>
 						</Button>
-						<Button label="Видалити" style={styles.deleteButton}>
+						<TouchableOpacity style={styles.deleteButton}>
 							<Text style={styles.buttonText}>Видалити</Text>
-						</Button>
+						</TouchableOpacity>
 					</View>
 				</View>
 				<View style={styles.albumsContainer}>
