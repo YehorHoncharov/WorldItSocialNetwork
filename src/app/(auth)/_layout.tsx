@@ -3,16 +3,18 @@ import { Platform } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Header } from "../../shared/ui/header";
 
+
 export default function AuthLayout() {
 	return (
-		<SafeAreaView style={{flex: 1}} edges={["top",]}>
-			<Header.HeaderSecond></Header.HeaderSecond>
+		<SafeAreaView
+			style={{ flex: 1, backgroundColor: "white" }}
+			edges={["top"]}
+		>
+			<Header.HeaderSecond />
 			<Stack
 				screenOptions={{
 					headerShown: false,
-					statusBarStyle:
-						Platform.OS === "android" ? "dark" : undefined,
-					statusBarBackgroundColor: "#ffffff",
+					statusBarStyle: Platform.OS === "android" ? "dark" : undefined,
 				}}
 			/>
 		</SafeAreaView>

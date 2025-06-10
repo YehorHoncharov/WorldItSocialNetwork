@@ -31,6 +31,10 @@ export default function RootLayout() {
 					name="(settings)" 
 					options={{ headerShown: false }} 
 				/>
+				<Stack.Screen 
+					name="(friends)" 
+					options={{ headerShown: false }} 
+				/>
 			</Stack>
 		</Providers>
 	);

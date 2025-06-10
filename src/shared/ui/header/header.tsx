@@ -7,6 +7,7 @@ import D from "../icons/logo/d";
 import I from "../icons/logo/i";
 import T from "../icons/logo/t";
 import { styles } from "./header.styles";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useRouter } from "expo-router";
 import { useState } from "react";
 import { MyPublicationModal } from "../../../modules/my_publications/modal/modal";
@@ -18,26 +19,42 @@ interface HeaderProps {
   actionType?: 1 | 2; // 1 пости, 2 фльбоми
 }
 
-function Header() { 
+function Header({ actionType }: HeaderProps) {
   const router = useRouter();
-  const { user, refetchLogout } = useUserContext();
+  const { user } = useUserContext();
   const [modalOpened, setModalOpened] = useState<boolean>(false);
 
-  function onReg() {
-    router.navigate("/settings");
-  }
+  const Logout = async () => {
+    try {
+      await AsyncStorage.removeItem("token");
+    } catch {
+      console.log("Помилка виходу");
+    }
+  };
 
+  const onReg = () => {
+    router.navigate("/settings");
+  };
+
+  const toggleModal = () => {
+    setModalOpened(!modalOpened);
+  };
 
   return (
     <View style={styles.container}>
-      {modalOpened ? (
+      {modalOpened && actionType === 1 && (
         <MyPublicationModal
           modalVisible={modalOpened}
-          changeVisibility={() => {
-            setModalOpened(!modalOpened);
-          }}
-        ></MyPublicationModal>
-      ) : null}
+          changeVisibility={toggleModal}
+        />
+      )}
+      {modalOpened && actionType === 2 && (
+        <AddAlbumModal
+          modalVisible={modalOpened}
+          changeVisibility={toggleModal}
+          onClose={toggleModal}
+        />
+      )}
       <View
         style={{
           flexDirection: "row",
@@ -64,12 +81,8 @@ function Header() {
         </View>
       </View>
       <View style={{ flexDirection: "row", gap: 8, marginRight: 16 }}>
-        {user ? (
-          <TouchableWithoutFeedback
-            onPress={() => {
-              setModalOpened(!modalOpened);
-            }}
-          >
+        {user && actionType ? (
+          <TouchableWithoutFeedback onPress={toggleModal}>
             <Image
               style={styles.plus}
               source={require("../images/plus-in-circle.png")}
@@ -82,7 +95,7 @@ function Header() {
             source={require("../images/settings-in-circle.png")}
           />
         </TouchableWithoutFeedback>
-        <TouchableWithoutFeedback onPress={refetchLogout}>
+        <TouchableWithoutFeedback onPress={Logout}>
           <Image
             style={styles.exit}
             source={require("../images/exit-in-circle.png")}
@@ -95,6 +108,7 @@ function Header() {
 
 function HeaderSecond(props: IInputPasswordProps) {
   const { label, error, style, ...otherProps } = props;
+
   const [hidden, setHidden] = useState(true);
 
   return (

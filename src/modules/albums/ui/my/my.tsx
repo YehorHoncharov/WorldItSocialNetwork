@@ -1,4 +1,3 @@
-
 import {
   View,
   Text,
@@ -154,12 +153,10 @@ export function My(props: IAlbumProps) {
       return;
     }
 
-    // Якщо зображення вже існує на бекенді (не є новим base64), додаємо його ID до imagesToDelete
     if (!imageToDelete.url.startsWith("data:image")) {
       setImagesToDelete((prev) => [...prev, id]);
     }
 
-    // Видаляємо зображення зі стану images
     setImages((prev) => prev.filter((image) => image.id !== id));
     setImageDimensions((prev) => {
       const updatedDimensions = { ...prev };
@@ -279,6 +276,8 @@ export function My(props: IAlbumProps) {
       </View>
     );
   }
+
+  console.log(userImageSource)
 
   return (
     <View style={styles.container}>

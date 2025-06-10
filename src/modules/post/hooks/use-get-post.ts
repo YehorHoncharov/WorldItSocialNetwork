@@ -11,25 +11,18 @@ export function usePosts() {
       setIsLoading(true);
       setError(null);
       
-      const timestamp = Date.now();
-      const response = await fetch(`http://192.168.1.104:3000/posts?timestamp=${timestamp}`);
-      
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
+      const response = await fetch("http://192.168.1.104:3000/posts");
       const result = await response.json();
       
-      if (!result) {
-        console.warn("[refetch] Сервер вернул null/undefined");
-        return;
+      if (response.status === "error") {
+        return
       }
 
       setPosts(result);
       return result;
     } catch (error) {
       const err = error instanceof Error ? error.message : "Unknown error";
-      console.error("[refetch] Ошибка при запросе:", err);
+      console.error(err);
       setError(err);
       throw error; 
     } finally {

@@ -4,10 +4,11 @@ import OfflineIcon from "../../../../shared/ui/icons/offline-circle";
 import { Button } from "../../../../shared/ui/button";
 import { styles } from "./friend-profile.styles";
 import { IUser } from "../../../auth/types";
-import { Album } from "../album/album";
-import { useAlbums } from "../../hooks/useAlbums";
+import { useAlbums } from "../../../albums/hooks/useAlbums";
+import { Album } from "../../../albums/ui/album/album";
 
-export function FriendProfile(props: IUser) {
+
+export function FriendProfile() {
 	const { user } = useUserContext();
 	const { albums } = useAlbums();
 
