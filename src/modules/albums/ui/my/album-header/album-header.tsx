@@ -82,12 +82,12 @@ export function AlbumHeader() {
                     </View>
 
 
-                    <View style={{ flex: 1, gap: 8 }}>
+                    <ScrollView overScrollMode="never" contentContainerStyle={{ gap: 8 }} style={{ width: screenWidth, flex: 1, }}>
                         <My albums={albums} />
                         <FlatList
                             data={userAlbums.slice(1)}
                             keyExtractor={(item) => `${item.id}`}
-                            contentContainerStyle={{ gap: 10, paddingBottom: 20 }}
+                            contentContainerStyle={{ gap: 8, paddingBottom: 60 }}
                             renderItem={({ item }) => (
                                 <Album
                                     id={item.id}
@@ -104,8 +104,7 @@ export function AlbumHeader() {
                                 </View>
                             }
                         />
-
-                    </View>
+                    </ScrollView>
 
                 </Animated.View>
             </View>

@@ -190,7 +190,7 @@ export function My(props: IAlbumProps) {
       });
 
       if (response.status === "success") {
-        // setImages([]);
+        setImages([]);
         setChangeImage(false);
       } else {
         Alert.alert("Помилка", "Не вдалося зберегти зображення");
@@ -211,7 +211,6 @@ export function My(props: IAlbumProps) {
   }
 
   if (!user) {
-
     return (
       <View style={styles.container}>
         <Text>Користувач не авторизований</Text>
@@ -220,16 +219,14 @@ export function My(props: IAlbumProps) {
   }
 
   const userImageSource = user.image
-    ? {uri: API_BASE_URL+"/"+user.image}
+    ? { uri: API_BASE_URL + "/" + user.image }
     : require("../../../../shared/ui/images/user.png");
-  console.log(userImageSource)
 
   return (
     <View style={styles.container}>
-      <ScrollView contentContainerStyle={styles.scrollContainer}>
+      <ScrollView style={{ flex: 1 }} contentContainerStyle={styles.scrollContainer}>
         <View style={styles.mainBox}>
           <Text style={styles.title}>Мої фото</Text>
-
           <TouchableOpacity style={styles.addButton} onPress={onSearch}>
             <Image
               source={require("../../../../shared/ui/images/add-picture.png")}
@@ -239,12 +236,9 @@ export function My(props: IAlbumProps) {
           </TouchableOpacity>
         </View>
 
-        <View style={styles.imageContainer}>
+        <View style={[styles.imageContainer, { flex: 1 }]}>
           <View style={styles.imageWrapper}>
-            <Image
-              source={userImageSource}
-              style={styles.avatar}
-            />
+            <Image source={userImageSource} style={styles.avatar} />
             <View style={styles.actionButtons}>
               <TouchableOpacity style={styles.actionButton}>
                 <Image
@@ -290,9 +284,7 @@ export function My(props: IAlbumProps) {
                 </View>
               </View>
             ))
-          ) : (
-            null
-          )}
+          ) : null}
         </View>
 
         {changeImage && (

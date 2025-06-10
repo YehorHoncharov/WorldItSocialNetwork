@@ -56,8 +56,8 @@ export const styles = StyleSheet.create({
 		backgroundColor: "#CDCED2",
 	},
 	addImage: {
-		height: 162,
-		width: 162,
+		height: 157,
+		width: 157,
 		borderWidth: 1,
 		borderRadius: 10,
 		borderStyle: "dashed",
@@ -67,39 +67,44 @@ export const styles = StyleSheet.create({
 		paddingRight: 0.6
 	},
 	photoGrid: {
+		width: "100%",
 		flexDirection: "row",
 		flexWrap: "wrap",
-		gap: 19,
+		gap: 10,
 	},
-  
-  photo: {
-    width: 162,
-    height: 162,
-    borderRadius: 10,
-  },
-  deleteBtn: {
-    position: "absolute",
-    bottom: 10,
-    right: 10,
-	backgroundColor: "#FFFFFF",
-	borderRadius: 190,
-	borderWidth: 1,
-	borderColor: "#543C52",
-	width: 40,
-	height: 40,
-	justifyContent: "center",
-	alignItems: "center"
-  },
-  
-  submitBtn: {
-    marginTop: 24,
-    backgroundColor: "#7E5BC2",
-    borderRadius: 10,
-    paddingVertical: 12,
-    alignItems: "center",
-  },
-  submitText: {
-    color: "#fff",
-    fontSize: 16,
-    fontWeight: "600",}
+
+	photo: {
+		width: 157,
+		height: 157,
+		borderRadius: 10,
+	},
+	deleteBtn: {
+		position: "absolute",
+		bottom: 10,
+		right: 10,
+		backgroundColor: "#FFFFFF",
+		borderRadius: 190,
+		borderWidth: 1,
+		borderColor: "#543C52",
+		width: 40,
+		height: 40,
+		justifyContent: "center",
+		alignItems: "center"
+	},
+
+	submitBtn: {
+		flex: 1,
+		height: 40,
+		alignItems: "center",
+		justifyContent: "center",
+		borderRadius: 190,
+		gap: 10,
+		borderWidth: 1,
+		borderColor: "#543C52",
+	},
+	submitText: {
+		color: "#543C52",
+		fontSize: 14,
+		fontWeight: 500,
+	}
 });
