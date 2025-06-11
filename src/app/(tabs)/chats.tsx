@@ -1,6 +1,6 @@
 import { View, Text, Alert } from "react-native";
-import { FriendProfile } from "../../modules/albums/ui/friend-profile/friend-profile";
 import { useUserContext } from "../../modules/auth/context/user-context";
+import { FriendProfile } from "../../modules/friends/ui/friend-profile/friend-profile";
 
 export default function Chats() {
     const {user} = useUserContext()
@@ -11,8 +11,7 @@ export default function Chats() {
         
     return (
         <View>
-
-            <FriendProfile id={user.id} email={user.email} password={user.password}/>
+            <FriendProfile/>
         </View>
     )
 }

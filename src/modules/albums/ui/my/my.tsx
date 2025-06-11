@@ -277,7 +277,6 @@ export function My(props: IAlbumProps) {
     );
   }
 
-  console.log(userImageSource)
 
   return (
     <View style={styles.container}>

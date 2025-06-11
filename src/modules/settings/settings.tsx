@@ -36,15 +36,17 @@ interface IUserForm {
 	image?: string;
 }
 
+
 export function Settings() {
 	const { control, handleSubmit, reset } = useForm<IUserForm>({
 		defaultValues: {
 			dateOfBirth: new Date(),
-			image: "", 
+			image: "",
 		},
 	});
 	const { user } = useUserContext();
 	const [isEditing, setIsEditing] = useState(false);
+	const [isEditing2, setIsEditing2] = useState(false);
 	const router = useRouter();
 	const [isDrawing, setIsDrawing] = useState(false);
 	const signatureRef = useRef<SignaturePadRef>(null);
@@ -54,7 +56,7 @@ export function Settings() {
 	}
 
 	async function handleSave(data: IUserForm) {
-		const formattedImage = data.image ? data.image : ""
+		const formattedImage = data.image ? data.image: ""
 
 		try {
 			if (!user) return;
@@ -84,9 +86,13 @@ export function Settings() {
 				return;
 			}
 			setIsEditing(false);
+			setIsEditing2(false);
 		} catch (error) {
 			Alert.alert("Помилка", "Не вдалося зберегти дані");
 		}
+	}
+	function handleEditToggle2() {
+		setIsEditing2(!isEditing2);
 	}
 
 	function handlePress() {
@@ -164,14 +170,13 @@ export function Settings() {
 
 			const imageUrl = `data:image/${type};base64,${asset.base64}`;
 
-			const newImage= imageUrl
+			const newImage = imageUrl
 
 			return newImage;
 		} catch (error) {
 			Alert.alert(
 				"Помилка",
-				`Не вдалося вибрати зображення: ${
-					error instanceof Error ? error.message : "Невідома помилка"
+				`Не вдалося вибрати зображення: ${error instanceof Error ? error.message : "Невідома помилка"
 				}`
 			);
 			return null;
@@ -215,7 +220,6 @@ export function Settings() {
 			overScrollMode="never"
 		>
 			<View style={{ gap: 8 }}>
-				{/* Profile Card Section */}
 				<View style={styles.container}>
 					<View style={styles.userInfoFirst}>
 						<Text style={styles.userInfoText}>Картка профілю</Text>
@@ -262,11 +266,11 @@ export function Settings() {
 									}}
 									disabled={!isEditing}
 								>
-    
+									
 									<Image
 										source={
 											field.value
-												? {uri: field.value}
+												? { uri: field.value} 
 												: require("../../shared/ui/images/avatar.png")
 										}
 										style={{
@@ -275,12 +279,13 @@ export function Settings() {
 											borderRadius: 48,
 										}}
 									/>
+									
 								</TouchableOpacity>
 							)}
 						/>
 						<View style={{ gap: 10, padding: 16 }}>
-							
-							{!isEditing?  
+
+							{!isEditing ?
 								<Text
 									style={{
 										fontSize: 24,
@@ -289,9 +294,9 @@ export function Settings() {
 									}}
 								>
 									{user.name} {user.surname}
-									</Text>
-									: null}
-							
+								</Text>
+								: null}
+
 							{isEditing ? (
 								<Controller
 									control={control}
@@ -336,12 +341,12 @@ export function Settings() {
 						</Text>
 						<TouchableOpacity
 							onPress={
-								isEditing
+								isEditing2
 									? handleSubmit(handleSave)
-									: handleEditToggle
+									: handleEditToggle2
 							}
 						>
-							{isEditing ? (
+							{isEditing2 ? (
 								<View style={styles.buttonSave}>
 									<PencilIcon width={15} height={15} />
 									<Text
@@ -373,7 +378,7 @@ export function Settings() {
 									value={field.value}
 									onChange={field.onChange}
 									onChangeText={field.onChange}
-									editable={isEditing}
+									editable={isEditing2}
 								/>
 							)}
 						/>
@@ -388,7 +393,7 @@ export function Settings() {
 									value={field.value}
 									onChange={field.onChange}
 									onChangeText={field.onChange}
-									editable={isEditing}
+									editable={isEditing2}
 								/>
 							)}
 						/>
@@ -403,7 +408,7 @@ export function Settings() {
 									<>
 										<Pressable
 											onPress={
-												isEditing
+												isEditing2
 													? showDatepicker
 													: undefined
 											}
@@ -459,7 +464,7 @@ export function Settings() {
 									value={field.value}
 									onChange={field.onChange}
 									onChangeText={field.onChange}
-									editable={isEditing}
+									editable={isEditing2}
 								/>
 							)}
 						/>
@@ -472,7 +477,7 @@ export function Settings() {
 									label="Пароль"
 									placeholder="Введіть ваш пароль"
 									secureTextEntry
-									editable={isEditing}
+									editable={isEditing2}
 									value={field.value}
 									onChange={field.onChange}
 									onChangeText={field.onChange}

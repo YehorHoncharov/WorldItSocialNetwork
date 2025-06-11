@@ -8,13 +8,13 @@ import {
     FlatList,
 } from "react-native";
 import { useRef, useState, useEffect } from "react";
-import { useAlbums } from "../../../hooks/useAlbums";
-import { Settings } from "../../../../settings";
-import { My } from "../my";
-import { Album } from "../../album/album";
-import { NoAlbums } from "../../no-albums/no-albums";
-import { useUserContext } from "../../../../auth/context/user-context";
-import { IAlbum } from "../../../types/albums.types";
+import { useAlbums } from "../../hooks/useAlbums";
+import { Settings } from "../../../settings";
+import { My } from "../my/my";
+import { Album } from "../album/album";
+import { NoAlbums } from "../no-albums/no-albums";
+import { useUserContext } from "../../../auth/context/user-context";
+import { IAlbum } from "../../types/albums.types";
 
 const screenWidth = Dimensions.get("window").width;
 

@@ -6,11 +6,13 @@ import { styles } from "./friend-profile.styles";
 import { IUser } from "../../../auth/types";
 import { useAlbums } from "../../../albums/hooks/useAlbums";
 import { Album } from "../../../albums/ui/album/album";
+import { API_BASE_URL } from "../../../../settings";
 
 
 export function FriendProfile() {
 	const { user } = useUserContext();
 	const { albums } = useAlbums();
+	console.log(user?.image)
 
 	return (
 		<ScrollView style={styles.scrollView} overScrollMode="never">
@@ -19,7 +21,7 @@ export function FriendProfile() {
 					<View style={styles.profileImageContainer}>
 						<Image
 							style={styles.profileImage}
-							source={require("../../../../shared/ui/images/yehor.png")}
+							source={{uri: API_BASE_URL + "/" + user?.image}}
 						/>
 						<OfflineIcon style={styles.imageOnline} />
 					</View>

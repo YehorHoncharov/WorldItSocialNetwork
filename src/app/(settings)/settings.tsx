@@ -2,6 +2,8 @@ import { SafeAreaView, ScrollView, StatusBar, View } from "react-native";
 import  Providers  from "../providers";
 import { Header } from "../../shared/ui/header/header";
 import { Settings } from "../../modules/settings/settings";
+import { AlbumHeader } from "../../modules/albums/ui/album-header/album-header";
+
 
 
 export default function SettingsPage() {
@@ -9,18 +11,7 @@ export default function SettingsPage() {
 	return (
 		<Providers>
 			<SafeAreaView style={{ flex: 1, backgroundColor: "#ffffff" }}>
-				<ScrollView
-					overScrollMode="never"
-					contentContainerStyle={{
-						flexGrow: 1,
-						alignItems: "center",
-						backgroundColor: "#FAF8FF",
-						gap: 10,
-						paddingTop: 10,
-					}}
-				>
-					<Settings />
-				</ScrollView>
+				<AlbumHeader />
 			</SafeAreaView>
 		</Providers>
 	);

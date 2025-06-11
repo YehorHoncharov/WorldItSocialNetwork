@@ -51,7 +51,7 @@ export default function RegStepTwoModal({ modalVisible, changeVisibility }: Prop
       return;
     }
     const image = "../../../shared/ui/images/user.png"
-    await register(params.email, params.password, params.code, name, surname, username, image);
+    await register(params.email, params.password, params.code, name, surname, username);
     setShowWelcomeModal(false); 
     router.navigate("/home"); 
   };
