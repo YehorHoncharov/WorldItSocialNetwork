@@ -7,13 +7,13 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function TabsLayout() {
 	// Состояния для каждой вкладки
-	const [isHomeActive, setIsHomeActive] = useState(true);
+	const [isHomeActive, setIsHomeActive] = useState(false);
 	const [isMyPostsActive, setIsMyPostsActive] = useState(false);
 	const [isFriendsActive, setIsFriendsActive] = useState(false);
 	const [isChatsActive, setIsChatsActive] = useState(false);
 
 	return (
-		<SafeAreaView style={{ flex: 1, gap: 5, backgroundColor: "#ffffff" }}edges={["top"]}>
+		<SafeAreaView style={{ flex: 1, gap: 5, backgroundColor: "#ffffff" }} edges={["top"]}>
 			<Tabs
 				screenOptions={{
 					tabBarStyle: styles.footer,
@@ -42,7 +42,7 @@ export default function TabsLayout() {
 								}
 							/>
 						),
-						header: () => <Header actionType={1}/>,
+						header: () => <Header actionType={1} />,
 					}}
 				/>
 				<Tabs.Screen
@@ -66,7 +66,7 @@ export default function TabsLayout() {
 								}
 							/>
 						),
-						header: () => <Header actionType={2}/>,
+						header: () => <Header actionType={2} />,
 					}}
 				/>
 				<Tabs.Screen
@@ -115,6 +115,22 @@ export default function TabsLayout() {
 							/>
 						),
 						header: () => <Header />,
+					}}
+				/>
+				{}
+				<Tabs.Screen
+					name="settings"
+					listeners={{
+						tabPress: () => {
+							setIsHomeActive(false);
+							setIsMyPostsActive(false);
+							setIsFriendsActive(false);
+							setIsChatsActive(false);
+						},
+					}}
+					options={{
+						header: () => <Header />,
+						href: null
 					}}
 				/>
 			</Tabs>

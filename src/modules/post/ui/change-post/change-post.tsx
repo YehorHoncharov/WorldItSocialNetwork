@@ -102,19 +102,19 @@ export function ChangePostModal({
 
 				const loadedImages = postData.images
 					? postData.images.map((img) => {
-							const relativeUrl = img.url
-								.replace(/\\/g, "/")
-								.replace(/^\/?uploads\/*/i, "");
-							const normalizedUrl = img.url.startsWith("http")
-								? img.url
-								: `${API_BASE_URL}/uploads/${relativeUrl}`;
+						const relativeUrl = img.url
+							.replace(/\\/g, "/")
+							.replace(/^\/?uploads\/*/i, "");
+						const normalizedUrl = img.url.startsWith("http")
+							? img.url
+							: `${API_BASE_URL}/uploads/${relativeUrl}`;
 
-							return {
-								...img,
-								url: normalizedUrl,
-								rawUrl: img.url,
-							};
-					  })
+						return {
+							...img,
+							url: normalizedUrl,
+							rawUrl: img.url,
+						};
+					})
 					: [];
 
 				setImages(loadedImages);
@@ -238,18 +238,15 @@ export function ChangePostModal({
 				Alert.alert("Успіх", "Пост успішно оновлено");
 				await refetch();
 				changeVisibility();
-			} else {
-				Alert.alert(
-					"Помилка",
-					response.message || "Не вдалося оновити пост"
-				);
 			}
+			Alert.alert("Успіх", "Пост успішно оновлено");
+			await refetch();
+			changeVisibility();
 		} catch (error) {
 
 			Alert.alert(
 				"Помилка",
-				`Не вдалося оновити пост: ${
-					error instanceof Error ? error.message : "Невідома помилка"
+				`Не вдалося оновити пост: ${error instanceof Error ? error.message : "Невідома помилка"
 				}`
 			);
 		} finally {
@@ -322,8 +319,7 @@ export function ChangePostModal({
 
 			Alert.alert(
 				"Помилка",
-				`Не вдалося вибрати зображення: ${
-					error instanceof Error ? error.message : "Невідома помилка"
+				`Не вдалося вибрати зображення: ${error instanceof Error ? error.message : "Невідома помилка"
 				}`
 			);
 		}
@@ -363,8 +359,8 @@ export function ChangePostModal({
 								source={{ uri: img.url }}
 								style={styles.imageAdded}
 								resizeMode="cover"
-		
-								
+
+
 							/>
 							<TouchableOpacity
 								style={styles.removeImageButton}

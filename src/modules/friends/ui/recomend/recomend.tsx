@@ -10,7 +10,9 @@ export function RecomendFriends() {
 
 
     return (
-        <View style={styles.container}>
+        <ScrollView>
+
+            <View style={styles.container}>
             <View style={styles.buttonContainer}>
                 <Text style={[styles.text, { color: "#070A1C" }]}>Рекомендації</Text>
                 <TouchableOpacity>
@@ -22,8 +24,9 @@ export function RecomendFriends() {
 
             <FlatList
                 data={users}
+                scrollEnabled={false}
                 keyExtractor={(item) => `${item.id}`}
-                contentContainerStyle={{ gap: 10, paddingBottom: 20 }}
+                contentContainerStyle={{ gap: 10, paddingBottom: 100 }}
                 renderItem={({ item }) => (
                     <FriendsForm
                         id={item.id}
@@ -40,7 +43,9 @@ export function RecomendFriends() {
                         <Text>Немає друзів</Text>
                     </View>
                 }
-            />
-        </View>
+                />
+            </View>
+        </ScrollView>
+        
     );
 }

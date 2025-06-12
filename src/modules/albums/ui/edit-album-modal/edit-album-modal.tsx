@@ -10,33 +10,36 @@ import {
 } from "react-native";
 import DropDownPicker from "react-native-dropdown-picker";
 import { Input } from "../../../../shared/ui/input";
-import { POST } from "../../../../shared/api/post";
 import { API_BASE_URL } from "../../../../settings";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { styles } from "./edit-album-modal.style";
+import { IAlbum, ThemeItem, YearItem } from "../../types/albums.types";
+import { PUT } from "../../../../shared/api/put";
+import { useUserContext } from "../../../auth/context/user-context";
 
 interface Props {
   modalVisible: boolean;
+  albumId: number;
+  initialData: { name: string; theme: string; year: string };
   changeVisibility: () => void;
   onClose: () => void;
+  onUpdate: (updatedAlbum: IAlbum) => void;
 }
 
-interface YearItem {
-  label: string;
-  value: string;
-}
-
-interface ThemeItem {
-  label: string;
-  value: string;
-}
-
-export function AddAlbumModal({ modalVisible, changeVisibility, onClose }: Props) {
-  const [name, setName] = useState("");
-  const [theme, setTheme] = useState("");
-  const [year, setYear] = useState("");
+export function EditAlbumModal({
+  modalVisible,
+  albumId,
+  initialData,
+  changeVisibility,
+  onClose,
+  onUpdate,
+}: Props) {
+  const [name, setName] = useState(initialData.name);
+  const [theme, setTheme] = useState(initialData.theme);
+  const [year, setYear] = useState(initialData.year);
   const [openTheme, setOpenTheme] = useState(false);
   const [openYear, setOpenYear] = useState(false);
+  const { user } = useUserContext()
   const [themeItems, setThemeItems] = useState<ThemeItem[]>([
     { label: "Відпочинок", value: "#відпочинок" },
     { label: "Натхнення", value: "#натхнення" },
@@ -62,10 +65,16 @@ export function AddAlbumModal({ modalVisible, changeVisibility, onClose }: Props
     { label: "2016", value: "2016" },
   ]);
 
+  useEffect(() => {
+    setName(initialData.name);
+    setTheme(initialData.theme);
+    setYear(initialData.year);
+  }, [initialData]);
+
   const resetForm = () => {
-    setName("");
-    setTheme("");
-    setYear("");
+    setName(initialData.name);
+    setTheme(initialData.theme);
+    setYear(initialData.year);
   };
 
   const handleSubmit = async () => {
@@ -81,8 +90,8 @@ export function AddAlbumModal({ modalVisible, changeVisibility, onClose }: Props
         return;
       }
 
-      const response = await POST({
-        endpoint: `${API_BASE_URL}/albums/create`,
+      const response = await PUT({
+        endpoint: `${API_BASE_URL}/albums/${albumId}`,
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
@@ -95,16 +104,22 @@ export function AddAlbumModal({ modalVisible, changeVisibility, onClose }: Props
         },
       });
 
+      if (!user) return
+      const authorId = user.id
+
       if (response.status === "success") {
-        Alert.alert("Успіх", "Альбом успішно створено");
+        Alert.alert("Успіх", "Альбом успішно оновлено!");
+        onUpdate({ id: albumId, name, theme, year, authorId });
         resetForm();
         onClose();
-      } else {
-        Alert.alert("Помилка", "Не вдалося створити альбом");
       }
+      Alert.alert("Успіх", "Альбом успішно оновлено");
+      onUpdate({ id: albumId, name, theme, year, authorId });
+      resetForm();
+      onClose();
     } catch (err) {
       console.error(err);
-      Alert.alert("Помилка", "Сталася помилка при створенні альбому");
+      Alert.alert("Помилка", "Сталася помилка при оновленні альбому");
     }
   };
 
@@ -121,7 +136,7 @@ export function AddAlbumModal({ modalVisible, changeVisibility, onClose }: Props
       <View style={styles.centeredView}>
         <View style={styles.modalView}>
           <View style={styles.header}>
-            <Text style={styles.modalTitle}>Створити альбом</Text>
+            <Text style={styles.modalTitle}>Редагувати альбом</Text>
           </View>
 
           <ScrollView style={styles.scrollArea}>
@@ -136,6 +151,7 @@ export function AddAlbumModal({ modalVisible, changeVisibility, onClose }: Props
 
               <View style={{ width: "100%", zIndex: 2000, marginTop: 10 }}>
                 <DropDownPicker
+                  flatListProps={{ nestedScrollEnabled: true }}
                   open={openTheme}
                   value={theme}
                   items={themeItems}

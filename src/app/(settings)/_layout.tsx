@@ -12,6 +12,9 @@ export default function SettingsLayout() {
 					headerShown: false,
 				}}
 			/>
+
+			
+
 		</SafeAreaView>
 	);
 }

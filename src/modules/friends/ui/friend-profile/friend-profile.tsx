@@ -7,21 +7,31 @@ import { IUser } from "../../../auth/types";
 import { useAlbums } from "../../../albums/hooks/useAlbums";
 import { Album } from "../../../albums/ui/album/album";
 import { API_BASE_URL } from "../../../../settings";
+import { useEffect, useState } from "react";
+import { IAlbum } from "../../../albums/types/albums.types";
 
+interface FriendProfileProps{
+	user: IUser
+}
 
-export function FriendProfile() {
-	const { user } = useUserContext();
+export function FriendProfile({ user }: FriendProfileProps) {
 	const { albums } = useAlbums();
-	console.log(user?.image)
+	const [userAlbums, setUserAlbums] = useState<IAlbum[]>([]);
+
+	 useEffect(() => {
+        if (!user) return;
+        const myAlbums = albums.filter((album) => album.authorId === user.id);
+        setUserAlbums(myAlbums);
+    }, [albums, user]);
 
 	return (
-		<ScrollView style={styles.scrollView} overScrollMode="never">
+		<ScrollView style={styles.scrollView}>
 			<View style={styles.container}>
 				<View style={styles.profileContainer}>
 					<View style={styles.profileImageContainer}>
 						<Image
 							style={styles.profileImage}
-							source={{uri: API_BASE_URL + "/" + user?.image}}
+							source={{uri: user.image}}
 						/>
 						<OfflineIcon style={styles.imageOnline} />
 					</View>
@@ -84,7 +94,8 @@ export function FriendProfile() {
 					</View>
 
 					<FlatList
-						data={albums}
+						data={userAlbums}
+						scrollEnabled={false}
 						keyExtractor={(item) => item.id.toString()}
 						renderItem={({ item }) => (
 							<Album

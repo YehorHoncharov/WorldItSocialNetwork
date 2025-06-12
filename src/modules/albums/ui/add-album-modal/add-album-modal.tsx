@@ -97,6 +97,15 @@ export function AddAlbumModal({ modalVisible, onClose }: Props) {
         },
       });
 
+      if (response.status === "success") {
+        Alert.alert("Успіх", "Альбом успішно оновлено!");
+        resetForm();
+        onClose();
+      }
+      Alert.alert("Успіх", "Альбом успішно оновлено");
+      resetForm();
+      onClose();
+
     } catch (err) {
       console.error(err);
       Alert.alert("Помилка", "Сталася помилка при створенні альбому");

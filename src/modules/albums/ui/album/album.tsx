@@ -3,19 +3,24 @@ import { styles } from "./album.style";
 import Dots from "../../../../shared/ui/icons/dots";
 import { useEffect, useState } from "react";
 import { launchImageLibraryAsync, requestMediaLibraryPermissionsAsync } from "expo-image-picker";
-import { useUserContext } from "../../../auth/context/user-context";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { IAlbum, IAlbumImg, IPutResponse } from "../../types/albums.types";
 import { PUT } from "../../../../shared/api/put";
 import { API_BASE_URL } from "../../../../settings";
+import { ModalAlbum } from "../album-modal/album-modal";
 
-export function Album(props: IAlbum) {
+export function Album({ scrollOffset = 0, ...props }: IAlbum & { scrollOffset?: number }) {
 	const [images, setImages] = useState<IAlbumImg[]>([]);
 	const [imagesToDelete, setImagesToDelete] = useState<number[]>([]);
+	const [modalVisible, setModalVisible] = useState(false);
+	const [dotsPosition, setDotsPosition] = useState({ x: 388, y: 399 });
 	const [imageDimensions, setImageDimensions] = useState<{
 		[key: string]: { width: number; height: number };
 	}>({});
-	const { user } = useUserContext();
+	const [containerSize, setContainerSize] = useState({
+		width: 400,
+		height: 725,
+	});
 	const [tokenUser, setTokenUser] = useState<string>("");
 
 	const getToken = async (): Promise<string> => {
@@ -189,7 +194,7 @@ export function Album(props: IAlbum) {
 										style={styles.actionIcon}
 									/>
 								</TouchableOpacity>
-								<TouchableOpacity style={{ alignItems: "center", justifyContent: "center" }}>
+								<TouchableOpacity onPress={() => setModalVisible(true)} style={{ alignItems: "center", justifyContent: "center" }}>
 									<Dots width={20} height={20} />
 								</TouchableOpacity>
 							</View>
@@ -240,6 +245,14 @@ export function Album(props: IAlbum) {
 						<Text style={styles.submitText}>Зберегти</Text>
 					</TouchableOpacity>
 				</View>
+				<ModalAlbum
+					visible={modalVisible}
+					onClose={() => setModalVisible(false)}
+					albumId={props.id}
+					dotsPosition={dotsPosition}
+					containerSize={containerSize}
+					scrollOffset={scrollOffset}
+				/>
 			</ScrollView>
 		</View>
 	);

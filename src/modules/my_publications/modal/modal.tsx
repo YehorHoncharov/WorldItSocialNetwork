@@ -24,6 +24,7 @@ import { useUserContext } from "../../auth/context/user-context";
 import DropDownPicker from "react-native-dropdown-picker";
 import { usePosts } from "../../post/hooks/use-get-post";
 import { API_BASE_URL } from "../../../settings";
+import PlusIcon from "../../../shared/ui/icons/plus";
 
 interface Props {
   modalVisible: boolean;
@@ -45,7 +46,7 @@ export function MyPublicationModal({ modalVisible, changeVisibility }: Props) {
   const [name, setName] = useState("");
   const [theme, setTheme] = useState("");
   const [text, setText] = useState("");
-  const [links, setLinks] = useState("");
+  const [links, setLinks] = useState<string[]>([""]);
   const [images, setImages] = useState<IPostImg[]>([]);
   const [imageDimensions, setImageDimensions] = useState<{
     [key: string]: { width: number; height: number };
@@ -94,8 +95,13 @@ export function MyPublicationModal({ modalVisible, changeVisibility }: Props) {
       Alert.alert("Помилка", "Максимум 10 тегів");
       return;
     }
-    if (links && !isValidUrl(links)) {
-      Alert.alert("Помилка", "Введіть коректне посилання");
+
+    // Validate all links
+    const invalidLinks = links.filter(
+      (link) => link.trim() !== "" && !isValidUrl(link.trim())
+    );
+    if (invalidLinks.length > 0) {
+      Alert.alert("Помилка", "Будь ласка, введіть коректні посилання");
       return;
     }
 
@@ -113,6 +119,9 @@ export function MyPublicationModal({ modalVisible, changeVisibility }: Props) {
         ? { create: images.map((img) => ({ url: img.url })) }
         : undefined;
 
+    // Filter out empty links
+    const nonEmptyLinks = links.filter((link) => link.trim() !== "");
+
     setIsLoading(true);
     try {
       const response = await POST({
@@ -126,20 +135,18 @@ export function MyPublicationModal({ modalVisible, changeVisibility }: Props) {
           name: name.trim(),
           theme: theme.trim(),
           text: text.trim(),
-          links: links.trim() || undefined,
+          links: nonEmptyLinks.length > 0 ? nonEmptyLinks : undefined,
           tags: sanitizedTags.length > 0 ? sanitizedTags : undefined,
           images: formattedImages,
           authorId: user.id,
         },
       });
 
-      console.log(response + "POSSTTTTTTT");
-      console.log(response.status + "POSSTTTTTTT");
-      if (response.status === 'success') {
+      if (response.status === "success") {
         setName("");
         setTheme("");
         setText("");
-        setLinks("");
+        setLinks([""]);
         setImages([]);
         setValue([]);
         setItems([
@@ -157,10 +164,7 @@ export function MyPublicationModal({ modalVisible, changeVisibility }: Props) {
         changeVisibility();
         Alert.alert("Успіх", "Публікацію успішно створено");
       } else {
-        Alert.alert(
-          "Помилка"
-        //   response.message || "Не вдалося створити публікацію"
-        );
+        Alert.alert("Помилка");
       }
     } catch (err) {
       console.error("[refetch] Ошибка в процессе создания поста:", err);
@@ -177,8 +181,29 @@ export function MyPublicationModal({ modalVisible, changeVisibility }: Props) {
 
   const handleSubmitWithRefetch = async () => {
     await handleSubmit();
-
     const updatedPosts = await refetch();
+  };
+
+  const addLinksInput = () => {
+    if (links.length < 5) {
+      setLinks([...links, ""]);
+    } else {
+      Alert.alert("Увага", "Максимальна кількість посилань - 5");
+    }
+  };
+
+  const removeLinksInput = (index: number) => {
+    if (links.length > 1) {
+      const newLinks = [...links];
+      newLinks.splice(index, 1);
+      setLinks(newLinks);
+    }
+  };
+
+  const handleLinkChange = (text: string, index: number) => {
+    const newLinks = [...links];
+    newLinks[index] = text;
+    setLinks(newLinks);
   };
 
   async function onSearch() {
@@ -202,7 +227,7 @@ export function MyPublicationModal({ modalVisible, changeVisibility }: Props) {
 
       if (!result.canceled && result.assets) {
         const allowedFormats = ["jpeg", "png", "gif"];
-        const maxSizeInBytes = 5 * 1024 * 1024; // 5 MB
+        const maxSizeInBytes = 5 * 1024 * 1024;
 
         const newImages = await Promise.all(
           result.assets
@@ -235,7 +260,7 @@ export function MyPublicationModal({ modalVisible, changeVisibility }: Props) {
                     console.error(
                       `[MyPublicationModal] Помилка визначення розмірів: ${error}`
                     );
-                    resolve({ width: 150, height: 150 }); // Запасний варіант
+                    resolve({ width: 150, height: 150 });
                   }
                 );
               });
@@ -263,14 +288,7 @@ export function MyPublicationModal({ modalVisible, changeVisibility }: Props) {
           return;
         }
 
-        setImages((prev) => {
-          const updatedImages = [...prev, ...filteredImages];
-          console.log(
-            "[MyPublicationModal] Оновлений список зображень:",
-            updatedImages
-          );
-          return updatedImages;
-        });
+        setImages((prev) => [...prev, ...filteredImages]);
       } else if (result.canceled) {
         Alert.alert("Скасовано", "Вибір зображень було скасовано");
       }
@@ -290,6 +308,7 @@ export function MyPublicationModal({ modalVisible, changeVisibility }: Props) {
   };
 
   const isValidUrl = (url: string): boolean => {
+    if (url.trim() === "") return true;
     const urlPattern = /^(https?:\/\/)([\w.-]+)\.([a-z]{2,})(\/.*)?$/i;
     return urlPattern.test(url);
   };
@@ -393,15 +412,96 @@ export function MyPublicationModal({ modalVisible, changeVisibility }: Props) {
                   autoCapitalize="sentences"
                 />
               </View>
-              <Input
-                style={{ width: "100%" }}
-                label="Посилання"
-                placeholder="Ваше посилання..."
-                value={links}
-                onChangeText={setLinks}
-                keyboardType="url"
-              />
-              <View style={{ width: "100%", zIndex: 1000 }}>
+
+              <View style={{ width: "90%", marginTop: 10 }}>
+                <Text
+                  style={{
+                    fontSize: 16,
+                    fontWeight: "600",
+                    color: "#333",
+                    marginBottom: 8,
+                  }}
+                >
+                  Посилання
+                </Text>
+
+                {links.map((link, index) => (
+                  <View
+                    key={`link-${index}`}
+                    style={{
+                      marginBottom: 10,
+                      flexDirection: "row",
+                      alignItems: "center",
+                      gap: 10,
+                    }}
+                  >
+                    <TextInput
+                      style={{
+                        flex: 1,
+                        borderWidth: 1,
+                        borderColor: "#CDCED2",
+                        borderRadius: 10,
+                        padding: 12,
+                        backgroundColor: "#f9f9f9",
+                        fontSize: 16,
+                      }}
+                      placeholder="Введіть посилання..."
+                      value={link}
+                      onChangeText={(text) => handleLinkChange(text, index)}
+                      keyboardType="url"
+                    />
+
+                    {links.length > 1 && (
+                      <TouchableOpacity
+                        onPress={() => removeLinksInput(index)}
+                        style={{
+                          width: 30,
+                          height: 30,
+                          backgroundColor: "#E9E5EE",
+                          borderRadius: 15,
+                          justifyContent: "center",
+                          alignItems: "center",
+                        }}
+                      >
+                        <Text style={{ color: "#543C52", fontSize: 18 }}>
+                          ×
+                        </Text>
+                      </TouchableOpacity>
+                    )}
+                  </View>
+                ))}
+
+                {links.length < 5 && (
+                  <TouchableOpacity
+                    onPress={addLinksInput}
+                    style={{
+                      flexDirection: "row",
+                      alignItems: "center",
+                      marginTop: 5,
+                      paddingVertical: 8,
+                    }}
+                  >
+                    <View
+                      style={{
+                        width: 30,
+                        height: 30,
+                        backgroundColor: "#E9E5EE",
+                        borderRadius: 15,
+                        justifyContent: "center",
+                        alignItems: "center",
+                        marginRight: 10,
+                      }}
+                    >
+                      <Text style={{ color: "#543C52", fontSize: 18 }}>+</Text>
+                    </View>
+                    <Text style={{ color: "#543C52", fontSize: 16 }}>
+                      Додати посилання
+                    </Text>
+                  </TouchableOpacity>
+                )}
+              </View>
+
+              <View style={{ width: "90%", zIndex: 1000 }}>
                 <DropDownPicker
                   open={open}
                   value={value}
@@ -436,9 +536,9 @@ export function MyPublicationModal({ modalVisible, changeVisibility }: Props) {
                     zIndex: 1000,
                     flex: 1,
                   }}
-                  onChangeValue={(newValue) => {
-                    console.log("[ChangePostModal] Selected tags:", newValue);
-                  }}
+                  // onChangeValue={(newValue) => {
+                  //   console.log("[ChangePostModal] Selected tags:", newValue);
+                  // }}
                   onChangeSearchText={(text) => {
                     const sanitizedText = text.trim();
                     if (
@@ -582,7 +682,7 @@ const styles = StyleSheet.create({
   textArea: {
     width: "100%",
     minHeight: 120,
-    minWidth: 300,
+    minWidth: "90%",
     padding: 16,
     borderWidth: 1,
     borderColor: "#CDCED2",
@@ -698,164 +798,3 @@ const styles = StyleSheet.create({
     height: 40,
   },
 });
-
-// const styles = StyleSheet.create({
-//   centeredView: {
-//     flex: 1,
-//     justifyContent: "center",
-//     backgroundColor: "rgba(0, 0, 0, 0.5)",
-//     alignItems: "center", 
-//   },
-//   modalView: {
-//     width: "90%", 
-//     maxHeight: "80%",
-//     backgroundColor: "white",
-//     borderRadius: 20,
-//     padding: 15,
-//     shadowColor: "#000",
-//     shadowOffset: { width: 0, height: 2 },
-//     shadowOpacity: 0.25,
-//     shadowRadius: 4,
-//     elevation: 5,
-//   },
-//   header: {
-//     flexDirection: "row",
-//     justifyContent: "space-between",
-//     alignItems: "center",
-//     marginBottom: 16,
-//   },
-//   modalTitle: {
-//     fontSize: 24,
-//     fontWeight: "500",
-//     color: "#070A1C",
-//     textAlign: "center", // Center the title
-//     flex: 1, // Allow title to take space
-//   },
-//   form: {
-//     width: "100%",
-//     gap: 10,
-//     alignItems: "center", // Center-align all inputs
-//     justifyContent: "center",
-//   },
-//   textArea: {
-//     width: "100%", 
-//     minHeight: 120,
-//     padding: 16,
-//     borderWidth: 1,
-//     borderColor: "#CDCED2",
-//     borderRadius: 10,
-//     fontSize: 16,
-//     backgroundColor: "#f9f9f9",
-//     textAlign: "center", // Center text within textarea
-//   },
-//   actions: {
-//     gap: 16,
-//     marginTop: 20,
-//     flexDirection: "row",
-//     alignItems: "center",
-//     justifyContent: "center", // Center the action buttons
-//   },
-//   addImageButton: {
-//     backgroundColor: "#f0f0f0",
-//     padding: 12,
-//     borderRadius: 8,
-//     alignItems: "center",
-//     borderWidth: 1,
-//     borderColor: "#ddd",
-//   },
-//   addImageText: {
-//     color: "#333",
-//     fontWeight: "500",
-//     fontSize: 16,
-//   },
-//   submitButton: {
-//     flexDirection: "row",
-//     alignItems: "center",
-//     justifyContent: "center",
-//     backgroundColor: "#543C52",
-//     paddingHorizontal: 15,
-//     paddingVertical: 10,
-//     borderRadius: 1234,
-//     gap: 8,
-//     minWidth: 130,
-//   },
-//   submitText: {
-//     color: "white",
-//     fontSize: 14,
-//     fontWeight: "500",
-//     flexShrink: 1,
-//   },
-//   scrollArea: {
-//     flexGrow: 1,
-//   },
-//   imageGrid: {
-//     flexDirection: "column",
-//     gap: 8,
-//     alignItems: "center", // Center the image grid
-//   },
-//   imageContainer: {
-//     position: "relative",
-//     alignItems: "center",
-//     justifyContent: "center",
-//   },
-//   imageAdded: {
-//     width: 225, // Standardized size
-//     height: 225, // Standardized size
-//     borderRadius: 16,
-//   },
-//   removeImageButton: {
-//     position: "absolute",
-//     top: 10,
-//     right: 10,
-//     backgroundColor: "white",
-//     width: 30,
-//     height: 30,
-//     borderRadius: 15,
-//     justifyContent: "center",
-//     alignItems: "center",
-//     borderWidth: 1,
-//     borderColor: "#543C52",
-//   },
-//   noImagesText: {
-//     fontSize: 16,
-//     color: "#666",
-//     textAlign: "center",
-//     marginVertical: 10,
-//   },
-//   imageSectionTitle: {
-//     fontSize: 16,
-//     fontWeight: "600",
-//     marginTop: 20,
-//     marginBottom: 10,
-//     color: "#333",
-//     textAlign: "center", // Center the title
-//   },
-//   selectedTagsContainer: {
-//     flexDirection: "row",
-//     flexWrap: "wrap",
-//     marginTop: 10,
-//     gap: 8,
-//     justifyContent: "center", // Center tags
-//   },
-//   tag: {
-//     backgroundColor: "#E9E5EE",
-//     paddingHorizontal: 12,
-//     paddingVertical: 6,
-//     borderRadius: 15,
-//     flexDirection: "row",
-//     alignItems: "center",
-//     gap: 8,
-//   },
-//   tagText: {
-//     color: "#543C52",
-//     fontSize: 14,
-//   },
-//   removeTagText: {
-//     color: "#543C52",
-//     fontSize: 14,
-//   },
-//   icon: {
-//     width: 40,
-//     height: 40,
-//   },
-// });
