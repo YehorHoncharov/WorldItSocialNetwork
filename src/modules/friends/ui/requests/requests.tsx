@@ -3,12 +3,27 @@ import { styles } from "./requests.style";
 import { FriendsForm } from "../friends-form/friends-form";
 import { useUserContext } from "../../../auth/context/user-context";
 import { useUsers } from "../../hooks/useUsers";
+import { useFriends } from "../../hooks/useFriends";
+import { useEffect, useState } from "react";
+import { IFriendship } from "../../types//friends.type";
+import { IUser } from "../../../auth/types/user";
 
 export function RequestsFriends() {
 	const { users } = useUsers();
     const { user } = useUserContext();
+    const [userFriends, setUserFriends] = useState<IUser[]>([]);
 
+    useEffect(() => {
+    if (!user || !user.friendship) return;
 
+    const myFriends = users.filter((userF) =>
+        user.friendship?.some(
+            (f) => f.status === false && f.idFrom === userF.id
+        )
+    );
+
+    setUserFriends(myFriends);
+}, [users, user]);
     return (
         <ScrollView>
 
@@ -23,7 +38,7 @@ export function RequestsFriends() {
             </View>
 
             <FlatList
-                data={users}
+                data={userFriends}
                 scrollEnabled={false}
                 keyExtractor={(item) => `${item.id}`}
                 contentContainerStyle={{ gap: 10, paddingBottom: 100 }}

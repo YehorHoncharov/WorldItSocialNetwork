@@ -119,8 +119,15 @@ export function MyPublicationModal({ modalVisible, changeVisibility }: Props) {
         ? { create: images.map((img) => ({ url: img.url })) }
         : undefined;
 
-    // Filter out empty links
-    const nonEmptyLinks = links.filter((link) => link.trim() !== "");
+    var nonEmptyLinks = links.filter((link) => link.trim() !== "");
+    let correctLinks = "";
+
+    nonEmptyLinks.forEach((link, index) => {
+      link = link.trim();
+      if (isValidUrl(link)) {
+        correctLinks += link + (index < nonEmptyLinks.length - 1 ? "," : "");
+      }
+    });
 
     setIsLoading(true);
     try {
@@ -135,7 +142,7 @@ export function MyPublicationModal({ modalVisible, changeVisibility }: Props) {
           name: name.trim(),
           theme: theme.trim(),
           text: text.trim(),
-          links: nonEmptyLinks.length > 0 ? nonEmptyLinks : undefined,
+          links: correctLinks ? correctLinks : undefined,
           tags: sanitizedTags.length > 0 ? sanitizedTags : undefined,
           images: formattedImages,
           authorId: user.id,
@@ -163,15 +170,32 @@ export function MyPublicationModal({ modalVisible, changeVisibility }: Props) {
         ]);
         changeVisibility();
         Alert.alert("Успіх", "Публікацію успішно створено");
-      } else {
-        Alert.alert("Помилка");
       }
+      Alert.alert("Успіх", "Публікацію успішно створено");
+      setName("");
+      setTheme("");
+      setText("");
+      setLinks([""]);
+      setImages([]);
+      setValue([]);
+      setItems([
+        { label: "Відпочинок", value: "#відпочинок" },
+        { label: "Натхнення", value: "#натхнення" },
+        { label: "Життя", value: "#життя" },
+        { label: "Природа", value: "#природа" },
+        { label: "Спокій", value: "#спокій" },
+        { label: "Читання", value: "#читання" },
+        { label: "Гармонія", value: "#гармонія" },
+        { label: "Музика", value: "#музика" },
+        { label: "Фільми", value: "#фільми" },
+        { label: "Подорожі", value: "#подорожі" },
+      ]);
+      changeVisibility();
     } catch (err) {
       console.error("[refetch] Ошибка в процессе создания поста:", err);
       Alert.alert(
         "Помилка",
-        `Не вдалося створити публікацію: ${
-          err instanceof Error ? err.message : "Невідома помилка"
+        `Не вдалося створити публікацію: ${err instanceof Error ? err.message : "Невідома помилка"
         }`
       );
     } finally {
@@ -245,9 +269,8 @@ export function MyPublicationModal({ modalVisible, changeVisibility }: Props) {
                 );
                 return null;
               }
-              const imageUrl = `data:image/${
-                asset.mimeType?.split("/")[1] || "jpeg"
-              };base64,${base64String}`;
+              const imageUrl = `data:image/${asset.mimeType?.split("/")[1] || "jpeg"
+                };base64,${base64String}`;
 
               const dimensions = await new Promise<{
                 width: number;
@@ -296,8 +319,7 @@ export function MyPublicationModal({ modalVisible, changeVisibility }: Props) {
       console.error("[MyPublicationModal] Помилка вибору зображення:", error);
       Alert.alert(
         "Помилка",
-        `Не вдалося вибрати зображення: ${
-          error instanceof Error ? error.message : "Невідома помилка"
+        `Не вдалося вибрати зображення: ${error instanceof Error ? error.message : "Невідома помилка"
         }`
       );
     }

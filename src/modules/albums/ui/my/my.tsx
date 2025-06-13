@@ -219,12 +219,13 @@ export function My(props: IAlbumProps) {
 
   async function save() {
     try {
-      const formattedImages = {
+      var formattedImages = {
         create: images
           .filter((img) => img.url.startsWith("data:image"))
           .map((img) => ({ url: img.url })),
         delete: imagesToDelete.map((id) => ({ id })),
       };
+      // formattedImages.create.push(user?.image ? { url: user.image } : { url: "" });
 
       const response: IPutResponse = await PUT({
         endpoint: `${API_BASE_URL}/albums/${minAlbum?.id}`,

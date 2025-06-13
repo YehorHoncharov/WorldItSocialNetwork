@@ -1,3 +1,5 @@
+import { IFriendship } from '../../friends/types/friends.type';
+
 export interface IUser{
     id: number,
     name?: string,
@@ -7,4 +9,6 @@ export interface IUser{
     email: string,
     password: string,
     signature?: string,
-    image?: string}
+    image?: string,
+    friendship?: IFriendship[]
+}

@@ -13,7 +13,8 @@ export function Author({ scrollOffset = 0, ...props }: IPost & { scrollOffset?: 
   const [dotsPosition, setDotsPosition] = useState({ x: 150, y: 78 });
   const containerRef = useRef<View>(null);
   const dotsRef = useRef<ElementRef<typeof TouchableOpacity>>(null);
-  const {user} = useUserByID(props.authorId)
+  const { user } = useUserByID(props.authorId)
+  const { user: currentUser } = useUserContext();
   const [containerSize, setContainerSize] = useState({
     width: 400,
     height: 725,
@@ -28,13 +29,11 @@ export function Author({ scrollOffset = 0, ...props }: IPost & { scrollOffset?: 
     }
   };
 
-
   useEffect(() => {
     if (modalVisible) {
       measureDots();
     }
   }, [modalVisible]);
-
 
   useEffect(() => {
     if (modalVisible) {
@@ -58,7 +57,7 @@ export function Author({ scrollOffset = 0, ...props }: IPost & { scrollOffset?: 
           <View style={{ position: "relative" }}>
             <Image
               style={{ width: 50, height: 50, borderRadius: 200 }}
-              source={{uri: `${API_BASE_URL}/${user?.image}`}}
+              source={{ uri: `${API_BASE_URL}/${user?.image}` }}
             />
             <Image
               style={{
@@ -79,14 +78,16 @@ export function Author({ scrollOffset = 0, ...props }: IPost & { scrollOffset?: 
           source={require("../../../../shared/ui/images/signature.png")}
         />
       </View>
-      <View>
-        <TouchableOpacity
-          ref={dotsRef}
-          onPress={() => setModalVisible(true)}
-        >
-          <Dots style={{ height: 20, width: 20 }} />
-        </TouchableOpacity>
-      </View>
+      {currentUser?.id === props.authorId ?
+        <View>
+          <TouchableOpacity
+            ref={dotsRef}
+            onPress={() => setModalVisible(true)}
+          >
+            <Dots style={{ height: 20, width: 20 }} />
+          </TouchableOpacity>
+        </View>
+        : null}
       <ModalPost
         visible={modalVisible}
         onClose={() => setModalVisible(false)}

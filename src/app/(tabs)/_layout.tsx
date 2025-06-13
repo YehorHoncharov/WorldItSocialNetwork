@@ -66,7 +66,7 @@ export default function TabsLayout() {
 								}
 							/>
 						),
-						header: () => <Header actionType={2} />,
+						header: () => <Header actionType={1} />,
 					}}
 				/>
 				<Tabs.Screen

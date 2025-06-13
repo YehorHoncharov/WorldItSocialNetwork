@@ -12,7 +12,7 @@ export function FriendsForm(props: IUser) {
     const navigation = useRouter();
     const {user} = useUserContext()
     function onPress() {
-        const { dateOfBirth, ...rest } = props;
+        const { dateOfBirth, friendship, ...rest } = props;
 
         navigation.navigate({
             pathname: "/friends-profile",
