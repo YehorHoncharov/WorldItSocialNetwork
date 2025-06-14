@@ -48,7 +48,7 @@ export function ModalAlbum({
     const modalHeight = 140;
     const { height: screenHeight } = Dimensions.get("window");
 
-    const adjustedX = Math.max(0, dotsPosition?.x ? dotsPosition.x - modalWidth + 145 : 0);
+    const adjustedX = Math.max(0, dotsPosition?.x ? dotsPosition.x - modalWidth + 158 : 0);
     const adjustedY = dotsPosition?.y ? dotsPosition.y - scrollOffset - 5 : 0;
     const clampedY = Math.min(Math.max(adjustedY, 0), screenHeight - modalHeight);
 

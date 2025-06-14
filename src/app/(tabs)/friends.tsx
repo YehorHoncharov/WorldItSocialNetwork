@@ -38,13 +38,11 @@ export default function Friends() {
       <FriendsHeader activeTab={activeTab} onTabPress={handleTabPress} />
 
       {activeTab === 'main' ? (
-        <View
-          style={{ flex: 1, gap: 20, alignItems: "center" }}
-        >
-          <RequestsFriends />
-          <RecomendFriends />
-          <AllFriends />
-        </View>
+        <ScrollView contentContainerStyle={{alignItems:"center", gap: 10}} >
+          <RequestsFriends scrollable={true} />
+          <RecomendFriends scrollable={true} />
+          <AllFriends scrollable={true} />
+        </ScrollView>
       ) : (
         <View style={{ flex: 1, overflow: 'hidden' }}>
           <Animated.View style={{
@@ -52,15 +50,15 @@ export default function Friends() {
             width: screenWidth * 3,
             transform: [{ translateX }],
           }}>
-            <View style={{ width: screenWidth }}>
+            <ScrollView style={{ width: screenWidth }}>
               <RequestsFriends />
-            </View>
-            <View style={{ width: screenWidth }}>
+            </ScrollView>
+            <ScrollView style={{ width: screenWidth }}>
               <RecomendFriends />
-            </View>
-            <View style={{ width: screenWidth }}>
+            </ScrollView>
+            <ScrollView style={{ width: screenWidth }}>
               <AllFriends />
-            </View>
+            </ScrollView>
           </Animated.View>
         </View>
       )}

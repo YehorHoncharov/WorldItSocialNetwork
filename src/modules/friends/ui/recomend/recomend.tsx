@@ -1,24 +1,58 @@
-import { ScrollView, View, Text, TouchableOpacity, FlatList } from "react-native";
-import { styles } from "./recomend.style";
+import { ScrollView, View, Text, TouchableOpacity, FlatList, Alert } from "react-native";
 import { FriendsForm } from "../friends-form/friends-form";
-import { useUsers } from "../../hooks/useUsers";
 import { useUserContext } from "../../../auth/context/user-context";
+import { styles } from "./recomend.style";
+import { useUsers } from "../../hooks/useUsers";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
-export function RecomendFriends() {
+export function RecomendFriends({ scrollable = true }: { scrollable?: boolean }) {
     const { users } = useUsers();
     const { user } = useUserContext();
 
+    async function handleRequest(userId: number) {
+        try {
+            if (!user) return;
+            const token = await AsyncStorage.getItem("token");
+            if (!token) {
+                Alert.alert("Помилка", "Користувач не авторизований");
+                return;
+            }
 
-    return (
-        <ScrollView>
+            const response = await fetch(
+                `http://192.168.1.104:3000/friendship/create`,
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${token}`,
+                    },
+                    body: JSON.stringify({
+                        idFrom: user.id,
+                        status: false,
+                        userId: userId,
+                    }),
+                }
+            );
 
-            <View style={styles.container}>
+            const result = await response.json();
+
+            if (result.status === "error") {
+                Alert.alert("Помилка", result.message);
+                return;
+            }
+
+            Alert.alert("Успіх", "Запит відправлено");
+        } catch (error) {
+            Alert.alert("Помилка", "Не вдалося зберегти дані");
+        }
+    }
+
+    const content = (
+        <View style={styles.container}>
             <View style={styles.buttonContainer}>
                 <Text style={[styles.text, { color: "#070A1C" }]}>Рекомендації</Text>
                 <TouchableOpacity>
-                    <Text style={[styles.text, { color: "#543C52" }]}>
-                        Дивитись всі
-                    </Text>
+                    <Text style={[styles.text, { color: "#543C52" }]}>Дивитись всі</Text>
                 </TouchableOpacity>
             </View>
 
@@ -26,16 +60,14 @@ export function RecomendFriends() {
                 data={users}
                 scrollEnabled={false}
                 keyExtractor={(item) => `${item.id}`}
-                contentContainerStyle={{ gap: 10, paddingBottom: 100 }}
+                contentContainerStyle={{ gap: 10, flexGrow: 1 }}
                 renderItem={({ item }) => (
                     <FriendsForm
-                        id={item.id}
-                        name={item.name}
-                        surname={item.surname}
-                        username={item.username}
-                        email={item.email}
-                        image={`http://192.168.1.104:3000/${item.image}`}
-                        password={item.password}
+                        {...item}
+                        actionButton={{
+                            label: "Додати",
+                            onPress: () => handleRequest(item.id),
+                        }}
                     />
                 )}
                 ListEmptyComponent={
@@ -43,9 +75,9 @@ export function RecomendFriends() {
                         <Text>Немає друзів</Text>
                     </View>
                 }
-                />
-            </View>
-        </ScrollView>
-        
+            />
+        </View>
     );
+
+    return scrollable ? <ScrollView>{content}</ScrollView> : content;
 }

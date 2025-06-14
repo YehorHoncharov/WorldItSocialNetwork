@@ -2,12 +2,15 @@ import { StyleSheet } from "react-native";
 
 export const styles = StyleSheet.create({
 	container: {
-		flex: 1,
+		// flex: 1,
+		width: "100%",
 		backgroundColor: "#fff",
 		borderColor: "#CDCED2",
 		borderWidth: 1,
 		borderRadius: 10,
 		gap: 8,
+		alignItems: "center",
+		justifyContent: "center",
 	},
 	scrollContainer: {
 		flexGrow: 1,

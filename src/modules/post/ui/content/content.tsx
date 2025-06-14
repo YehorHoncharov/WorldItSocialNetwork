@@ -76,17 +76,18 @@ export function Content(props: IPost) {
 					return (
 						<View
 							key={`img-${imageItem.id || `temp-${index}`}`}
-							style={
-								rowImages.length === 2
-									? styles.imageHalf
-									: styles.imageThird
-							}
+							style={[
+								rowImages.length === 1 ? styles.imageOne :
+									rowImages.length === 2
+										? styles.imageHalf
+										: styles.imageThird
+							]}
 						>
 							<Image
 								style={styles.image}
 								source={{ uri: imageUrl }}
 								resizeMode="cover"
-							
+
 							/>
 						</View>
 					);
@@ -99,8 +100,8 @@ export function Content(props: IPost) {
 		return <ActivityIndicator size="large" />;
 	}
 
-	if (!props.images){
-		return 
+	if (!props.images) {
+		return
 	}
 
 	const groupedImages = groupImages(props.images);
@@ -108,8 +109,8 @@ export function Content(props: IPost) {
 	return (
 		<View style={styles.container}>
 			<View style={styles.textContainer}>
-				<Text style={{fontSize: 18}}>{props.name}</Text>
-				<Text/>
+				<Text style={{ fontSize: 18 }}>{props.name}</Text>
+				<Text />
 				{props.theme && <Text>{props.theme}</Text>}
 				{/* {props.links && <Text selectable>{props.links}</Text>} */}
 				<Text style={styles.text}>{props.text}</Text>

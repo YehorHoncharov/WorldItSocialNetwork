@@ -84,17 +84,17 @@ export function AlbumHeader() {
                         transform: [{ translateX }],
                     }}
                 >
-                    <View style={{ width: screenWidth, flex: 1, marginBottom: 60 }}>
+                    <View style={{ width: screenWidth, flex: 1, marginBottom: 60, backgroundColor: "#E9E5EE" }}>
                         <Settings />
                     </View>
                     
                     <FlatList
-                        style={{ width: screenWidth, flex: 1 }}
+                        style={{ width: screenWidth, flex: 1, backgroundColor: "#E9E5EE", marginBottom: 20 }}
                         contentContainerStyle={{ gap: 8, paddingBottom: 60 }}
                         data={userAlbums.slice(1)}
                         keyExtractor={(item) => `${item.id}`}
                         ListHeaderComponent={() => (
-                            <View style={{ gap: 8 }}>
+                            <View style={{ alignItems: "center", justifyContent: "center", paddingTop: 16, backgroundColor: "#E9E5EE" }}>
                                 <My albums={albums} />
                             </View>
                         )}
@@ -123,12 +123,12 @@ export function AlbumHeader() {
 const styles = StyleSheet.create({
     tabContainer: {
         paddingLeft: 32,
+        height: 56,
         flexDirection: "row",
         justifyContent: "center",
         width: "100%",
-        borderBottomWidth: 1,
-        borderBottomColor: "#eee",
         alignContent: "center",
+        backgroundColor: "#E9E5EE",
     },
     tabItem: {
         flex: 1,

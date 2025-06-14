@@ -6,7 +6,7 @@ const modalWidth = Math.min(width * 0.9, 343);
 export const styles = StyleSheet.create({
 	centeredView: {
 		flex: 1,
-		justifyContent: "flex-end",
+		justifyContent: "center",
 		backgroundColor: "rgba(0, 0, 0, 0.5)",
 		paddingHorizontal: 10,
 	},
@@ -14,8 +14,7 @@ export const styles = StyleSheet.create({
 		width: "100%",
 		maxHeight: "90%",
 		backgroundColor: "white",
-		borderTopLeftRadius: 20,
-		borderTopRightRadius: 20,
+		borderRadius: 20,
 		padding: 13,
 		shadowColor: "#000",
 		shadowOffset: { width: 0, height: 2 },

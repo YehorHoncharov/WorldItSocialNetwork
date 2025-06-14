@@ -1,19 +1,21 @@
 import { ScrollView, View, Text, TouchableOpacity, Image, Alert } from "react-native";
 import { styles } from "./album.style";
 import Dots from "../../../../shared/ui/icons/dots";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { launchImageLibraryAsync, requestMediaLibraryPermissionsAsync } from "expo-image-picker";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { IAlbum, IAlbumImg, IPutResponse } from "../../types/albums.types";
 import { PUT } from "../../../../shared/api/put";
 import { API_BASE_URL } from "../../../../settings";
 import { ModalAlbum } from "../album-modal/album-modal";
+import { useUserContext } from "../../../auth/context/user-context";
 
 export function Album({ scrollOffset = 0, ...props }: IAlbum & { scrollOffset?: number }) {
 	const [images, setImages] = useState<IAlbumImg[]>([]);
 	const [imagesToDelete, setImagesToDelete] = useState<number[]>([]);
 	const [modalVisible, setModalVisible] = useState(false);
-	const [dotsPosition, setDotsPosition] = useState({ x: 388, y: 399 });
+	const [dotsPosition, setDotsPosition] = useState({ x: 0, y: 0 });
+	const dotsRef = useRef<any>(null);
 	const [imageDimensions, setImageDimensions] = useState<{
 		[key: string]: { width: number; height: number };
 	}>({});
@@ -22,6 +24,7 @@ export function Album({ scrollOffset = 0, ...props }: IAlbum & { scrollOffset?: 
 		height: 725,
 	});
 	const [tokenUser, setTokenUser] = useState<string>("");
+	const { user } = useUserContext()
 
 	const getToken = async (): Promise<string> => {
 		const token = await AsyncStorage.getItem("tokenStorage");
@@ -34,6 +37,25 @@ export function Album({ scrollOffset = 0, ...props }: IAlbum & { scrollOffset?: 
 			setImages(props.images);
 		}
 	}, [props.images]);
+
+	const measureDots = () => {
+		if (dotsRef.current) {
+			dotsRef.current.measureInWindow((x: number, y: number, width: number, height: number) => {
+				setDotsPosition({ x, y });
+			});
+		}
+	};
+
+	useEffect(() => {
+		if (modalVisible) {
+			measureDots();
+		}
+	}, [modalVisible, scrollOffset]);
+
+	const handleContainerLayout = (event: any) => {
+		const { width, height } = event.nativeEvent.layout;
+		setContainerSize({ width, height });
+	};
 
 	async function onSearch() {
 		try {
@@ -71,13 +93,9 @@ export function Album({ scrollOffset = 0, ...props }: IAlbum & { scrollOffset?: 
 								Alert.alert("Помилка", `Зображення занадто велике (макс. 5 МБ)`);
 								return null;
 							}
-							const imageUrl = `data:image/${asset.mimeType?.split("/")[1] || "jpeg"
-								};base64,${base64String}`;
+							const imageUrl = `data:image/${asset.mimeType?.split("/")[1] || "jpeg"};base64,${base64String}`;
 
-							const dimensions = await new Promise<{
-								width: number;
-								height: number;
-							}>((resolve) => {
+							const dimensions = await new Promise<{ width: number; height: number }>((resolve) => {
 								Image.getSize(
 									imageUrl,
 									(width, height) => resolve({ width, height }),
@@ -102,9 +120,7 @@ export function Album({ scrollOffset = 0, ...props }: IAlbum & { scrollOffset?: 
 						})
 				);
 
-				const filteredImages = newImages.filter(
-					(img): img is IAlbumImg => img !== null
-				);
+				const filteredImages = newImages.filter((img): img is IAlbumImg => img !== null);
 
 				if (images.length + filteredImages.length - imagesToDelete.length > 10) {
 					Alert.alert("Увага", "Максимальна кількість зображень - 10");
@@ -119,8 +135,7 @@ export function Album({ scrollOffset = 0, ...props }: IAlbum & { scrollOffset?: 
 			console.error("Помилка вибору зображення:", error);
 			Alert.alert(
 				"Помилка",
-				`Не вдалося вибрати зображення: ${error instanceof Error ? error.message : "Невідома помилка"
-				}`
+				`Не вдалося вибрати зображення: ${error instanceof Error ? error.message : "Невідома помилка"}`
 			);
 		}
 	}
@@ -162,8 +177,7 @@ export function Album({ scrollOffset = 0, ...props }: IAlbum & { scrollOffset?: 
 				token: tokenUser,
 				body: {
 					images:
-						formattedImages.create.length > 0 ||
-							formattedImages.delete.length > 0
+						formattedImages.create.length > 0 || formattedImages.delete.length > 0
 							? formattedImages
 							: undefined,
 				},
@@ -181,23 +195,29 @@ export function Album({ scrollOffset = 0, ...props }: IAlbum & { scrollOffset?: 
 	}
 
 	return (
-		<View style={styles.container}>
+		<View style={styles.container} onLayout={handleContainerLayout}>
 			<ScrollView contentContainerStyle={styles.scrollContainer}>
-				<View style={{ gap: 27 }}>
-					<View style={{ gap: 16 }}>
+				<View style={{ gap: 27, alignItems: "center", justifyContent: "center", width: "100%", alignContent: "center" }}>
+					<View style={{ width: "100%" }}>
 						<View style={styles.mainBox}>
 							<Text style={styles.title}>{props.name}</Text>
-							<View style={styles.actionButtons}>
-								<TouchableOpacity style={styles.actionButton}>
-									<Image
-										source={require("../../../../shared/ui/images/eye-my-publication.png")}
-										style={styles.actionIcon}
-									/>
-								</TouchableOpacity>
-								<TouchableOpacity onPress={() => setModalVisible(true)} style={{ alignItems: "center", justifyContent: "center" }}>
-									<Dots width={20} height={20} />
-								</TouchableOpacity>
-							</View>
+							{user?.id === props.authorId ?
+								<View style={styles.actionButtons}>
+									<TouchableOpacity style={styles.actionButton}>
+										<Image
+											source={require("../../../../shared/ui/images/eye-my-publication.png")}
+											style={styles.actionIcon}
+										/>
+									</TouchableOpacity>
+									<TouchableOpacity
+										ref={dotsRef}
+										onPress={() => setModalVisible(true)}
+										style={{ alignItems: "center", justifyContent: "center" }}
+									>
+										<Dots width={20} height={20} />
+									</TouchableOpacity>
+								</View>
+								: null}
 						</View>
 						<View style={styles.theme}>
 							<Text style={{ fontSize: 16 }}>{props.theme}</Text>
@@ -205,7 +225,7 @@ export function Album({ scrollOffset = 0, ...props }: IAlbum & { scrollOffset?: 
 						</View>
 						<View style={styles.separator} />
 					</View>
-					<View style={{ gap: 16 }}>
+					<View style={{ gap: 27, alignItems: "flex-start", justifyContent: "space-between", width: "100%" }}>
 						<Text style={styles.title}>Фотографії</Text>
 						<View style={styles.photoGrid}>
 							{images.length > 0
@@ -219,6 +239,7 @@ export function Album({ scrollOffset = 0, ...props }: IAlbum & { scrollOffset?: 
 											}}
 											style={styles.photo}
 										/>
+										{ user?.id === props.authorId ? 
 										<TouchableOpacity
 											onPress={() => deleteImage(img.id)}
 											style={styles.deleteBtn}
@@ -228,32 +249,39 @@ export function Album({ scrollOffset = 0, ...props }: IAlbum & { scrollOffset?: 
 												style={{ width: 20, height: 20 }}
 											/>
 										</TouchableOpacity>
+										: null}
 									</View>
 								))
 								: null}
-							{images.length < 10 && (
-								<TouchableOpacity style={styles.addImage} onPress={onSearch}>
-									<Image
-										style={{ width: 40.6, height: 40 }}
-										source={require("../../../../shared/ui/images/plus-in-circle.png")}
-									/>
-								</TouchableOpacity>
-							)}
+							{user?.id === props.authorId ? (
+								<>
+									{images.length < 10 && (
+										<TouchableOpacity style={styles.addImage} onPress={onSearch}>
+											<Image
+												style={{ width: 40.6, height: 40 }}
+												source={require("../../../../shared/ui/images/plus-in-circle.png")}
+											/>
+										</TouchableOpacity>
+									)}
+								</>
+							) : null}
 						</View>
 					</View>
-					<TouchableOpacity onPress={handleSubmit} style={styles.submitBtn}>
-						<Text style={styles.submitText}>Зберегти</Text>
-					</TouchableOpacity>
+					{user?.id === props.authorId ?
+						<TouchableOpacity onPress={handleSubmit} style={styles.submitBtn}>
+							<Text style={styles.submitText}>Зберегти</Text>
+						</TouchableOpacity>
+						: null}
 				</View>
-				<ModalAlbum
-					visible={modalVisible}
-					onClose={() => setModalVisible(false)}
-					albumId={props.id}
-					dotsPosition={dotsPosition}
-					containerSize={containerSize}
-					scrollOffset={scrollOffset}
-				/>
 			</ScrollView>
+			<ModalAlbum
+				visible={modalVisible}
+				onClose={() => setModalVisible(false)}
+				albumId={props.id}
+				dotsPosition={dotsPosition}
+				containerSize={containerSize}
+				scrollOffset={scrollOffset}
+			/>
 		</View>
 	);
 }

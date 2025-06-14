@@ -56,7 +56,7 @@ export function Settings() {
 	}
 
 	async function handleSave(data: IUserForm) {
-		const formattedImage = data.image ? data.image: ""
+		const formattedImage = data.image ? data.image : ""
 
 		try {
 			if (!user) return;
@@ -214,12 +214,12 @@ export function Settings() {
 
 	return (
 		<ScrollView
-			contentContainerStyle={{ paddingBottom: 30 }}
+			contentContainerStyle={{ paddingBottom: 30, marginTop: 10, alignItems: "center", justifyContent: "center", backgroundColor: "#E9E5EE" }}
 			scrollEnabled={!isDrawing}
 			keyboardShouldPersistTaps="handled"
 			overScrollMode="never"
 		>
-			<View style={{ gap: 8 }}>
+			<View style={{ gap: 8, width: "90%", alignItems: "center", justifyContent: "center", }}>
 				<View style={styles.container}>
 					<View style={styles.userInfoFirst}>
 						<Text style={styles.userInfoText}>Картка профілю</Text>
@@ -266,11 +266,11 @@ export function Settings() {
 									}}
 									disabled={!isEditing}
 								>
-									
+
 									<Image
 										source={
 											field.value
-												? { uri: field.value} 
+												? { uri: field.value }
 												: require("../../shared/ui/images/avatar.png")
 										}
 										style={{
@@ -279,11 +279,11 @@ export function Settings() {
 											borderRadius: 48,
 										}}
 									/>
-									
+
 								</TouchableOpacity>
 							)}
 						/>
-						<View style={{ gap: 10, padding: 16 }}>
+						<View style={{ gap: 10, width: "100%", alignItems: "center", marginBottom: 5 }}>
 
 							{!isEditing ?
 								<Text
@@ -291,6 +291,7 @@ export function Settings() {
 										fontSize: 24,
 										color: "#070A1C",
 										fontWeight: "700",
+
 									}}
 								>
 									{user.name} {user.surname}
@@ -303,7 +304,7 @@ export function Settings() {
 									name="username"
 									render={({ field }) => (
 										<Input
-											width={343}
+											style={{ width: "100%" }}
 											label="Юзернейм"
 											placeholder="Введіть ваш юзер"
 											value={field.value}
@@ -372,7 +373,7 @@ export function Settings() {
 							name="name"
 							render={({ field }) => (
 								<Input
-									width={343}
+									style={{ width: "100%" }}
 									label="Ім'я"
 									placeholder="Введіть ваше ім'я"
 									value={field.value}
@@ -387,7 +388,7 @@ export function Settings() {
 							name="surname"
 							render={({ field }) => (
 								<Input
-									width={343}
+									style={{ width: "100%" }}
 									label="Прізвище"
 									placeholder="Введіть ваше прізвище"
 									value={field.value}
@@ -414,7 +415,7 @@ export function Settings() {
 											}
 										>
 											<Input
-												width={343}
+												style={{ width: "100%" }}
 												label="Дата народження"
 												value={field.value?.toLocaleDateString()}
 												editable={false}
@@ -457,7 +458,7 @@ export function Settings() {
 							name="email"
 							render={({ field }) => (
 								<Input
-									width={343}
+									style={{ width: "100%" }}
 									label="Електронна адреса"
 									placeholder="Введіть вашу електронну адресу"
 									keyboardType="email-address"
@@ -473,7 +474,7 @@ export function Settings() {
 							name="password"
 							render={({ field }) => (
 								<Input.Password
-									width={343}
+									style={{ width: "100%" }}
 									label="Пароль"
 									placeholder="Введіть ваш пароль"
 									secureTextEntry

@@ -9,20 +9,29 @@ import { Album } from "../../../albums/ui/album/album";
 import { API_BASE_URL } from "../../../../settings";
 import { useEffect, useState } from "react";
 import { IAlbum } from "../../../albums/types/albums.types";
+import { usePosts } from "../../../post/hooks/use-get-post";
+import Post from "../../../post/ui/main-page/main.page";
+import { IPost } from "../../../post/types/post";
 
-interface FriendProfileProps{
+interface FriendProfileProps {
 	user: IUser
 }
 
 export function FriendProfile({ user }: FriendProfileProps) {
 	const { albums } = useAlbums();
+	const { posts } = usePosts();
 	const [userAlbums, setUserAlbums] = useState<IAlbum[]>([]);
+	const [userPosts, setUserPosts] = useState<IPost[]>([]);
+	const { user: currentUser } = useUserContext();
 
-	 useEffect(() => {
-        if (!user) return;
-        const myAlbums = albums.filter((album) => album.authorId === user.id);
-        setUserAlbums(myAlbums);
-    }, [albums, user]);
+
+	useEffect(() => {
+		if (!user) return;
+		const myAlbums = albums.filter((album) => album.authorId === user.id);
+		const myPosts = posts.filter((post) => post.authorId === user.id);
+		setUserAlbums(myAlbums);
+		setUserPosts(myPosts);
+	}, [albums, user]);
 
 	return (
 		<ScrollView style={styles.scrollView}>
@@ -31,7 +40,7 @@ export function FriendProfile({ user }: FriendProfileProps) {
 					<View style={styles.profileImageContainer}>
 						<Image
 							style={styles.profileImage}
-							source={{uri: user.image}}
+							source={{ uri: user.image }}
 						/>
 						<OfflineIcon style={styles.imageOnline} />
 					</View>
@@ -109,6 +118,45 @@ export function FriendProfile({ user }: FriendProfileProps) {
 						)}
 						contentContainerStyle={styles.albumsList}
 					/>
+
+				</View>
+
+				<View style={styles.albumsContainer}>
+					<View style={styles.albumsSection}>
+						<View style={styles.albumsHeader}>
+							<View style={styles.albumsIcon}>
+								<Image
+									style={{ height: 17, width: 17 }}
+									source={require("../../../../shared/ui/images/album-image.png")}
+								/>
+							</View>
+							<Text style={styles.albumsLabel}>Пости</Text>
+						</View>
+						<Text style={styles.viewAll}>Дивитись всі</Text>
+					</View>
+
+					<FlatList
+						data={userPosts}
+						scrollEnabled={false}
+						keyExtractor={(item) => item.id.toString()}
+						renderItem={({ item }) => (
+
+							<Post
+								id={item.id}
+								name={item.name}
+								theme={item.theme}
+								text={item.text}
+								authorId={item.authorId}
+								likes={item.likes}
+								views={item.views}
+								tags={item.tags}
+								images={item.images}
+								links={item.links}
+							/>
+						)}
+						contentContainerStyle={styles.albumsList}
+					/>
+
 				</View>
 			</View>
 		</ScrollView>

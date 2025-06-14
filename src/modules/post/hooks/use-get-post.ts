@@ -14,8 +14,9 @@ export function usePosts() {
       const response = await fetch("http://192.168.1.104:3000/posts");
       const result = await response.json();
       
-      if (response.status === "error") {
-        return
+      if (!response.ok) {
+        setError(`Error: ${response.status} ${response.statusText}`);
+        return;
       }
 
       setPosts(result);

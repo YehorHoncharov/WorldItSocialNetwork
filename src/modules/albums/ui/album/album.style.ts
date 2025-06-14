@@ -71,6 +71,8 @@ export const styles = StyleSheet.create({
 		flexDirection: "row",
 		flexWrap: "wrap",
 		gap: 10,
+		alignItems: "center",
+		justifyContent: "center",
 	},
 
 	photo: {

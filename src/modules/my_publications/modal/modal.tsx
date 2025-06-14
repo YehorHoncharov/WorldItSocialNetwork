@@ -148,7 +148,7 @@ export function MyPublicationModal({ modalVisible, changeVisibility }: Props) {
           authorId: user.id,
         },
       });
-
+      console.log(1)
       if (response.status === "success") {
         setName("");
         setTheme("");
@@ -199,6 +199,26 @@ export function MyPublicationModal({ modalVisible, changeVisibility }: Props) {
         }`
       );
     } finally {
+      Alert.alert("Успіх", "Публікацію успішно створено");
+      setName("");
+      setTheme("");
+      setText("");
+      setLinks([""]);
+      setImages([]);
+      setValue([]);
+      setItems([
+        { label: "Відпочинок", value: "#відпочинок" },
+        { label: "Натхнення", value: "#натхнення" },
+        { label: "Життя", value: "#життя" },
+        { label: "Природа", value: "#природа" },
+        { label: "Спокій", value: "#спокій" },
+        { label: "Читання", value: "#читання" },
+        { label: "Гармонія", value: "#гармонія" },
+        { label: "Музика", value: "#музика" },
+        { label: "Фільми", value: "#фільми" },
+        { label: "Подорожі", value: "#подорожі" },
+      ]);
+      changeVisibility();
       setIsLoading(false);
     }
   };

@@ -9,7 +9,7 @@ export const styles = StyleSheet.create({
 	tabContainer: {
 		flexDirection: "row",
 		justifyContent: "space-around",
-		padding: 20,
+		padding: 20
 		gap: 24,
         marginTop: 10 
 	},

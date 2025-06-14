@@ -83,6 +83,7 @@ export function Author({ scrollOffset = 0, ...props }: IPost & { scrollOffset?: 
           <TouchableOpacity
             ref={dotsRef}
             onPress={() => setModalVisible(true)}
+            style={styles.dotsButton}
           >
             <Dots style={{ height: 20, width: 20 }} />
           </TouchableOpacity>

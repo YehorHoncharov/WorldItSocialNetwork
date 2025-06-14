@@ -19,5 +19,11 @@ export const styles = StyleSheet.create({
 		width: 315,
 		height: 95,
 	},
+	dotsButton: {
+		position: "absolute",
+		right: 0,
+		top: 0,
+		zIndex: 1,
+	}
 	
 });

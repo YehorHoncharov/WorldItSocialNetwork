@@ -6,6 +6,7 @@ export const styles = StyleSheet.create({
 	},
 	container: {
 		padding: 16,
+		gap: 10,
 	},
 	profileContainer: {
 		backgroundColor: "white",
@@ -104,7 +105,6 @@ export const styles = StyleSheet.create({
 		backgroundColor: "white",
 		borderRadius: 10,
 		padding: 16,
-		marginBottom: 16,
 	},
 	albumsSection: {
 		flexDirection: "row",
@@ -130,6 +130,7 @@ export const styles = StyleSheet.create({
 		color: "#543C52",
 	},
 	albumsList: {
+		width: "100%",
 		gap: 10,
 		paddingBottom: 20,
 	},
