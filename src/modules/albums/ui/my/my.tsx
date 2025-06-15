@@ -361,7 +361,7 @@ export function My(props: IAlbumProps) {
               justifyContent: "center",
             }}
           >
-            <TouchableOpacity style={[styles.addButton, { width: "100%" }]} onPress={save}>
+            <TouchableOpacity style={[styles.addButton, { width: "50%" }]} onPress={save}>
               <Text style={styles.addButtonText}>Зберегти</Text>
             </TouchableOpacity>
           </View>

@@ -47,6 +47,7 @@ export const styles = StyleSheet.create({
 		fontSize: 16,
 		color: "#070A1C",
 		fontWeight: "500",
+		alignSelf: "center",
 	},
 	buttonContainer: {
 		flexDirection: "row",

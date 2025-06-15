@@ -106,14 +106,18 @@ export const styles = StyleSheet.create({
         width: 90,
         height: 40,
         borderRadius: 1234,
-        backgroundColor: "#543C52"
+        backgroundColor: "#543C52",
+        alignItems: "center",
+        justifyContent: "center",
     },
     cancelButton: {
         width: 90,
         height: 40,
         borderRadius: 1234,
         borderWidth: 1,
-        borderColor: "#543C52"
+        borderColor: "#543C52",
+        alignItems: "center",
+        justifyContent: "center",
     },
     submitTextCancel: {
         color: "#543C52",

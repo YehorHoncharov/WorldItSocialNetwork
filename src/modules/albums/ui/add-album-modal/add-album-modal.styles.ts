@@ -65,6 +65,7 @@ export const styles = StyleSheet.create({
 		padding: 12,
 		borderRadius: 1234,
 		gap: 8,
+
 	},
 	submitText: {
 		color: "white",
@@ -102,22 +103,26 @@ export const styles = StyleSheet.create({
 		color: "#333",
 		fontSize: 14,
 	},
-    saveButton: {
-        width: 90,
-        height: 40,
-        borderRadius: 1234,
-        backgroundColor: "#543C52"
-    },
-    cancelButton: {
-        width: 90,
-        height: 40,
-        borderRadius: 1234,
-        borderWidth: 1,
-        borderColor: "#543C52"
-    },
-    submitTextCancel: {
-        color: "#543C52",
+	saveButton: {
+		width: 90,
+		height: 40,
+		borderRadius: 1234,
+		backgroundColor: "#543C52",
+		alignItems: "center",
+		justifyContent: "center",
+	},
+	cancelButton: {
+		width: 90,
+		height: 40,
+		borderRadius: 1234,
+		borderWidth: 1,
+		borderColor: "#543C52",
+		alignItems: "center",
+		justifyContent: "center",
+	},
+	submitTextCancel: {
+		color: "#543C52",
 		fontSize: 14,
 		fontWeight: "500",
-    }
+	}
 });

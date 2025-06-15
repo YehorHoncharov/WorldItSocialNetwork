@@ -148,7 +148,6 @@ export function MyPublicationModal({ modalVisible, changeVisibility }: Props) {
           authorId: user.id,
         },
       });
-      console.log(1)
       if (response.status === "success") {
         setName("");
         setTheme("");
@@ -171,26 +170,6 @@ export function MyPublicationModal({ modalVisible, changeVisibility }: Props) {
         changeVisibility();
         Alert.alert("Успіх", "Публікацію успішно створено");
       }
-      Alert.alert("Успіх", "Публікацію успішно створено");
-      setName("");
-      setTheme("");
-      setText("");
-      setLinks([""]);
-      setImages([]);
-      setValue([]);
-      setItems([
-        { label: "Відпочинок", value: "#відпочинок" },
-        { label: "Натхнення", value: "#натхнення" },
-        { label: "Життя", value: "#життя" },
-        { label: "Природа", value: "#природа" },
-        { label: "Спокій", value: "#спокій" },
-        { label: "Читання", value: "#читання" },
-        { label: "Гармонія", value: "#гармонія" },
-        { label: "Музика", value: "#музика" },
-        { label: "Фільми", value: "#фільми" },
-        { label: "Подорожі", value: "#подорожі" },
-      ]);
-      changeVisibility();
     } catch (err) {
       console.error("[refetch] Ошибка в процессе создания поста:", err);
       Alert.alert(
@@ -557,7 +536,6 @@ export function MyPublicationModal({ modalVisible, changeVisibility }: Props) {
                   mode="BADGE"
                   badgeDotColors={["#543C52"]}
                   badgeStyle={{
-                    backgroundColor: "#E9E5EE",
                     padding: 4,
                     borderRadius: 8,
                     minHeight: 20,
@@ -565,7 +543,7 @@ export function MyPublicationModal({ modalVisible, changeVisibility }: Props) {
                   placeholder="Оберіть або додайте теги"
                   searchable={true}
                   searchPlaceholder="Пошук або створення тегу..."
-                  listMode="SCROLLVIEW"
+                  listMode="MODAL"
                   scrollViewProps={{
                     nestedScrollEnabled: true,
                   }}
@@ -578,9 +556,6 @@ export function MyPublicationModal({ modalVisible, changeVisibility }: Props) {
                     zIndex: 1000,
                     flex: 1,
                   }}
-                  // onChangeValue={(newValue) => {
-                  //   console.log("[ChangePostModal] Selected tags:", newValue);
-                  // }}
                   onChangeSearchText={(text) => {
                     const sanitizedText = text.trim();
                     if (
