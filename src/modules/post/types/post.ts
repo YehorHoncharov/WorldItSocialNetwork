@@ -1,5 +1,6 @@
 import { IUser } from "../../auth/types";
 
+
 export interface IPostImg {
   id: number;
   url: string;
@@ -18,13 +19,19 @@ export interface PostTag {
 
 export interface IPost {
   id: number;
-  name: string;
-  theme: string | null;
-  text: string;
-  links: string | null;
-  views: number | null;
-  likes: number | null;
+  title: string;
+  // theme: string | null;
+  content: string;
+  links: Link[] | null;
+  views: IUser | null;
+  likes: IUser | null;
   authorId: number;
   images: IPostImg[] | null;
   tags: PostTag[] | null;
+}
+
+export interface Link {
+  id: number;
+  url: string;
+  userPostId: number;
 }

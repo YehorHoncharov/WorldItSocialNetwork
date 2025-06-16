@@ -42,7 +42,7 @@ export default function TabsLayout() {
 								}
 							/>
 						),
-						header: () => <Header />,
+						header: () => <Header actionType={1} />,
 					}}
 				/>
 				<Tabs.Screen
@@ -117,7 +117,7 @@ export default function TabsLayout() {
 						header: () => <Header />,
 					}}
 				/>
-				{}
+				{ }
 				<Tabs.Screen
 					name="settings"
 					listeners={{
@@ -129,7 +129,7 @@ export default function TabsLayout() {
 						},
 					}}
 					options={{
-						header: () => <Header actionType={2}/>,
+						header: () => <Header actionType={2} />,
 						href: null
 					}}
 				/>

@@ -51,7 +51,7 @@ export default function RegStepTwoModal({ modalVisible, changeVisibility }: Prop
       return;
     }
     const image = "../../../shared/ui/images/user.png"
-    await register(params.email, params.password, params.code, name, surname, username);
+    await register(params.email, params.password, params.code, name, surname, username,);
     setShowWelcomeModal(false); 
     router.navigate("/home"); 
   };
@@ -72,21 +72,21 @@ export default function RegStepTwoModal({ modalVisible, changeVisibility }: Prop
           <ScrollView style={styles.scrollArea}>
             <View style={styles.form}>
               <Input
-                width={343}
+                style={{width: "100%"}}
                 label="Ім'я"
                 placeholder="Введіть ваше ім'я"
                 value={name}
                 onChangeText={setName}
               />
               <Input
-                width={343}
+                style={{width: "100%"}}
                 label="Прізвище"
                 placeholder="Введіть ваше прізвище"
                 value={surname}
                 onChangeText={setSurname}
               />
               <Input
-                width={343}
+                style={{width: "100%"}}
                 label="Ім'я користувача"
                 placeholder="@"
                 value={username}

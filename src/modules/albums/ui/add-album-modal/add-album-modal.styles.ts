@@ -30,6 +30,7 @@ export const styles = StyleSheet.create({
 		color: "#070A1C",
 	},
 	form: {
+		width: "100%",
 		gap: 5,
 		marginBottom: 20,
 		alignItems: "center",
@@ -74,6 +75,7 @@ export const styles = StyleSheet.create({
 	},
 	scrollArea: {
 		flexGrow: 0,
+		width: "100%",
 	},
 
 	imageGrid: {

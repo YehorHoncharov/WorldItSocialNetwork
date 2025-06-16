@@ -5,8 +5,7 @@ import OfflineIcon from "../../../../shared/ui/icons/offline-circle";
 import { Button } from "../../../../shared/ui/button";
 import { useRouter } from "expo-router";
 import { useUserContext } from "../../../auth/context/user-context";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { ReactNode } from "react";
+import { API_BASE_URL } from "../../../../settings";
 
 type FriendsFormProps = IUser & {
     actionButton: {
@@ -37,7 +36,7 @@ export function FriendsForm(props: FriendsFormProps) {
             onPress={onPress}
         >
             <View style={styles.profileContainer}>
-                <Image style={styles.profileImage} source={{ uri: props.image }} />
+                <Image style={styles.profileImage} source={{ uri: API_BASE_URL+"/"+props.image }} />
                 <OfflineIcon style={styles.imageOnline} />
             </View>
 

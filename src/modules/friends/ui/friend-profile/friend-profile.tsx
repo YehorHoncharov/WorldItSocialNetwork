@@ -40,7 +40,7 @@ export function FriendProfile({ user }: FriendProfileProps) {
 					<View style={styles.profileImageContainer}>
 						<Image
 							style={styles.profileImage}
-							source={{ uri: user.image }}
+							source={{ uri: API_BASE_URL+"/"+user.image }}
 						/>
 						<OfflineIcon style={styles.imageOnline} />
 					</View>
@@ -143,9 +143,8 @@ export function FriendProfile({ user }: FriendProfileProps) {
 
 							<Post
 								id={item.id}
-								name={item.name}
-								theme={item.theme}
-								text={item.text}
+								title={item.title}
+								content={item.content}
 								authorId={item.authorId}
 								likes={item.likes}
 								views={item.views}

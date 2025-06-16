@@ -4,12 +4,13 @@ import { useUserContext } from "../../../auth/context/user-context";
 import { styles } from "./recomend.style";
 import { useUsers } from "../../hooks/useUsers";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { IUser } from "../../../auth/types";
 
 export function RecomendFriends({ scrollable = true }: { scrollable?: boolean }) {
     const { users } = useUsers();
     const { user } = useUserContext();
 
-    async function handleRequest(userId: number) {
+    async function handleRequest(userTo: IUser) {
         try {
             if (!user) return;
             const token = await AsyncStorage.getItem("token");
@@ -27,9 +28,9 @@ export function RecomendFriends({ scrollable = true }: { scrollable?: boolean })
                         Authorization: `Bearer ${token}`,
                     },
                     body: JSON.stringify({
-                        idFrom: user.id,
+                        profile1: user,
+                        profile2: userTo,
                         status: false,
-                        userId: userId,
                     }),
                 }
             );
@@ -66,7 +67,7 @@ export function RecomendFriends({ scrollable = true }: { scrollable?: boolean })
                         {...item}
                         actionButton={{
                             label: "Додати",
-                            onPress: () => handleRequest(item.id),
+                            onPress: () => handleRequest(item),
                         }}
                     />
                 )}

@@ -133,11 +133,11 @@ export function AddAlbumModal({ modalVisible, onClose }: Props) {
           <ScrollView style={styles.scrollArea}>
             <View style={styles.form}>
               <Input
-                width={343}
                 label="Назва альбому"
-                placeholder="назва альбому"
+                placeholder="Назва альбому"
                 value={name}
                 onChangeText={setName}
+                width={320}
               />
 
               <View style={{ width: "100%", zIndex: 2000, marginTop: 10 }}>
@@ -151,7 +151,7 @@ export function AddAlbumModal({ modalVisible, onClose }: Props) {
                   placeholder="Оберіть тему"
                   searchable={true}
                   searchPlaceholder="Пошук теми..."
-                  listMode="SCROLLVIEW"
+                  listMode="MODAL"
                   scrollViewProps={{
                     nestedScrollEnabled: true,
                   }}
@@ -177,7 +177,7 @@ export function AddAlbumModal({ modalVisible, onClose }: Props) {
                   placeholder="Оберіть рік"
                   searchable={true}
                   searchPlaceholder="Пошук року..."
-                  listMode="SCROLLVIEW"
+                  listMode="MODAL"
                   scrollViewProps={{
                     nestedScrollEnabled: true,
                   }}

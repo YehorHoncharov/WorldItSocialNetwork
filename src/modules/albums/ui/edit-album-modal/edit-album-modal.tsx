@@ -142,7 +142,7 @@ export function EditAlbumModal({
           <ScrollView style={styles.scrollArea}>
             <View style={styles.form}>
               <Input
-                width={343}
+                width={320}
                 label="Назва альбому"
                 placeholder="назва альбому"
                 value={name}
@@ -161,7 +161,7 @@ export function EditAlbumModal({
                   placeholder="Оберіть тему"
                   searchable={true}
                   searchPlaceholder="Пошук теми..."
-                  listMode="SCROLLVIEW"
+                  listMode="MODAL"
                   scrollViewProps={{
                     nestedScrollEnabled: true,
                   }}
@@ -203,7 +203,7 @@ export function EditAlbumModal({
                   placeholder="Оберіть рік"
                   searchable={true}
                   searchPlaceholder="Пошук року..."
-                  listMode="SCROLLVIEW"
+                  listMode="MODAL"
                   scrollViewProps={{
                     nestedScrollEnabled: true,
                   }}

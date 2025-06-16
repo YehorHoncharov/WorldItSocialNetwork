@@ -15,7 +15,6 @@ interface IUserContext {
     name: string,
     surname: string,
     username: string,
-    image: string
   ) => void;
   isAuthenticated: () => boolean;
   updateUser: (updatedUser: IUser) => void;
@@ -104,7 +103,7 @@ export function UserContextProvider({ children }: IUserContextProviderProps) {
     name: string,
     surname: string,
     username: string,
-    image: string
+    // image: string
   ) {
     try {
       const response = await fetch("http://192.168.1.104:3000/user/reg", {
@@ -113,7 +112,7 @@ export function UserContextProvider({ children }: IUserContextProviderProps) {
           "Content-Type": "application/json",
           // "Cache-Control": "no-cache",
         },
-        body: JSON.stringify({ email, password, code, name, surname, username, image }),
+        body: JSON.stringify({ email, password, code, name, surname, username }),
       });
       const result: Response<string> = await response.json();
       if (result.status === "error") {
