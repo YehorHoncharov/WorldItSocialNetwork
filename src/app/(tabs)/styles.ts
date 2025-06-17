@@ -2,19 +2,17 @@ import { StyleSheet } from "react-native";
 
 export const styles = StyleSheet.create({
     footer: {
-        position: 'absolute',
-        bottom: 0,
-        left: 0,
-        right: 0,
+        // position: 'absolute',
+        // bottom: 0,
+        // left: 0,
+        // right: 0,
         height: 70, 
         paddingBottom: 40, 
         flexDirection: 'row',
         justifyContent: 'space-around',
         alignItems: 'center',
         backgroundColor: '#FFFFFF',
-        borderTopWidth: 0,
-        elevation: 0,
-        shadowOpacity: 0,
+
     },
     home: {
         width: 68,
@@ -30,6 +28,6 @@ export const styles = StyleSheet.create({
     },
     chats: {
         width: 47,
-        height: 54,
+        height: 54
     },
 });

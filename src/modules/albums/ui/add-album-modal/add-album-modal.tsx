@@ -14,6 +14,7 @@ import { POST } from "../../../../shared/api/post";
 import { API_BASE_URL } from "../../../../settings";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useUserContext } from "../../../auth/context/user-context";
+import { useAlbums } from "../../hooks/useAlbums";
 
 interface Props {
   modalVisible: boolean;
@@ -38,6 +39,7 @@ export function AddAlbumModal({ modalVisible, onClose }: Props) {
   const { user } = useUserContext()
   const [openTheme, setOpenTheme] = useState(false);
   const [openYear, setOpenYear] = useState(false);
+  const { refetch } = useAlbums()
   const [themeItems, setThemeItems] = useState<ThemeItem[]>([
     { label: "Відпочинок", value: "#відпочинок" },
     { label: "Натхнення", value: "#натхнення" },
@@ -105,6 +107,8 @@ export function AddAlbumModal({ modalVisible, onClose }: Props) {
       Alert.alert("Успіх", "Альбом успішно оновлено");
       resetForm();
       onClose();
+
+      const refetchAlbum = await refetch()
 
     } catch (err) {
       console.error(err);

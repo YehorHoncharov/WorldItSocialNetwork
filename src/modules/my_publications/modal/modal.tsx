@@ -42,7 +42,7 @@ interface IPostImg {
   userPostId: number;
 }
 
-export function MyPublicationModal({ modalVisible, changeVisibility }: Props) {
+export async function MyPublicationModal({ modalVisible, changeVisibility }: Props) {
   const [name, setName] = useState("");
   const [theme, setTheme] = useState("");
   const [text, setText] = useState("");
@@ -113,10 +113,10 @@ export function MyPublicationModal({ modalVisible, changeVisibility }: Props) {
       Alert.alert("Помилка", "Теги мають бути не довшими за 50 символів");
       return;
     }
-
+    // { create: [{ uri: string}] }
     const formattedImages =
       images.length > 0
-        ? { create: images.map((img) => ({ url: img.url })) }
+        ? images.map((img) => ({ url: img.url }))
         : undefined;
 
     var nonEmptyLinks = links.filter((link) => link.trim() !== "");
@@ -383,6 +383,9 @@ export function MyPublicationModal({ modalVisible, changeVisibility }: Props) {
       </View>
     );
   };
+
+  await refetch()
+  
 
   return (
     <Modal
@@ -660,6 +663,7 @@ export function MyPublicationModal({ modalVisible, changeVisibility }: Props) {
     </Modal>
   );
 }
+
 
 const styles = StyleSheet.create({
   centeredView: {
