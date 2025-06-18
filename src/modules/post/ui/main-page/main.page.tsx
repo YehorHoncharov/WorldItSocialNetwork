@@ -7,15 +7,14 @@ import { StyleSheet } from "react-native";
 export default function Post(props: IPost) {
 	const {
 		id,
-		name,
-		text,
-		theme,
+		title,
+		content,
 		images,
 		likes,
 		views,
 		tags,
 		links,
-		authorId,
+		author_id,
 	} = props;
 
 	return (
@@ -23,24 +22,22 @@ export default function Post(props: IPost) {
 			<View style={styles.container}>
 				<Author
 					id={id}
-					name={name}
-					text={text}
-					theme={theme}
+					title={title}
+					content={content}
 					images={images}
 					likes={likes}
 					links={links}
-					authorId={authorId}
+					author_id={author_id}
 					views={views}
 					tags={tags}
 				/>
 				<Content
 					id={id}
-					name={name}
-					text={text}
-					theme={theme}
+					title={title}
+					content={content}
 					likes={likes}
 					links={links}
-					authorId={authorId}
+					author_id={author_id}
 					views={views}
 					tags={tags}
 					images={images}

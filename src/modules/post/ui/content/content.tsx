@@ -109,16 +109,14 @@ export function Content(props: IPost) {
 	return (
 		<View style={styles.container}>
 			<View style={styles.textContainer}>
-				<Text style={{ fontSize: 18 }}>{props.name}</Text>
-				<Text />
-				{props.theme && <Text>{props.theme}</Text>}
-				{/* {props.links && <Text selectable>{props.links}</Text>} */}
-				<Text style={styles.text}>{props.text}</Text>
+				<Text style={{ fontSize: 18 }}>{props.title}</Text>
+		
+				<Text style={styles.text}>{props.content}</Text>
 				{props.tags && props.tags.length > 0 && (
 					<View style={styles.tagsContainer}>
 						{props.tags.map((tagItem, index) => (
 							<View
-								key={`tag-${tagItem.tagId || `temp-${index}`}`}
+								key={`tag-${tagItem.tag.tagId || `temp-${index}`}`}
 								style={styles.tag}
 							>
 								<Text style={styles.tagText}>
@@ -145,7 +143,7 @@ export function Content(props: IPost) {
 						<Like width={20} height={20} />
 					</TouchableOpacity>
 					<Text style={styles.statText}>
-						{props.likes ?? 0} Вподобань
+						0 Вподобань
 					</Text>
 				</View>
 				<View style={styles.postButs}>
@@ -156,7 +154,7 @@ export function Content(props: IPost) {
 						/>
 					</TouchableOpacity>
 					<Text style={styles.statText}>
-						{props.views ?? 0} Переглядів
+						0 Переглядів
 					</Text>
 				</View>
 			</View>

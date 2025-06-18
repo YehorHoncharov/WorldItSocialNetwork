@@ -1,6 +1,6 @@
-import { View, Text, Alert } from "react-native";
+import { View, Alert } from "react-native";
 import { useUserContext } from "../../modules/auth/context/user-context";
-import { FriendProfile } from "../../modules/friends/ui/friend-profile/friend-profile";
+import {ContactsScreen} from "../../modules/chat/ui/contacts/contacts";
 
 export default function Chats() {
     const {user} = useUserContext()
@@ -10,8 +10,9 @@ export default function Chats() {
     } 
         
     return (
-        <View>
-
+        <View style={{ flex: 1 }}>
+            {/* <ChatHeader/> */}
+            <ContactsScreen/>
         </View>
     )
 }

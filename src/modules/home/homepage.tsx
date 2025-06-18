@@ -7,7 +7,7 @@ import { useUserContext } from "../auth/context/user-context";
 export function Homepage() {
   const { posts, refetch } = usePosts();
   const [refreshing, setRefreshing] = useState(false);
-  const { showWelcomeModal, setShowWelcomeModal} = useUserContext();
+  const { showWelcomeModal, setShowWelcomeModal } = useUserContext();
   const { user } = useUserContext();
 
   const onRefresh = useCallback(async () => {
@@ -33,13 +33,12 @@ export function Homepage() {
         <View style={styles.postContainer}>
           <Post
             id={item.id}
-            name={item.name}
-            text={item.text}
+            title={item.title}
+            content={item.content}
             images={item.images}
-            theme={item.theme}
             links={item.links}
             tags={item.tags}
-            authorId={item.authorId}
+            author_id={item.author_id}
             likes={item.likes}
             views={item.views}
           />

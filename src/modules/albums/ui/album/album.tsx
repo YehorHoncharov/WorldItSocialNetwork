@@ -120,8 +120,7 @@ export function Album({ scrollOffset = 0, ...props }: IAlbum & { scrollOffset?: 
 						})
 				);
 
-				const filteredImages = newImages.filter((img): img is IAlbumImg => img !== null);
-
+				const filteredImages = newImages.filter((img) => img !== null) as IAlbumImg[];
 				if (images.length + filteredImages.length - imagesToDelete.length > 10) {
 					Alert.alert("Увага", "Максимальна кількість зображень - 10");
 					return;
@@ -161,9 +160,9 @@ export function Album({ scrollOffset = 0, ...props }: IAlbum & { scrollOffset?: 
 
 	async function handleSubmit() {
 		try {
-			const formattedImages = [
+			const formattedImages: IAlbumImg[] = [
 				...images,
-				...imagesToDelete.map((id) => ({ id }))
+				...imagesToDelete.map((id) => ({ id: id, url: "" }))
 			]
 
 			
@@ -226,8 +225,7 @@ return (
 							: null}
 					</View>
 					<View style={styles.theme}>
-						<Text style={{ fontSize: 16 }}>{props.theme}</Text>
-						<Text style={{ fontSize: 16 }}>{props.year}</Text>
+						{/* <Text style={{ fontSize: 16 }}>{props.year}</Text> */}
 					</View>
 					<View style={styles.separator} />
 				</View>

@@ -8,9 +8,11 @@ export interface IPostImg {
 }
 
 export interface PostTag {
-  userPostId: number;
-  tagId: number;
-  name: string;
+  tag: {
+    userPostId: number;
+    tagId: number;
+    name: string;
+  }
 }
 
 export interface IPost {
@@ -21,7 +23,7 @@ export interface IPost {
   links: Link[] | null;
   views: IUser | null;
   likes: IUser | null;
-  authorId: number;
+  author_id: number;
   images: IPostImg[] | null;
   tags: PostTag[] | null;
 }

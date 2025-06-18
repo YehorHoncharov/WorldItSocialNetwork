@@ -42,7 +42,7 @@ interface IPostImg {
   userPostId: number;
 }
 
-export async function MyPublicationModal({ modalVisible, changeVisibility }: Props) {
+export function MyPublicationModal({ modalVisible, changeVisibility }: Props) {
   const [name, setName] = useState("");
   const [theme, setTheme] = useState("");
   const [text, setText] = useState("");
@@ -68,16 +68,7 @@ export async function MyPublicationModal({ modalVisible, changeVisibility }: Pro
     { label: "Фільми", value: "#фільми" },
     { label: "Подорожі", value: "#подорожі" },
   ]);
-  const { refetch } = usePosts();
-
-  const getToken = async (): Promise<string> => {
-    const token = await AsyncStorage.getItem("tokenStorage");
-    return token || "";
-  };
-
-  useEffect(() => {
-    getToken().then(setTokenUser);
-  }, []);
+  // const { refetch } = usePosts();
 
   const handleSubmit = async () => {
     if (!name.trim() || !theme.trim() || !text.trim()) {
@@ -131,6 +122,7 @@ export async function MyPublicationModal({ modalVisible, changeVisibility }: Pro
 
     setIsLoading(true);
     try {
+      console.log(111)
       const response = await POST({
         endpoint: `${API_BASE_URL}/posts/create`,
         headers: {
@@ -139,13 +131,13 @@ export async function MyPublicationModal({ modalVisible, changeVisibility }: Pro
         },
         token: tokenUser,
         body: {
-          name: name.trim(),
+          title: name.trim(),
           theme: theme.trim(),
-          text: text.trim(),
+          content: text.trim(),
           links: correctLinks ? correctLinks : undefined,
           tags: sanitizedTags.length > 0 ? sanitizedTags : undefined,
           images: formattedImages,
-          authorId: user.id,
+          author_id: user.id,
         },
       });
       if (response.status === "success") {
@@ -204,7 +196,7 @@ export async function MyPublicationModal({ modalVisible, changeVisibility }: Pro
 
   const handleSubmitWithRefetch = async () => {
     await handleSubmit();
-    const updatedPosts = await refetch();
+    // const updatedPosts = await refetch();
   };
 
   const addLinksInput = () => {
@@ -384,7 +376,7 @@ export async function MyPublicationModal({ modalVisible, changeVisibility }: Pro
     );
   };
 
-  await refetch()
+
   
 
   return (
@@ -648,7 +640,7 @@ export async function MyPublicationModal({ modalVisible, changeVisibility }: Pro
               </TouchableOpacity>
               <TouchableOpacity
                 style={[styles.submitButton, isLoading && { opacity: 0.7 }]}
-                onPress={handleSubmitWithRefetch}
+                onPress={handleSubmit}
                 disabled={isLoading}
               >
                 <>

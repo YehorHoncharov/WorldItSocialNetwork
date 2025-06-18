@@ -19,13 +19,13 @@ export function FriendsForm(props: FriendsFormProps) {
     const { user } = useUserContext();
 
     function onPress() {
-        const { dateOfBirth, friendship, actionButton, ...rest } = props;
+        const { date_of_birth, friendship, actionButton, ...rest } = props;
 
         navigation.navigate({
             pathname: "/friends-profile",
             params: {
                 ...rest,
-                dateOfBirth: dateOfBirth ? new Date(dateOfBirth).toISOString() : undefined
+                dateOfBirth: date_of_birth ? new Date(date_of_birth).toISOString() : undefined
             },
         });
     }

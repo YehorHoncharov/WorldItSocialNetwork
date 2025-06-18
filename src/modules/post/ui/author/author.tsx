@@ -13,13 +13,12 @@ export function Author({ scrollOffset = 0, ...props }: IPost & { scrollOffset?: 
   const [dotsPosition, setDotsPosition] = useState({ x: 150, y: 78 });
   const containerRef = useRef<View>(null);
   const dotsRef = useRef<ElementRef<typeof TouchableOpacity>>(null);
-  const { user } = useUserByID(props.authorId)
+  const { user } = useUserByID(props.author_id)
   const { user: currentUser } = useUserContext();
   const [containerSize, setContainerSize] = useState({
     width: 400,
     height: 725,
   });
-
 
   const measureDots = () => {
     if (dotsRef.current) {
@@ -78,7 +77,7 @@ export function Author({ scrollOffset = 0, ...props }: IPost & { scrollOffset?: 
           source={require("../../../../shared/ui/images/signature.png")}
         />
       </View>
-      {currentUser?.id === props.authorId ?
+      {currentUser?.id === props.author_id ?
         <View>
           <TouchableOpacity
             ref={dotsRef}

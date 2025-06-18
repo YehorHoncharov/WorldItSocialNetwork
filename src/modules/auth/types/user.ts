@@ -5,7 +5,7 @@ export interface IUser{
     name?: string,
     username?: string,
     surname?: string,
-    dateOfBirth?: Date,
+    date_of_birth?: Date,
     email: string,
     password: string,
     signature?: string,

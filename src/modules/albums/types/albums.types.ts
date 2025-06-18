@@ -2,15 +2,20 @@
 export interface IAlbumImg {
 	id: number;
 	url: string;
-	albumId: number;
+	albumId?: number;
+}[]
+
+export interface IAlbumTag {
+	id: number;
+	name: string;
 }
 
 export interface IAlbum {
 	id: number;
 	name: string;
-	theme: string;
-	year: string;
-	images?: IAlbumImg[]
+	created_at: Date;
+	images?: IAlbumImg[];
+	topic?: IAlbumTag[];
 	authorId: number;
 }
 

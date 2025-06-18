@@ -32,9 +32,8 @@ interface TagItem {
 }
 
 interface UpdateData {
-  name: string;
-  theme: string;
-  text: string;
+  title: string;
+  content: string;
   links?: string;
   tags?: string[];
   images?: {
@@ -107,7 +106,7 @@ export function ChangePostModal({
         const tagsFromPost = Array.from(
           new Set(
             postData.tags
-              ?.map((tag) => tag.name)
+              ?.map((tag) => tag.tag.name)
               .filter((tag): tag is string => tag !== null) || []
           )
         );
@@ -150,15 +149,7 @@ export function ChangePostModal({
       Alert.alert("Помилка", "Дані поста або ID поста відсутні");
       return;
     }
-    if (!tokenUser) {
-      Alert.alert("Помилка", "Токен авторизації відсутній");
-      return;
-    }
-    if (!name.trim() || !theme.trim() || !text.trim()) {
-      Alert.alert("Помилка", "Заповніть усі обов’язкові поля");
-      return;
-    }
-
+  
     // Перевірка коректності посилань
     const invalidLinks = links.filter(
       (link) => link.trim() !== "" && !isValidUrl(link.trim())
@@ -193,9 +184,8 @@ export function ChangePostModal({
     });
 
     const updatedData: UpdateData = {
-      name: name.trim(),
-      theme: theme.trim(),
-      text: text.trim(),
+      title: name.trim(),
+      content: text.trim(),
       links: correctLinks || undefined,
       tags: sanitizedTags,
     };
@@ -238,6 +228,7 @@ export function ChangePostModal({
     }
 
     setIsLoading(true);
+    console.log("Updated Data:", updatedData);
     try {
       const response = await PUT<IPost>({
         endpoint: `${API_BASE_URL}/posts/${postData.id}`,
