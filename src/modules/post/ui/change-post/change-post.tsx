@@ -38,9 +38,9 @@ interface UpdateData {
   links?: string;
   tags?: string[];
   images?: {
-    create?: { url: string }[];
-    delete?: { id: number }[];
-  };
+    id?: number;
+    url: string;
+  }[];
 }
 
 interface Props {
@@ -88,21 +88,26 @@ export function ChangePostModal({
       setTokenUser(token || "");
 
       if (postData) {
-        setName(postData.name || "");
-        setTheme(postData.theme || "");
-        setText(postData.text || "");
+        setName(postData.title || "");
+        setText(postData.content || "");
         setLinks(
           Array.isArray(postData.links)
-            ? postData.links
+            ? postData.links.map((l: any) =>
+              typeof l === "string"
+                ? l
+                : typeof l === "object" && l !== null && "url" in l
+                  ? l.url
+                  : ""
+            )
             : postData.links
-            ? [postData.links]
-            : [""]
+              ? [postData.links]
+              : [""]
         );
 
         const tagsFromPost = Array.from(
           new Set(
             postData.tags
-              ?.map((tag) => tag.tag?.name)
+              ?.map((tag) => tag.name)
               .filter((tag): tag is string => tag !== null) || []
           )
         );
@@ -111,19 +116,19 @@ export function ChangePostModal({
 
         const loadedImages = postData.images
           ? postData.images.map((img) => {
-              const relativeUrl = img.url
-                .replace(/\\/g, "/")
-                .replace(/^\/?uploads\/*/i, "");
-              const normalizedUrl = img.url.startsWith("http")
-                ? img.url
-                : `${API_BASE_URL}/uploads/${relativeUrl}`;
+            const relativeUrl = img.url
+              .replace(/\\/g, "/")
+              .replace(/^\/?uploads\/*/i, "");
+            const normalizedUrl = img.url.startsWith("http")
+              ? img.url
+              : `${API_BASE_URL}/uploads/${relativeUrl}`;
 
-              return {
-                ...img,
-                url: normalizedUrl,
-                rawUrl: img.url,
-              };
-            })
+            return {
+              ...img,
+              url: normalizedUrl,
+              rawUrl: img.url,
+            };
+          })
           : [];
 
         setImages(loadedImages);
@@ -197,7 +202,7 @@ export function ChangePostModal({
 
     const existingImages = postData.images || [];
     const persistedImages = images.filter((img) =>
-      existingImages.some((pi) => pi.id === img.id && pi.url === img.rawUrl)
+      existingImages.some((pi) => pi.id === img.id && pi.url === img.url)
     );
 
     const newImages = images
@@ -226,10 +231,10 @@ export function ChangePostModal({
     }
 
     if (newImages.length > 0 || deletedImages.length > 0) {
-      updatedData.images = {
-        ...(newImages.length > 0 ? { create: newImages } : {}),
-        ...(deletedImages.length > 0 ? { delete: deletedImages } : {}),
-      };
+      updatedData.images = [
+        ...newImages,
+        ...deletedImages.map((img) => ({ id: img.id, url: "" })),
+      ];
     }
 
     setIsLoading(true);
@@ -566,7 +571,7 @@ export function ChangePostModal({
                     zIndex: 1000,
                     flex: 1,
                   }}
-                  onChangeValue={() => {}}
+                  onChangeValue={() => { }}
                   onChangeSearchText={(text) => {
                     const sanitizedText = text.trim();
                     if (

@@ -161,85 +161,91 @@ export function Album({ scrollOffset = 0, ...props }: IAlbum & { scrollOffset?: 
 
 	async function handleSubmit() {
 		try {
-			const formattedImages = {
-				create: images
-					.filter((img) => img.url.startsWith("data:image"))
-					.map((img) => ({ url: img.url })),
-				delete: imagesToDelete.map((id) => ({ id })),
-			};
+			const formattedImages = [
+				...images,
+				...imagesToDelete.map((id) => ({ id }))
+			]
 
-			const response: IPutResponse = await PUT({
-				endpoint: `${API_BASE_URL}/albums/${props.id}`,
-				headers: {
-					"Content-Type": "application/json",
-					Authorization: `Bearer ${tokenUser}`,
-				},
-				token: tokenUser,
-				body: {
-					images:
-						formattedImages.create.length > 0 || formattedImages.delete.length > 0
-							? formattedImages
-							: undefined,
-				},
-			});
+			
+		// if (filteredImages.length > 0 || deletedImages.length > 0) {
+		// 	updatedData.images = [
+		// 		...newImages,
+		// 		...deletedImages.map((img) => ({ id: img.id, url: "" })),
+		// 	];
+		// }
 
-			if (response.status === "success" && response.data) {
-				setImages(response.data.images || []);
-				setImagesToDelete([]);
-				Alert.alert("Успіх", "Зміни успішно збережено");
-			}
+		const response: IPutResponse = await PUT({
+			endpoint: `${API_BASE_URL}/albums/${props.id}`,
+			headers: {
+				"Content-Type": "application/json",
+				Authorization: `Bearer ${tokenUser}`,
+			},
+			token: tokenUser,
+			body: {
+				images:
+					formattedImages.length > 0 || formattedImages.length > 0
+						? formattedImages
+						: undefined,
+			},
+		});
+
+		if (response.status === "success" && response.data) {
+			setImages(response.data.images || []);
+			setImagesToDelete([]);
 			Alert.alert("Успіх", "Зміни успішно збережено");
-		} catch (err) {
-			console.error("Помилка збереження:", err);
 		}
+		Alert.alert("Успіх", "Зміни успішно збережено");
+	} catch (err) {
+		console.error("Помилка збереження:", err);
 	}
+}
 
-	return (
-		<View style={styles.container} onLayout={handleContainerLayout}>
-			<ScrollView contentContainerStyle={styles.scrollContainer}>
-				<View style={{ gap: 27, alignItems: "center", justifyContent: "center", width: "100%", alignContent: "center" }}>
-					<View style={{ width: "100%" }}>
-						<View style={styles.mainBox}>
-							<Text style={styles.title}>{props.name}</Text>
-							{user?.id === props.authorId ?
-								<View style={styles.actionButtons}>
-									<TouchableOpacity style={styles.actionButton}>
-										<Image
-											source={require("../../../../shared/ui/images/eye-my-publication.png")}
-											style={styles.actionIcon}
-										/>
-									</TouchableOpacity>
-									<TouchableOpacity
-										ref={dotsRef}
-										onPress={() => setModalVisible(true)}
-										style={{ alignItems: "center", justifyContent: "center" }}
-									>
-										<Dots width={20} height={20} />
-									</TouchableOpacity>
-								</View>
-								: null}
-						</View>
-						<View style={styles.theme}>
-							<Text style={{ fontSize: 16 }}>{props.theme}</Text>
-							<Text style={{ fontSize: 16 }}>{props.year}</Text>
-						</View>
-						<View style={styles.separator} />
+return (
+	<View style={styles.container} onLayout={handleContainerLayout}>
+		<ScrollView contentContainerStyle={styles.scrollContainer}>
+			<View style={{ gap: 27, alignItems: "center", justifyContent: "center", width: "100%", alignContent: "center" }}>
+				<View style={{ width: "100%" }}>
+					<View style={styles.mainBox}>
+						<Text style={styles.title}>{props.name}</Text>
+						{user?.id === props.authorId ?
+							<View style={styles.actionButtons}>
+								<TouchableOpacity style={styles.actionButton}>
+									<Image
+										source={require("../../../../shared/ui/images/eye-my-publication.png")}
+										style={styles.actionIcon}
+									/>
+								</TouchableOpacity>
+								<TouchableOpacity
+									ref={dotsRef}
+									onPress={() => setModalVisible(true)}
+									style={{ alignItems: "center", justifyContent: "center" }}
+								>
+									<Dots width={20} height={20} />
+								</TouchableOpacity>
+							</View>
+							: null}
 					</View>
-					<View style={{ gap: 27, alignItems: "flex-start", justifyContent: "space-between", width: "100%" }}>
-						<Text style={styles.title}>Фотографії</Text>
-						<View style={styles.photoGrid}>
-							{images.length > 0
-								? images.map((img) => (
-									<View key={img.id}>
-										<Image
-											source={{
-												uri: img.url.startsWith("data:image")
-													? img.url
-													: `${API_BASE_URL}/${img.url.replace(/^\/?uploads\/*/i, "uploads/")}`,
-											}}
-											style={styles.photo}
-										/>
-										{ user?.id === props.authorId ? 
+					<View style={styles.theme}>
+						<Text style={{ fontSize: 16 }}>{props.theme}</Text>
+						<Text style={{ fontSize: 16 }}>{props.year}</Text>
+					</View>
+					<View style={styles.separator} />
+				</View>
+				<View style={{ gap: 27, alignItems: "flex-start", justifyContent: "space-between", width: "100%" }}>
+					<Text style={styles.title}>Фотографії</Text>
+					<View style={styles.photoGrid}>
+						{images.length > 0
+							? images.map((img) => (
+								<View key={img.id}>
+									<Image
+										source={{
+											uri: img.url.startsWith("data:image")
+												? img.url
+												: `${API_BASE_URL}/${img.url.replace(/^\/?uploads\/*/i, "uploads/")}`,
+										}}
+										style={styles.photo}
+									/>
+									{user?.id === props.authorId ?
 										<TouchableOpacity
 											onPress={() => deleteImage(img.id)}
 											style={styles.deleteBtn}
@@ -250,38 +256,38 @@ export function Album({ scrollOffset = 0, ...props }: IAlbum & { scrollOffset?: 
 											/>
 										</TouchableOpacity>
 										: null}
-									</View>
-								))
-								: null}
-							{user?.id === props.authorId ? (
-								<>
-									{images.length < 10 && (
-										<TouchableOpacity style={styles.addImage} onPress={onSearch}>
-											<Image
-												style={{ width: 40.6, height: 40 }}
-												source={require("../../../../shared/ui/images/plus-in-circle.png")}
-											/>
-										</TouchableOpacity>
-									)}
-								</>
-							) : null}
-						</View>
+								</View>
+							))
+							: null}
+						{user?.id === props.authorId ? (
+							<>
+								{images.length < 10 && (
+									<TouchableOpacity style={styles.addImage} onPress={onSearch}>
+										<Image
+											style={{ width: 40.6, height: 40 }}
+											source={require("../../../../shared/ui/images/plus-in-circle.png")}
+										/>
+									</TouchableOpacity>
+								)}
+							</>
+						) : null}
 					</View>
-					{user?.id === props.authorId ?
-						<TouchableOpacity onPress={handleSubmit} style={styles.submitBtn}>
-							<Text style={styles.submitText}>Зберегти</Text>
-						</TouchableOpacity>
-						: null}
 				</View>
-			</ScrollView>
-			<ModalAlbum
-				visible={modalVisible}
-				onClose={() => setModalVisible(false)}
-				albumId={props.id}
-				dotsPosition={dotsPosition}
-				containerSize={containerSize}
-				scrollOffset={scrollOffset}
-			/>
-		</View>
-	);
+				{user?.id === props.authorId ?
+					<TouchableOpacity onPress={handleSubmit} style={styles.submitBtn}>
+						<Text style={styles.submitText}>Зберегти</Text>
+					</TouchableOpacity>
+					: null}
+			</View>
+		</ScrollView>
+		<ModalAlbum
+			visible={modalVisible}
+			onClose={() => setModalVisible(false)}
+			albumId={props.id}
+			dotsPosition={dotsPosition}
+			containerSize={containerSize}
+			scrollOffset={scrollOffset}
+		/>
+	</View>
+);
 }

@@ -4,17 +4,13 @@ import { IUser } from "../../auth/types";
 export interface IPostImg {
   id: number;
   url: string;
-  rawUrl?: string;
   userPostId: number;
 }
 
 export interface PostTag {
   userPostId: number;
   tagId: number;
-  tag: {
-    id: number;
-    name: string;
-  };
+  name: string;
 }
 
 export interface IPost {

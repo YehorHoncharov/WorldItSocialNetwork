@@ -89,10 +89,9 @@ export function ModalPost({
           modalVisible={modalOpened}
           postData={{
             id: postId,
-            name: currentPost.name || "",
-            theme: currentPost.theme || "",
-            text: currentPost.text || "",
-            links: currentPost.links || "",
+            title: currentPost.title || "",
+            content: currentPost.content || "",
+            links: currentPost.links || [],
             images: currentPost.images || [],
             tags: currentPost.tags || [],
             authorId: currentPost.authorId || 0,
