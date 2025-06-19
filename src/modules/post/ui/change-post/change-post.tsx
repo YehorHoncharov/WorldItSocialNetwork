@@ -75,7 +75,7 @@ export function ChangePostModal({
     { label: "Фільми", value: "#фільми" },
     { label: "Подорожі", value: "#подорожі" },
   ]);
-
+  console.log(postData)
   const isValidUrl = (url: string): boolean => {
     const urlPattern = /^(https?:\/\/)([\w.-]+)\.([a-z]{2,})(\/.*)?$/i;
     return urlPattern.test(url);
@@ -112,25 +112,7 @@ export function ChangePostModal({
         );
 
         setValue(tagsFromPost);
-
-        const loadedImages = postData.images
-          ? postData.images.map((img) => {
-            const relativeUrl = img.url
-              .replace(/\\/g, "/")
-              .replace(/^\/?uploads\/*/i, "");
-            const normalizedUrl = img.url.startsWith("http")
-              ? img.url
-              : `${API_BASE_URL}/uploads/${relativeUrl}`;
-
-            return {
-              ...img,
-              url: normalizedUrl,
-              rawUrl: img.url,
-            };
-          })
-          : [];
-
-        setImages(loadedImages);
+        setImages(postData.images || []);
 
         const additionalTags = tagsFromPost
           .filter((tag) => !items.some((item) => item.value === tag))
@@ -149,7 +131,7 @@ export function ChangePostModal({
       Alert.alert("Помилка", "Дані поста або ID поста відсутні");
       return;
     }
-  
+
     // Перевірка коректності посилань
     const invalidLinks = links.filter(
       (link) => link.trim() !== "" && !isValidUrl(link.trim())
@@ -192,13 +174,13 @@ export function ChangePostModal({
 
     const existingImages = postData.images || [];
     const persistedImages = images.filter((img) =>
-      existingImages.some((pi) => pi.id === img.id && pi.url === img.url)
+      existingImages.some((pi) => pi.image.id === img.image.id && pi.image.filename === img.image.filename)
     );
 
     const newImages = images
-      .filter((img) => img.url.startsWith("data:image"))
+      .filter((img) => img.image.filename.startsWith("data:image"))
       .map((img) => {
-        const matches = img.url.match(/^data:image\/(\w+);base64,(.+)$/);
+        const matches = img.image.filename.match(/^data:image\/(\w+);base64,(.+)$/);
         if (!matches || !["jpeg", "png", "gif"].includes(matches[1].toLowerCase())) {
           return null;
         }
@@ -207,13 +189,13 @@ export function ChangePostModal({
         if (estimatedSizeInBytes > 5 * 1024 * 1024) {
           return null;
         }
-        return { url: img.url };
+        return { url: img.image.filename };
       })
       .filter((img): img is { url: string } => img !== null);
 
     const deletedImages = existingImages
-      .filter((pi) => !persistedImages.some((img) => img.id === pi.id))
-      .map((pi) => ({ id: pi.id }));
+      .filter((pi) => !persistedImages.some((img) => img.image.id === pi.image.id))
+      .map((pi) => ({ id: pi.image.id, url: pi.image.filename }));
 
     if (newImages.length + persistedImages.length > 10) {
       Alert.alert("Помилка", "Максимум 10 зображень дозволено");
@@ -223,7 +205,7 @@ export function ChangePostModal({
     if (newImages.length > 0 || deletedImages.length > 0) {
       updatedData.images = [
         ...newImages,
-        ...deletedImages.map((img) => ({ id: img.id, url: "" })),
+        ...deletedImages.map((img) => ({ id: img.id, url: img.url })),
       ];
     }
 
@@ -307,10 +289,11 @@ export function ChangePostModal({
             const url = `data:image/${type};base64,${base64String}`;
 
             return {
-              id: Date.now() + index,
-              url,
-              rawUrl: url,
-              userPostId: postData?.id || 0,
+              image: {
+                id: Date.now() + index,
+                filename: url,
+                userPostId: postData?.id || 0,
+              },
             } as IPostImg;
           })
           .filter((img): img is IPostImg => img !== null);
@@ -349,18 +332,16 @@ export function ChangePostModal({
       return <Text style={styles.noImagesText}>Додайте зображення</Text>;
     }
 
+
     return (
       <View style={styles.imageGrid}>
         {images.map((img, idx) => {
-          const isValidImage =
-            img.url.startsWith("data:image/") || img.url.startsWith("http");
-          if (!isValidImage) {
-            return null;
-          }
+          const correctImage = API_BASE_URL+'/'+img.image.filename
           return (
-            <View key={`image-${img.id}-${idx}`} style={styles.imageContainer}>
+            <View key={`image-${img.image.id}-${idx}`} style={styles.imageContainer}>
+           
               <Image
-                source={{ uri: img.url }}
+                source={{ uri: correctImage }}
                 style={styles.imageAdded}
                 resizeMode="cover"
               />

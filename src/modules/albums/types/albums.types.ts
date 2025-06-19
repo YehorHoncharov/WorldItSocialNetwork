@@ -10,13 +10,17 @@ export interface IAlbumTag {
 	name: string;
 }
 
+export interface IAlbumTheme {
+	label: string;
+	value: string;
+}
+
 export interface IAlbum {
 	id: number;
 	name: string;
-	created_at: Date;
 	images?: IAlbumImg[];
 	topic?: IAlbumTag[];
-	authorId: number;
+	author_id: number;
 }
 
 export interface IAlbumStart {
@@ -40,20 +44,10 @@ export interface Props {
   onClose: () => void;
 }
 
-export interface YearItem {
-  label: string;
-  value: string;
-}
-
-export interface ThemeItem {
-  label: string;
-  value: string;
-}
-
 export interface IAlbumEditProps {
 	id: number;
 	name: string;
-	theme: string;
-	year: string;
+	theme: IAlbumTag[];
+	// year: string;
 	authorId: number;
 }

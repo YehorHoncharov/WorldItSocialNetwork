@@ -27,8 +27,8 @@ export function FriendProfile({ user }: FriendProfileProps) {
 
 	useEffect(() => {
 		if (!user) return;
-		const myAlbums = albums.filter((album) => album.authorId === user.id);
-		const myPosts = posts.filter((post) => post.authorId === user.id);
+		const myAlbums = albums.filter((album) => album.author_id === user.id);
+		const myPosts = posts.filter((post) => post.author_id === user.id);
 		setUserAlbums(myAlbums);
 		setUserPosts(myPosts);
 	}, [albums, user]);
@@ -110,9 +110,9 @@ export function FriendProfile({ user }: FriendProfileProps) {
 							<Album
 								id={item.id}
 								name={item.name}
-								theme={item.theme}
-								year={item.year}
-								authorId={item.authorId}
+								topic={item.topic}
+								created_at={item.created_at}
+								author_id={item.author_id}
 								images={item.images}
 							/>
 						)}
@@ -145,7 +145,7 @@ export function FriendProfile({ user }: FriendProfileProps) {
 								id={item.id}
 								title={item.title}
 								content={item.content}
-								authorId={item.authorId}
+								author_id={item.author_id}
 								likes={item.likes}
 								views={item.views}
 								tags={item.tags}

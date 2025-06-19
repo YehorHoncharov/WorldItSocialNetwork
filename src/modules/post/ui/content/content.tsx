@@ -4,25 +4,25 @@ import {
 	Image,
 	TouchableOpacity,
 	FlatList,
-	StyleSheet,
 	ActivityIndicator,
 } from "react-native";
 import { useEffect, useState } from "react";
 import Like from "../../../../shared/ui/icons/like";
 import { IPost, IPostImg } from "../../types/post";
 import { styles } from "./content.styles";
+import { API_BASE_URL } from "../../../../settings";
 
 export function Content(props: IPost) {
-	const BASE_URL = "http://192.168.1.104:3000/";
-	const [isLoading, setIsLoading] = useState(true);
 
+	const [isLoading, setIsLoading] = useState(true);
+	
 	useEffect(() => {
 		checkServerAvailability();
 	}, []);
 
 	const checkServerAvailability = async () => {
 		try {
-			const response = await fetch(BASE_URL);
+			const response = await fetch(API_BASE_URL);
 			setIsLoading(false);
 		} catch (error) {
 			setIsLoading(false);
@@ -40,10 +40,11 @@ export function Content(props: IPost) {
 			correctedPath = `uploads/${imagePath.substring(7)}`;
 		}
 
-		const fullUrl = `${BASE_URL}${correctedPath}`;
+		const fullUrl = `${API_BASE_URL}/${correctedPath}`;
 
 		return fullUrl;
 	};
+	
 
 	const groupImages = (images: IPostImg[]) => {
 		const grouped = [];
@@ -70,12 +71,13 @@ export function Content(props: IPost) {
 				}
 			>
 				{rowImages.map((imageItem, index) => {
-					const imageUrl = getImageUrl(imageItem.url);
+					const imageUrl = getImageUrl(imageItem.image.filename);
+					
 					if (!imageUrl) return null;
 
 					return (
 						<View
-							key={`img-${imageItem.id || `temp-${index}`}`}
+							key={`img-${imageItem.image.id || `temp-${index}`}`}
 							style={[
 								rowImages.length === 1 ? styles.imageOne :
 									rowImages.length === 2

@@ -12,7 +12,7 @@ export function MyPublications() {
 
   useEffect(() => {
       if (!user) return;
-      const myPosts = posts.filter((post) => post.authorId === user.id);
+      const myPosts = posts.filter((post) => post.author_id === user.id);
       setUserPosts(myPosts);
   }, [posts, user]);
   
@@ -27,13 +27,12 @@ export function MyPublications() {
         <View style={styles.postContainer}>
           <Post
             id={item.id}
-            name={item.name}
-            text={item.text}
+            title={item.title}
+            content={item.content}
             images={item.images}
-            theme={item.theme}
             links={item.links}
             tags={item.tags}
-            authorId={item.authorId}
+            author_id={item.author_id}
             likes={item.likes}
             views={item.views}
           />

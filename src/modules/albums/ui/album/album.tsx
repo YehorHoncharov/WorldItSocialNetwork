@@ -206,7 +206,7 @@ return (
 				<View style={{ width: "100%" }}>
 					<View style={styles.mainBox}>
 						<Text style={styles.title}>{props.name}</Text>
-						{user?.id === props.authorId ?
+						{user?.id === props.author_id ?
 							<View style={styles.actionButtons}>
 								<TouchableOpacity style={styles.actionButton}>
 									<Image
@@ -243,7 +243,7 @@ return (
 										}}
 										style={styles.photo}
 									/>
-									{user?.id === props.authorId ?
+									{user?.id === props.author_id ?
 										<TouchableOpacity
 											onPress={() => deleteImage(img.id)}
 											style={styles.deleteBtn}
@@ -257,7 +257,7 @@ return (
 								</View>
 							))
 							: null}
-						{user?.id === props.authorId ? (
+						{user?.id === props.author_id ? (
 							<>
 								{images.length < 10 && (
 									<TouchableOpacity style={styles.addImage} onPress={onSearch}>
@@ -271,7 +271,7 @@ return (
 						) : null}
 					</View>
 				</View>
-				{user?.id === props.authorId ?
+				{user?.id === props.author_id ?
 					<TouchableOpacity onPress={handleSubmit} style={styles.submitBtn}>
 						<Text style={styles.submitText}>Зберегти</Text>
 					</TouchableOpacity>

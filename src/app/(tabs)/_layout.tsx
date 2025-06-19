@@ -6,7 +6,6 @@ import { styles } from "./styles";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function TabsLayout() {
-	// Состояния для каждой вкладки
 	const [isHomeActive, setIsHomeActive] = useState(true);
 	const [isMyPostsActive, setIsMyPostsActive] = useState(false);
 	const [isFriendsActive, setIsFriendsActive] = useState(false);

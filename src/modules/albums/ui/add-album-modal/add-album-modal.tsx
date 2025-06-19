@@ -15,6 +15,7 @@ import { API_BASE_URL } from "../../../../settings";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useUserContext } from "../../../auth/context/user-context";
 import { useAlbums } from "../../hooks/useAlbums";
+import { IAlbumTag, IAlbumTheme } from "../../types/albums.types";
 
 interface Props {
   modalVisible: boolean;
@@ -22,57 +23,33 @@ interface Props {
   changeVisibility: () => void;
 }
 
-interface YearItem {
-  label: string;
-  value: string;
-}
-
-interface ThemeItem {
-  label: string;
-  value: string;
-}
-
 export function AddAlbumModal({ modalVisible, onClose }: Props) {
   const [name, setName] = useState("");
-  const [theme, setTheme] = useState("");
-  const [year, setYear] = useState("");
+  const [theme, setTheme] = useState<string>();
   const { user } = useUserContext()
   const [openTheme, setOpenTheme] = useState(false);
-  const [openYear, setOpenYear] = useState(false);
   const { refetch } = useAlbums()
-  const [themeItems, setThemeItems] = useState<ThemeItem[]>([
-    { label: "Відпочинок", value: "#відпочинок" },
-    { label: "Натхнення", value: "#натхнення" },
-    { label: "Життя", value: "#життя" },
-    { label: "Природа", value: "#природа" },
-    { label: "Спокій", value: "#спокій" },
-    { label: "Читання", value: "#читання" },
-    { label: "Гармонія", value: "#гармонія" },
-    { label: "Музика", value: "#музика" },
-    { label: "Фільми", value: "#фільми" },
-    { label: "Подорожі", value: "#подорожі" },
+  const [themeItems, setThemeItems] = useState<IAlbumTheme[]>([
+    { label: "#Відпочинок", value: "#відпочинок" },
+    { label: "#Натхнення", value: "#натхнення" },
+    { label: "#Життя", value: "#життя" },
+    { label: "#Природа", value: "#природа" },
+    { label: "#Спокій", value: "#спокій" },
+    { label: "#Читання", value: "#читання" },
+    { label: "#Гармонія", value: "#гармонія" },
+    { label: "#Музика", value: "#музика" },
+    { label: "#Фільми", value: "#фільми" },
+    { label: "#Подорожі", value: "#подорожі" },
   ]);
-  const [yearItems, setYearItems] = useState<YearItem[]>([
-    { label: "2025", value: "2025" },
-    { label: "2024", value: "2024" },
-    { label: "2023", value: "2023" },
-    { label: "2022", value: "2022" },
-    { label: "2021", value: "2021" },
-    { label: "2020", value: "2020" },
-    { label: "2019", value: "2019" },
-    { label: "2018", value: "2018" },
-    { label: "2017", value: "2017" },
-    { label: "2016", value: "2016" },
-  ]);
+
 
   const resetForm = () => {
     setName("");
-    setTheme("");
-    setYear("");
+    setTheme(undefined);
   };
 
   const handleSubmit = async () => {
-    if (!name || !theme || !year) {
+    if (!name || !theme) {
       Alert.alert("Помилка", "Будь ласка, заповніть обов'язкові поля");
       return;
     }
@@ -93,9 +70,8 @@ export function AddAlbumModal({ modalVisible, onClose }: Props) {
         },
         token: token,
         body: {
-          name,
-          theme,
-          year,
+          name: name,
+          topic: [theme],
         },
       });
 
@@ -107,8 +83,6 @@ export function AddAlbumModal({ modalVisible, onClose }: Props) {
       Alert.alert("Успіх", "Альбом успішно оновлено");
       resetForm();
       onClose();
-
-      const refetchAlbum = await refetch()
 
     } catch (err) {
       console.error(err);
@@ -147,7 +121,7 @@ export function AddAlbumModal({ modalVisible, onClose }: Props) {
               <View style={{ width: "100%", zIndex: 2000, marginTop: 10 }}>
                 <DropDownPicker
                   open={openTheme}
-                  value={theme}
+                  value={theme || null}
                   items={themeItems}
                   setOpen={setOpenTheme}
                   setValue={setTheme}
@@ -168,9 +142,10 @@ export function AddAlbumModal({ modalVisible, onClose }: Props) {
                     zIndex: 2000,
                   }}
                 />
+
               </View>
 
-              <View style={{ width: "100%", zIndex: 1000, marginTop: 10 }}>
+              {/* <View style={{ width: "100%", zIndex: 1000, marginTop: 10 }}>
                 <DropDownPicker
                   open={openYear}
                   value={year}
@@ -194,7 +169,7 @@ export function AddAlbumModal({ modalVisible, onClose }: Props) {
                     zIndex: 1000,
                   }}
                 />
-              </View>
+              </View> */}
             </View>
 
             <View style={styles.actions}>

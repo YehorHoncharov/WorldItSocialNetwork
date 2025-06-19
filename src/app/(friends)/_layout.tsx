@@ -19,7 +19,7 @@ export default function FriendsLayout() {
 					headerShown: false,
 				}}
 			/>
-			{/* <Tabs.Screen
+			<Tabs.Screen
 				name="friends"
 				listeners={{
 					tabPress: () => {
@@ -45,7 +45,7 @@ export default function FriendsLayout() {
 					),
 					header: () => <Header actionType={2}/>,
 				}}
-			/> */}
+			/>
 		</SafeAreaView>
 	);
 }

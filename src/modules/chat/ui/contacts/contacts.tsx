@@ -1,35 +1,24 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, FlatList, Image, StyleSheet } from 'react-native';
 
-interface Contact {
-  id: string;
-  name: string;
-  image: string;
-}
-
-const contacts: Contact[] = [
-  { id: '1', name: 'kotik', image: 'https://bannerplus.ru/files/img/pics/veselye-kartinki-na-avu/veselye-kartinki-na-avu-0.webp' },
-  { id: '2', name: 'kotik', image: 'https://bannerplus.ru/files/img/pics/veselye-kartinki-na-avu/veselye-kartinki-na-avu-0.webp' },
-  { id: '3', name: 'kotik', image: 'https://bannerplus.ru/files/img/pics/veselye-kartinki-na-avu/veselye-kartinki-na-avu-0.webp' },
-  { id: '4', name: 'kotik', image: 'https://bannerplus.ru/files/img/pics/veselye-kartinki-na-avu/veselye-kartinki-na-avu-0.webp' },
-  { id: '5', name: 'kotik', image: 'https://bannerplus.ru/files/img/pics/veselye-kartinki-na-avu/veselye-kartinki-na-avu-0.webp' },
-  { id: '6', name: 'kotik', image: 'https://bannerplus.ru/files/img/pics/veselye-kartinki-na-avu/veselye-kartinki-na-avu-0.webp' },
-  { id: '7', name: 'kotik', image: 'https://bannerplus.ru/files/img/pics/veselye-kartinki-na-avu/veselye-kartinki-na-avu-0.webp' },
-];
+import { useUsers } from '../../../friends/hooks/useUsers';
+import { Friend1 } from '../friend1/friend';
+import { IUser } from '../../../auth/types';
 
 
 export function ContactsScreen(){
   const [searchQuery, setSearchQuery] = useState('')
+  const { users } = useUsers()
 
-  const filteredContacts = contacts.filter(contact =>
-    contact.name.includes(searchQuery)
-  );
+  // const filteredContacts = contacts.filter(contact =>
+  //   contact.name.includes(searchQuery)
+  // );
 
-  function renderItem({item} : {item: Contact}){
+  function renderItem({item} : {item: IUser}){
     return(
         <View style={styles.contactItem}>
-        <Image source={{ uri: item.image }} style={styles.avatar} />
-        <Text style={styles.contactName}>{item.name}</Text>
+          <Image source={{ uri: item.image }} style={styles.avatar} />
+          <Text style={styles.contactName}>{item.name}</Text>
     </View>
     )
 };
@@ -46,12 +35,19 @@ export function ContactsScreen(){
         value={searchQuery}
         onChangeText={setSearchQuery}
       />
-     <FlatList
-        data={filteredContacts}
-        renderItem={renderItem}
-        keyExtractor={item => item.id}
-        style={styles.contactList}
-      />
+      {/* <Search/> */}
+      <FlatList
+                data={users}
+                scrollEnabled={false}
+                keyExtractor={(item) => `${item.id}`}
+                contentContainerStyle={{ gap: 10, flexGrow: 1 }}
+                renderItem={renderItem}
+                ListEmptyComponent={
+                    <View>
+                        <Text>Немає контактів</Text>
+                    </View>
+                }
+            />
     </View>
   );
 };
@@ -60,12 +56,15 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 10,
-    backgroundColor: '#fff',
+    backgroundColor: '#ffffff',
     justifyContent: 'space-between',
+    alignItems: 'center',
   },
   searchInput: {
+    width: '90%',
+    // width: 343,
     height: 40,
-    borderColor: '#ccc',
+    borderColor: '#cccccc',
     borderWidth: 1,
     borderRadius: 5,
     paddingHorizontal: 10,
@@ -73,6 +72,9 @@ const styles = StyleSheet.create({
   },
   contactList: {
     flex: 1,
+    // width: '90%',
+    width: 343,
+    gap: 16
   },
   contactItem: {
     flexDirection: 'row',

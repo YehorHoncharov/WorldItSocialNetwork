@@ -94,7 +94,7 @@ export function ModalPost({
             links: currentPost.links || [],
             images: currentPost.images || [],
             tags: currentPost.tags || [],
-            authorId: currentPost.authorId || 0,
+            author_id: currentPost.author_id || 0,
             views: currentPost.views || null,
             likes: currentPost.likes || null,
           }}

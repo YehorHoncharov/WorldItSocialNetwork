@@ -13,13 +13,13 @@ import { Input } from "../../../../shared/ui/input";
 import { API_BASE_URL } from "../../../../settings";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { styles } from "./edit-album-modal.style";
-import { IAlbum, ThemeItem, YearItem } from "../../types/albums.types";
+import { IAlbum, } from "../../types/albums.types";
 import { PUT } from "../../../../shared/api/put";
 import { useUserContext } from "../../../auth/context/user-context";
 
 interface Props {
   modalVisible: boolean;
-  albumId: number;
+  album_id: number;
   initialData: { name: string; theme: string; year: string };
   changeVisibility: () => void;
   onClose: () => void;
@@ -28,7 +28,7 @@ interface Props {
 
 export function EditAlbumModal({
   modalVisible,
-  albumId,
+  album_id,
   initialData,
   changeVisibility,
   onClose,
@@ -91,7 +91,7 @@ export function EditAlbumModal({
       }
 
       const response = await PUT({
-        endpoint: `${API_BASE_URL}/albums/${albumId}`,
+        endpoint: `${API_BASE_URL}/albums/${album_id}`,
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
@@ -109,12 +109,12 @@ export function EditAlbumModal({
 
       if (response.status === "success") {
         Alert.alert("Успіх", "Альбом успішно оновлено!");
-        onUpdate({ id: albumId, name, theme, year, authorId });
+        onUpdate({ id: album_id, name, created_at, author_id });
         resetForm();
         onClose();
       }
       Alert.alert("Успіх", "Альбом успішно оновлено");
-      onUpdate({ id: albumId, name, theme, year, authorId });
+      onUpdate({ id: album_id, name, created_at, author_id });
       resetForm();
       onClose();
     } catch (err) {

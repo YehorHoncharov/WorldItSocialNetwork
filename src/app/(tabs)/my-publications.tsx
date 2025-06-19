@@ -6,7 +6,6 @@ export default function MyPublication() {
 
     return (
         <Providers>
-        
             <SafeAreaView style={{ flex: 1, backgroundColor: "#FAF8FF" }}>
                <MyPublications />
             </SafeAreaView>

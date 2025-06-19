@@ -122,7 +122,7 @@ export function MyPublicationModal({ modalVisible, changeVisibility }: Props) {
 
     setIsLoading(true);
     try {
-      console.log(111)
+      // console.log(formattedImages)
       const response = await POST({
         endpoint: `${API_BASE_URL}/posts/create`,
         headers: {
