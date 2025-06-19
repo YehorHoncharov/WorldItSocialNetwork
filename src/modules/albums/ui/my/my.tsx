@@ -284,6 +284,7 @@ export function My(props: IAlbumProps) {
       <ScrollView
         style={{ flex: 1 }}
         contentContainerStyle={styles.scrollContainer}
+        overScrollMode="never"
       >
         <View style={styles.mainBox}>
           <Text style={styles.title}>Мої фото</Text>

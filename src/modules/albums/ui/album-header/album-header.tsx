@@ -31,10 +31,10 @@ export function AlbumHeader() {
 
     useEffect(() => {
         if (!user) return;
-        const myAlbums = albums.filter((album) => album.authorId === user.id);
+        const myAlbums = albums.filter((album) => album.author_id === user.id);
         setUserAlbums(myAlbums);
     }, [albums, user]);
-
+    console.log(userAlbums)
     const handleTabPress = (tab: string) => {
         const toValue = tab === "personal" ? 0 : -screenWidth;
         Animated.timing(translateX, {
@@ -102,9 +102,9 @@ export function AlbumHeader() {
                             <Album
                                 id={item.id}
                                 name={item.name}
-                                theme={item.theme}
-                                year={item.year}
-                                authorId={item.authorId}
+                                topic={item.topic}
+                                created_at={item.created_at}
+                                author_id={item.author_id}
                                 images={item.images}
                             />
                         )}

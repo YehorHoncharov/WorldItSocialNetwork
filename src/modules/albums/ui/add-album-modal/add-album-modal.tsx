@@ -108,7 +108,7 @@ export function AddAlbumModal({ modalVisible, onClose }: Props) {
             <Text style={styles.modalTitle}>Створити альбом</Text>
           </View>
 
-          <ScrollView style={styles.scrollArea}>
+          <ScrollView style={styles.scrollArea} overScrollMode="never">
             <View style={styles.form}>
               <Input
                 label="Назва альбому"

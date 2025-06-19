@@ -1,4 +1,4 @@
-import { SafeAreaView, ScrollView, StatusBar, View } from "react-native";
+import { SafeAreaView, StatusBar, View } from "react-native";
 import  Providers from "../providers";
 import { MyPublications } from "../../modules/my_publications/my-publications";
 

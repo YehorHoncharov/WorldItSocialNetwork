@@ -79,5 +79,5 @@ export function AllFriends({ scrollable = true }: { scrollable?: boolean }) {
         </View>
     );
 
-    return scrollable ? <ScrollView>{content}</ScrollView> : content;
+    return scrollable ? <ScrollView overScrollMode="never">{content}</ScrollView> : content;
 }

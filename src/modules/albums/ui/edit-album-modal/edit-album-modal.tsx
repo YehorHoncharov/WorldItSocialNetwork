@@ -139,7 +139,7 @@ export function EditAlbumModal({
             <Text style={styles.modalTitle}>Редагувати альбом</Text>
           </View>
 
-          <ScrollView style={styles.scrollArea}>
+          <ScrollView style={styles.scrollArea} overScrollMode="never">
             <View style={styles.form}>
               <Input
                 width={320}

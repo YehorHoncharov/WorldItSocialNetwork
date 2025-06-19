@@ -34,7 +34,7 @@ export function FriendProfile({ user }: FriendProfileProps) {
 	}, [albums, user]);
 
 	return (
-		<ScrollView style={styles.scrollView}>
+		<ScrollView style={styles.scrollView} overScrollMode="never">
 			<View style={styles.container}>
 				<View style={styles.profileContainer}>
 					<View style={styles.profileImageContainer}>

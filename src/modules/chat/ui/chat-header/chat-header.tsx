@@ -1,4 +1,4 @@
-import { TouchableOpacity, View, Text, StyleSheet } from "react-native";
+import { TouchableOpacity, View, Text, StyleSheet, Image } from "react-native";
 
 type ChatHeaderProps = {
   activeTab: string;
@@ -9,24 +9,25 @@ export function ChatHeader({ activeTab, onTabPress }: ChatHeaderProps) {
   return (
     <View style={styles.tabContainer}>
       <TouchableOpacity style={styles.tabItem} onPress={() => onTabPress("contacts")}>
+        <Text>1</Text>
         <Image
-          style={[ styles.icon, activeTab === "contacts" && styles.tabContsctsActive ]}>
-          source={require("../../../../shared/images/chat-icon.png")}
-        </Image>
+          // style={[ styles.icon, activeTab === "contacts" && styles.tabContsctsActive ]}
+          // source={require("../../../../shared/images/chat-icon.png")}
+        />
       </TouchableOpacity>
       <TouchableOpacity style={styles.tabItem} onPress={() => onTabPress("messages")}>
+        <Text>2</Text>
         <Image
-            style={[styles.tabText, activeTab === "messages" && styles.tabMessagesActive]}
-            source={require("../../../../shared/images/messages.png")}
-        >
-        </Image>
+            // style={[styles.tabText, activeTab === "messages" && styles.tabMessagesActive]}
+            // source={require("../../../../shared/images/messages.png")}
+        />
       </TouchableOpacity>
       <TouchableOpacity style={styles.tabItem} onPress={() => onTabPress("chat-group")}>
+        <Text>3</Text>
         <Image
-            style={[ styles.icon, activeTab === "chat-group" && styles.tabGroupActive ]}
-            source={require("../../../../shared/images/group-chat.png")}
-        >
-        </Image>
+            // style={[ styles.icon, activeTab === "chat-group" && styles.tabGroupActive ]}
+            // source={require("../../../../shared/images/group-chat.png")}
+        />
       </TouchableOpacity>
     </View>
   );

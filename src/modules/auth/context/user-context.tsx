@@ -118,8 +118,8 @@ export function UserContextProvider({ children }: IUserContextProviderProps) {
       if (result.status === "error") {
         throw new Error(result.message);
       }
-      await AsyncStorage.setItem("token", result.data);
-      await getData(result.data);
+      AsyncStorage.setItem("token", result.data);
+      getData(result.data);
 
       try {
         const create_start_album = await POST({
@@ -128,13 +128,13 @@ export function UserContextProvider({ children }: IUserContextProviderProps) {
             "Content-Type": "application/json",
             Authorization: `Bearer ${result.data}`,
           },
-          token: await result.data,
+          token: result.data,
           body: {
             name: "Мої фото",
             images: user?.image,
           },
         });
-
+        
         if (create_start_album.status === "error") {
           console.log(create_start_album.message + " CREATED!");
           return;
@@ -158,7 +158,7 @@ export function UserContextProvider({ children }: IUserContextProviderProps) {
             // Authorization: `Bearer ${token}`,
           },
         });
-        const result: Response<any> = await response.json();
+        const result = await response.json();
         if (result.status === "error") {
           console.error("[logout] Server error:", result.message);
         }

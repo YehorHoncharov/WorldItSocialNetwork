@@ -69,7 +69,8 @@ export default function RegStepTwoModal({ modalVisible, changeVisibility }: Prop
             <Text style={styles.modalTitle}>Додай деталі про себе</Text>
           </View>
 
-          <ScrollView style={styles.scrollArea}>
+          <ScrollView style={styles.scrollArea} overScrollMode="never">
+            
             <View style={styles.form}>
               <Input
                 style={{width: "100%"}}

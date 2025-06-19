@@ -14,6 +14,7 @@ export default function RegThree() {
 	return (
 		<SafeAreaView style={{ flex: 1, backgroundColor: "#ffffff" }}>
 			<ScrollView
+			overScrollMode="never"
 				contentContainerStyle={{
 					flex: 1,
 				}}
