@@ -34,7 +34,7 @@ export function AlbumHeader() {
         const myAlbums = albums.filter((album) => album.author_id === user.id);
         setUserAlbums(myAlbums);
     }, [albums, user]);
-    console.log(userAlbums)
+    // console.log(userAlbums)
     const handleTabPress = (tab: string) => {
         const toValue = tab === "personal" ? 0 : -screenWidth;
         Animated.timing(translateX, {
@@ -84,12 +84,12 @@ export function AlbumHeader() {
                         transform: [{ translateX }],
                     }}
                 >
-                    <View style={{ width: screenWidth, flex: 1, marginBottom: 60, backgroundColor: "#E9E5EE" }}>
+                    <View style={{ width: screenWidth, flex: 1, backgroundColor: "#E9E5EE" }}>
                         <Settings />
                     </View>
                     
                     <FlatList
-                        style={{ width: screenWidth, flex: 1, backgroundColor: "#E9E5EE", marginBottom: 20 }}
+                        style={{ width: screenWidth, flex: 1, backgroundColor: "#E9E5EE" }}
                         contentContainerStyle={{ gap: 8, paddingBottom: 60 }}
                         data={userAlbums.slice(1)}
                         keyExtractor={(item) => `${item.id}`}

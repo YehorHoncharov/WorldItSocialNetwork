@@ -63,7 +63,7 @@ export function Homepage() {
 
 const styles = StyleSheet.create({
   listContainer: {
-    paddingBottom: 20,
+    // paddingBottom: 20,
   },
   postContainer: {
     backgroundColor: "#FAF8FF",

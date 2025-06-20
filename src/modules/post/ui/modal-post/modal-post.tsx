@@ -19,7 +19,7 @@ import { IPost, IPostImg } from "../../types/post";
 interface ModalPostProps {
   visible: boolean;
   onClose: () => void;
-  postId: number;
+  post_id: number;
   dotsPosition: { x: number; y: number };
   containerSize: { width: number; height: number };
   scrollOffset?: number;
@@ -29,7 +29,7 @@ interface ModalPostProps {
 export function ModalPost({
   visible,
   onClose,
-  postId,
+  post_id,
   dotsPosition,
   scrollOffset = 0,
 }: ModalPostProps) {
@@ -64,7 +64,7 @@ export function ModalPost({
         endpoint: `http://192.168.1.104:3000/posts/${postId}`,
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${tokenUser}`,
+          // Authorization: `Bearer ${tokenUser}`,
         },
         token: tokenUser,
       });
@@ -75,7 +75,7 @@ export function ModalPost({
     }
   }
 
-  const currentPost = posts.find((post: IPost) => post.id === postId);
+  const currentPost = posts.find((post: IPost) => post.id === post_id);
 
   if (!currentPost) {
 
@@ -88,7 +88,7 @@ export function ModalPost({
         <ChangePostModal
           modalVisible={modalOpened}
           postData={{
-            id: postId,
+            id: post_id,
             title: currentPost.title || "",
             content: currentPost.content || "",
             links: currentPost.links || [],
@@ -138,7 +138,7 @@ export function ModalPost({
             <View style={styles.divider} />
             <TouchableOpacity
               style={styles.modalOption}
-              onPress={() => handleDelete(postId)}
+              onPress={() => handleDelete(post_id)}
             >
               <Image
                 source={require("../../../../shared/ui/images/trash.png")}

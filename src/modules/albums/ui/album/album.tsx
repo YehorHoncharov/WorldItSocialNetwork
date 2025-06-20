@@ -4,11 +4,12 @@ import Dots from "../../../../shared/ui/icons/dots";
 import { useEffect, useState, useRef } from "react";
 import { launchImageLibraryAsync, requestMediaLibraryPermissionsAsync } from "expo-image-picker";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { IAlbum, IAlbumImageShow, IAlbumImg, IPutResponse } from "../../types/albums.types";
+import { IAlbum, IAlbumImageDelete, IAlbumImageShow, IAlbumImg, IPutResponse } from "../../types/albums.types";
 import { PUT } from "../../../../shared/api/put";
 import { API_BASE_URL } from "../../../../settings";
 import { ModalAlbum } from "../album-modal/album-modal";
 import { useUserContext } from "../../../auth/context/user-context";
+
 
 export function Album({ scrollOffset = 0, ...props }: IAlbum & { scrollOffset?: number }) {
 	const [images, setImages] = useState<IAlbumImageShow[]>([]);
@@ -34,7 +35,8 @@ export function Album({ scrollOffset = 0, ...props }: IAlbum & { scrollOffset?: 
 	useEffect(() => {
 		getToken().then(setTokenUser);
 		if (props.images && Array.isArray(props.images)) {
-			setImages(props.images.map(image => ({ image:  { id: image.id, filename: image.filename, file: image.file, uploaded_at: image.uploaded_at } })));
+
+			setImages(props.images.map(image => ({ image: { id: image.image.id, filename: image.image.filename, file: image.image.file } })));
 		}
 	}, [props.images]);
 
@@ -78,70 +80,101 @@ export function Album({ scrollOffset = 0, ...props }: IAlbum & { scrollOffset?: 
 
 			if (!result.canceled && result.assets) {
 				const allowedFormats = ["jpeg", "png", "gif"];
-				const maxSizeInBytes = 5 * 1024 * 1024;
+				const maxSizeInBytes = 5 * 1024 * 1024; // 5 MB
 
-				const newImages = await Promise.all(
-					result.assets
-						.filter((asset) => {
-							const type = asset.mimeType?.split("/")[1]?.toLowerCase() || "";
-							return asset.base64 && allowedFormats.includes(type);
-						})
-						.map(async (asset, index) => {
-							const base64String = asset.base64!;
-							const estimatedSizeInBytes = (base64String.length * 3) / 4;
-							if (estimatedSizeInBytes > maxSizeInBytes) {
-								Alert.alert("Помилка", `Зображення занадто велике (макс. 5 МБ)`);
-								return null;
-							}
-							const imageUrl = `data:image/${asset.mimeType?.split("/")[1] || "jpeg"};base64,${base64String}`;
+				const newImages: IAlbumImageShow[] = result.assets
+					.map((asset, index) => {
+						if (!asset.mimeType || !asset.base64) {
+							Alert.alert(
+								"Помилка",
+								"Вибране зображення не підтримується або не містить даних."
+							);
+							return null;
+						}
+						const type = asset.mimeType.split("/")[1]?.toLowerCase();
+						if (!allowedFormats.includes(type)) {
+							Alert.alert(
+								"Помилка",
+								`Формат зображення ${type} не підтримується. Дозволені формати: ${allowedFormats.join(", ")}.`
+							);
+							return null;
+						}
+						const base64String = asset.base64;
+						const estimatedSizeInBytes = (base64String.length * 3) / 4;
+						if (estimatedSizeInBytes > maxSizeInBytes) {
+							Alert.alert(
+								"Помилка",
+								`Зображення занадто велике. Максимальний розмір: ${maxSizeInBytes / (1024 * 1024)} MB`
+							);
+							return null;
+						}
+						const url = `data:image/${type};base64,${base64String}`;
 
-							const dimensions = await new Promise<{ width: number; height: number }>((resolve) => {
-								Image.getSize(
-									imageUrl,
-									(width, height) => resolve({ width, height }),
-									(error) => {
-										console.error(`Помилка визначення розмірів: ${error}`);
-										resolve({ width: 150, height: 150 });
-									}
-								);
-							});
-
-							const imageKey = `${Date.now() + index}`;
-							setImageDimensions((prev) => ({
-								...prev,
-								[imageKey]: dimensions,
-							}));
-
-							return {
+						return {
+							image: {
 								id: Date.now() + index,
-								filename: imageUrl,
-								album_id: props.id,
-							};
-						})
-				);
+								filename: url,
+							},
+						};
+					})
+					.filter((img): img is IAlbumImageShow => img !== null);
 
-				const filteredImages = newImages.filter((img) => {
-					return img !== null;
-				});
-
-				if (images.length + filteredImages.length - imagesToDelete.length > 10) {
+				if (images.length + newImages.length > 10) {
 					Alert.alert("Увага", "Максимальна кількість зображень - 10");
 					return;
 				}
 
-				setImages((prev) => ({
-					...prev,
-					...filteredImages.map((img) => ({ image: { id: img.id, filename: img.filename, file: img.filename  } })),
-				}));
+				setImages((prev) => [...prev, ...newImages]);
+			} else if (result.canceled) {
 				Alert.alert("Скасовано", "Вибір зображень було скасовано");
 			}
 		} catch (error) {
-			console.error("Помилка вибору зображення:", error);
 			Alert.alert(
 				"Помилка",
 				`Не вдалося вибрати зображення: ${error instanceof Error ? error.message : "Невідома помилка"}`
 			);
 		}
+	}
+
+	const removeImage = (index: number) => {
+		setImages((prev) => prev.filter((_, i) => i !== index));
+	};
+
+	function renderImages() {
+		console.log(images)
+		return (
+			<View style={styles.imageGrid}>
+				{images.map((img, idx) => {
+					const correctImage = img.image.filename.startsWith("data:image")
+						? img.image.filename
+						: `${API_BASE_URL}/${img.image.filename.replace(/^\/+/, "")}`;
+					// console.log(correctImage.slice())
+					return (
+						<View key={img.image.id} style={styles.imageContainer}>
+							{/* <Text>{correctImage.slice(0,25)}</Text> */}
+							<Image
+								source={{ uri: correctImage }}
+								style={styles.imageAdded}
+								resizeMode="cover"
+								onError={(error) => {
+									console.error("Помилка завантаження зображення:", error.nativeEvent);
+									Alert.alert("Помилка", "Не вдалося завантажити зображення.");
+								}}
+							/>
+							<TouchableOpacity
+								style={styles.removeImageButton}
+								onPress={() => deleteImage(img.image.id)}
+							>
+								<Image
+									source={require("../../../../shared/ui/images/trash.png")}
+									style={{ width: 22, height: 22 }}
+								/>
+							</TouchableOpacity>
+						</View>
+					);
+				})}
+			</View>
+		);
 	}
 
 	function deleteImage(id: number) {
@@ -164,12 +197,14 @@ export function Album({ scrollOffset = 0, ...props }: IAlbum & { scrollOffset?: 
 	}
 
 	async function handleSubmit() {
+
+
 		try {
 			const formattedImages: IAlbumImageShow[] = [
 				...images,
-				...imagesToDelete.map((id) => ({ image: { id: id, filename: ""  } }))
+				...imagesToDelete.map((id) => ({ image: { id: id, filename: "" } }))
 			]
-
+			console.log(formattedImages)
 
 			// if (filteredImages.length > 0 || deletedImages.length > 0) {
 			// 	updatedData.images = [
@@ -182,7 +217,6 @@ export function Album({ scrollOffset = 0, ...props }: IAlbum & { scrollOffset?: 
 				endpoint: `${API_BASE_URL}/albums/${props.id}`,
 				headers: {
 					"Content-Type": "application/json",
-					Authorization: `Bearer ${tokenUser}`,
 				},
 				token: tokenUser,
 				body: {
@@ -194,7 +228,6 @@ export function Album({ scrollOffset = 0, ...props }: IAlbum & { scrollOffset?: 
 			});
 
 			if (response.status === "success" && response.data) {
-				setImages(response.data.images || []);
 				setImagesToDelete([]);
 				Alert.alert("Успіх", "Зміни успішно збережено");
 			}
@@ -237,29 +270,8 @@ export function Album({ scrollOffset = 0, ...props }: IAlbum & { scrollOffset?: 
 					<View style={{ gap: 27, alignItems: "flex-start", justifyContent: "space-between", width: "100%" }}>
 						<Text style={styles.title}>Фотографії</Text>
 						<View style={styles.photoGrid}>
-							{images.length > 0
-								? images.map((img, index) => (
-									< View key={img.image.id ?? index} >
-										<Image
-											source={{
-												uri: API_BASE_URL + "/" + img.image.filename
-											}}
-											style={styles.photo}
-										/>
-										{user?.id === props.author_id ?
-											<TouchableOpacity
-												onPress={() => deleteImage(img.image.id)}
-												style={styles.deleteBtn}
-											>
-												<Image
-													source={require("../../../../shared/ui/images/trash.png")}
-													style={{ width: 20, height: 20 }}
-												/>
-											</TouchableOpacity>
-											: null}
-									</View>
-								))
-								: null}
+							{images ? renderImages() : null}
+
 							{user?.id === props.author_id ? (
 								<>
 									{images.length < 10 && (

@@ -13,14 +13,14 @@ import { Input } from "../../../../shared/ui/input";
 import { API_BASE_URL } from "../../../../settings";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { styles } from "./edit-album-modal.style";
-import { IAlbum, } from "../../types/albums.types";
+import { IAlbum, IAlbumTag, IAlbumTheme, } from "../../types/albums.types";
 import { PUT } from "../../../../shared/api/put";
 import { useUserContext } from "../../../auth/context/user-context";
 
 interface Props {
   modalVisible: boolean;
   album_id: number;
-  initialData: { name: string; theme: string; year: string };
+  initialData: { name: string; topic: string;};
   changeVisibility: () => void;
   onClose: () => void;
   onUpdate: (updatedAlbum: IAlbum) => void;
@@ -35,12 +35,10 @@ export function EditAlbumModal({
   onUpdate,
 }: Props) {
   const [name, setName] = useState(initialData.name);
-  const [theme, setTheme] = useState(initialData.theme);
-  const [year, setYear] = useState(initialData.year);
+  const [topic, setTopic] = useState(initialData.topic);
   const [openTheme, setOpenTheme] = useState(false);
-  const [openYear, setOpenYear] = useState(false);
   const { user } = useUserContext()
-  const [themeItems, setThemeItems] = useState<ThemeItem[]>([
+  const [themeItems, setThemeItems] = useState<IAlbumTheme[]>([
     { label: "Відпочинок", value: "#відпочинок" },
     { label: "Натхнення", value: "#натхнення" },
     { label: "Життя", value: "#життя" },
@@ -52,33 +50,21 @@ export function EditAlbumModal({
     { label: "Фільми", value: "#фільми" },
     { label: "Подорожі", value: "#подорожі" },
   ]);
-  const [yearItems, setYearItems] = useState<YearItem[]>([
-    { label: "2025", value: "2025" },
-    { label: "2024", value: "2024" },
-    { label: "2023", value: "2023" },
-    { label: "2022", value: "2022" },
-    { label: "2021", value: "2021" },
-    { label: "2020", value: "2020" },
-    { label: "2019", value: "2019" },
-    { label: "2018", value: "2018" },
-    { label: "2017", value: "2017" },
-    { label: "2016", value: "2016" },
-  ]);
+  
 
   useEffect(() => {
     setName(initialData.name);
-    setTheme(initialData.theme);
-    setYear(initialData.year);
+    setTopic(initialData.topic);
   }, [initialData]);
 
   const resetForm = () => {
     setName(initialData.name);
-    setTheme(initialData.theme);
-    setYear(initialData.year);
+    setTopic(initialData.topic);
+   
   };
 
   const handleSubmit = async () => {
-    if (!name || !theme || !year) {
+    if (!name || !topic) {
       Alert.alert("Помилка", "Будь ласка, заповніть обов'язкові поля");
       return;
     }
@@ -99,22 +85,21 @@ export function EditAlbumModal({
         token: token,
         body: {
           name,
-          theme,
-          year,
+          topic,
         },
       });
 
       if (!user) return
-      const authorId = user.id
+      const author_id = user.id
 
       if (response.status === "success") {
         Alert.alert("Успіх", "Альбом успішно оновлено!");
-        onUpdate({ id: album_id, name, created_at, author_id });
+        onUpdate({ id: album_id, name, topic, author_id });
         resetForm();
         onClose();
       }
       Alert.alert("Успіх", "Альбом успішно оновлено");
-      onUpdate({ id: album_id, name, created_at, author_id });
+      onUpdate({ id: album_id, name, topic, author_id });
       resetForm();
       onClose();
     } catch (err) {
@@ -153,10 +138,10 @@ export function EditAlbumModal({
                 <DropDownPicker
                   flatListProps={{ nestedScrollEnabled: true }}
                   open={openTheme}
-                  value={theme}
+                  value={topic}
                   items={themeItems}
                   setOpen={setOpenTheme}
-                  setValue={setTheme}
+                  setValue={setTopic}
                   setItems={setThemeItems}
                   placeholder="Оберіть тему"
                   searchable={true}
@@ -192,8 +177,8 @@ export function EditAlbumModal({
                 />
               </View>
 
-              <View style={{ width: "100%", zIndex: 1000, marginTop: 10 }}>
-                <DropDownPicker
+              {/* <View style={{ width: "100%", zIndex: 1000, marginTop: 10 }}> */}
+                {/* <DropDownPicker
                   open={openYear}
                   value={year}
                   items={yearItems}
@@ -231,8 +216,8 @@ export function EditAlbumModal({
                       ]);
                     }
                   }}
-                />
-              </View>
+                /> */}
+              {/* </View> */}
             </View>
 
             <View style={styles.actions}>

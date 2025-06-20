@@ -20,6 +20,6 @@ const styles = StyleSheet.create({
         width: "100%",
         maxWidth: 800,
         gap: 10,
-        paddingBottom: 20,
+        // paddingBottom: 20,
     }
 });

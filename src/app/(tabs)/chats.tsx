@@ -5,6 +5,11 @@ import { useRef, useState } from "react";
 import { ChatHeader } from "../../modules/chat/ui/chat-header/chat-header";
 import { RecomendFriends } from "../../modules/friends/ui/recomend/recomend";
 import { AllFriends } from "../../modules/friends/ui/all/all";
+import { MessagesScreen } from "../../modules/chat/ui/messages/messages";
+import { ChatGroup } from "../../modules/chat/ui/chatGroup/chatGroup";
+
+
+
 
 const screenWidth = Dimensions.get("window").width;
 
@@ -44,13 +49,11 @@ export default function Chats() {
       <ChatHeader activeTab={activeTab} onTabPress={handleTabPress} />
 
       {activeTab === 'contacts' ? (
-        <ScrollView contentContainerStyle={{alignItems:"center", gap: 10}} overScrollMode="never">
+        <ScrollView contentContainerStyle={{gap: 10}} overScrollMode="never">
           <ContactsScreen scrollable={true} />
-          <RecomendFriends scrollable={true} />
-          <AllFriends scrollable={true} />
         </ScrollView>
       ) : (
-        <View style={{ flex: 1, overflow: 'hidden' }}>
+        <View style={{ flex: 1 }}>
           <Animated.View style={{
             flexDirection: 'row',
             width: screenWidth * 3,
@@ -60,22 +63,15 @@ export default function Chats() {
               <ContactsScreen />
             </ScrollView>
             <ScrollView style={{ width: screenWidth }} overScrollMode="never">
-              <RecomendFriends />
+              <MessagesScreen />
             </ScrollView>
             <ScrollView style={{ width: screenWidth }} overScrollMode="never">
-              <AllFriends />
+              <ChatGroup />
             </ScrollView>
           </Animated.View>
         </View>
       )}
     </View>
   );
-        
-    // return (
-    //     <View style={{ flex: 1 }}>
-            
-    //         <ContactsScreen/>
-    //     </View>
-    // )
 }
 

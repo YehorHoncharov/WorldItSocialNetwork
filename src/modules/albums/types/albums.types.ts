@@ -1,10 +1,10 @@
 
 export interface IAlbumImg {
-	id: number;
-	filename: string;
-	file?: string;
-	uploaded_at?: Date;
-	albumId?: number;
+	image: {
+		id: number;
+		filename: string;
+		file?: string,
+	}
 }
 export interface IAlbumImageShow {
 	image: {
@@ -13,7 +13,21 @@ export interface IAlbumImageShow {
 		file?: string;
 		uploaded_at?: Date;
 	};
-    
+}
+
+export interface IAlbumImageSend{
+	image?: {
+		id?: number 
+		url: string 
+	}
+	
+}
+export interface IAlbumImageDelete{
+	image?:{
+		id: number 
+		url?: string 
+	}
+	
 }
 
 export interface IAlbumTag {
@@ -30,7 +44,7 @@ export interface IAlbum {
 	id: number;
 	name: string;
 	images?: IAlbumImg[];
-	topic?: IAlbumTag[];
+	topic: IAlbumTag[];
 	created_at?: string;
 	author_id: number;
 }

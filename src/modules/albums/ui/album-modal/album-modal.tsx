@@ -87,8 +87,8 @@ export function ModalAlbum({
                     albumId={albumId}
                     initialData={{
                         name: currentAlbum.name,
-                        theme: currentAlbum.theme,
-                        year: currentAlbum.year,
+                        theme: currentAlbum.topic,
+
                     }}
                     changeVisibility={() => setModalOpened(false)}
                     onClose={() => {

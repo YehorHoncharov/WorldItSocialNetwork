@@ -9,24 +9,24 @@ export function ChatHeader({ activeTab, onTabPress }: ChatHeaderProps) {
   return (
     <View style={styles.tabContainer}>
       <TouchableOpacity style={styles.tabItem} onPress={() => onTabPress("contacts")}>
-        <Text>1</Text>
         <Image
           // style={[ styles.icon, activeTab === "contacts" && styles.tabContsctsActive ]}
-          // source={require("../../../../shared/images/chat-icon.png")}
+          style={[ styles.iconContact, activeTab === "contacts" && styles.iconContact ]}
+          source={require("../../../../shared/ui/images/contacts1.png")}
         />
       </TouchableOpacity>
       <TouchableOpacity style={styles.tabItem} onPress={() => onTabPress("messages")}>
-        <Text>2</Text>
         <Image
             // style={[styles.tabText, activeTab === "messages" && styles.tabMessagesActive]}
-            // source={require("../../../../shared/images/messages.png")}
+            style={[ styles.iconMessages, activeTab === "messages" && styles.iconMessages]}
+            source={require("../../../../shared/ui/images/messages (2).png")}
         />
       </TouchableOpacity>
       <TouchableOpacity style={styles.tabItem} onPress={() => onTabPress("chat-group")}>
-        <Text>3</Text>
         <Image
             // style={[ styles.icon, activeTab === "chat-group" && styles.tabGroupActive ]}
-            // source={require("../../../../shared/images/group-chat.png")}
+            style={[ styles.iconChatGroup, activeTab === "chat-group" && styles.iconChatGroup ]}
+            source={require("../../../../shared/ui/images/groupChats.png")}
         />
       </TouchableOpacity>
     </View>
@@ -36,18 +36,9 @@ export function ChatHeader({ activeTab, onTabPress }: ChatHeaderProps) {
 const styles = StyleSheet.create({
   tabContainer: {
     flexDirection: "row",
-    width: "100%",
-    backgroundColor: "#fff",
-    paddingHorizontal: 4,
-    paddingVertical: 8,
-    gap: 8,
-    borderBottomWidth: 1,
-    borderBottomColor: "#eee",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
+    justifyContent: "space-between",
+    alignItems: "center",
+    backgroundColor: "#ffffff",
   },
   tabItem: {
     alignItems: "center",
@@ -68,4 +59,16 @@ const styles = StyleSheet.create({
     borderBottomColor: "#543C52",
     paddingBottom: 3,
   },
+  iconContact: {
+    height: 52,
+    width: 74
+  },
+  iconMessages: {
+    height: 54,
+    width: 104
+  },
+  iconChatGroup: {
+    height: 54,
+    width: 96
+  }
 });

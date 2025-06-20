@@ -32,7 +32,7 @@ export function My(props: IAlbumProps) {
   const [changeImage, setChangeImage] = useState<boolean>(false);
   const { albums } = props;
 
-  const correctAlbums = albums.filter((album) => album.authorId === user?.id);
+  const correctAlbums = albums.filter((album) => album.author_id === user?.id);
 
   const minAlbum: IAlbum | null = correctAlbums.reduce(
     (min: IAlbum | null, album: IAlbum) => {
@@ -112,9 +112,8 @@ export function My(props: IAlbumProps) {
               }));
 
               return {
-                id: Date.now() + index, // Тимчасовий ID для фронтенду
-                url: imageUrl,
-                albumId: minAlbum?.id || 0,
+                id: Date.now() + index,
+                filename: imageUrl,
               };
             })
         );
@@ -147,17 +146,17 @@ export function My(props: IAlbumProps) {
   }
 
   function deleteImage(id: number) {
-    const imageToDelete = images.find((image) => image.id === id);
+    const imageToDelete = images.find((image) => image.image.id === id);
     if (!imageToDelete) {
       Alert.alert("Помилка", "Зображення не знайдено");
       return;
     }
 
-    if (!imageToDelete.url.startsWith("data:image")) {
+    if (!imageToDelete.image.filename.startsWith("data:image")) {
       setImagesToDelete((prev) => [...prev, id]);
     }
 
-    setImages((prev) => prev.filter((image) => image.id !== id));
+    setImages((prev) => prev.filter((image) => image.image.id !== id));
     setImageDimensions((prev) => {
       const updatedDimensions = { ...prev };
       delete updatedDimensions[id];
@@ -221,8 +220,8 @@ export function My(props: IAlbumProps) {
     try {
       var formattedImages = {
         create: images
-          .filter((img) => img.url.startsWith("data:image"))
-          .map((img) => ({ url: img.url })),
+          .filter((img) => img.image.filename.startsWith("data:image"))
+          .map((img) => ({ url: img.image.filename })),
         delete: imagesToDelete.map((id) => ({ id })),
       };
       // formattedImages.create.push(user?.image ? { url: user.image } : { url: "" });
@@ -327,9 +326,9 @@ export function My(props: IAlbumProps) {
 
           {images.length > 0 ? (
             images.map((image) => (
-              <View key={image.id} style={styles.imageWrapper}>
+              <View key={image.image.filename} style={styles.imageWrapper}>
                 <Image
-                  source={normalizeImageUrl(image.url)}
+                  source={normalizeImageUrl(image.image.filename)}
                   style={styles.avatar}
                 />
                 <View style={styles.actionButtons}>
@@ -341,7 +340,7 @@ export function My(props: IAlbumProps) {
                   </TouchableOpacity>
                   <TouchableOpacity
                     style={styles.actionButton}
-                    onPress={() => deleteImage(image.id)}
+                    onPress={() => deleteImage(image.image.id)}
                   >
                     <Image
                       source={require("../../../../shared/ui/images/trash.png")}

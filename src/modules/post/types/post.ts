@@ -5,7 +5,7 @@ export interface IPostImg {
   image: {
     id: number;
     filename: string;
-    userPostId: number; 
+    file?: string,
   }
   
 }

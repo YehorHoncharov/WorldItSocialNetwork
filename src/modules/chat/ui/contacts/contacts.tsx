@@ -24,8 +24,8 @@ export function ContactsScreen({ scrollable = true }: { scrollable?: boolean }) 
         <PeopleIcon style={{ borderColor: '#81818D', width: 20, height: 20 }} />
         <Text style={styles.title}>Контакти</Text>
       </View>
-      {/* <Search /> */}
-      <FlatList
+      <Search/>
+      {/* <FlatList
         data={filteredUsers}
         scrollEnabled={false}
         keyExtractor={(item) => `${item.id}`}
@@ -36,7 +36,7 @@ export function ContactsScreen({ scrollable = true }: { scrollable?: boolean }) 
             <Text>Немає контактів</Text>
           </View>
         }
-      />
+      /> */}
     </View>
   )
 

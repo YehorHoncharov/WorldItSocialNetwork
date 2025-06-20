@@ -91,7 +91,7 @@ export function Author({ scrollOffset = 0, ...props }: IPost & { scrollOffset?: 
       <ModalPost
         visible={modalVisible}
         onClose={() => setModalVisible(false)}
-        postId={props.id}
+        post_id={props.id}
         dotsPosition={dotsPosition}
         containerSize={containerSize}
         scrollOffset={scrollOffset}

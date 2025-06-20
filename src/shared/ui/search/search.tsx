@@ -1,121 +1,131 @@
-import React, { useEffect, useRef, useState } from "react";
-import { ScrollView, TextInput, TouchableOpacity, View, Text, Image, StyleSheet } from "react-native";
+import React, { useEffect, useState } from "react";
+import { TextInput, TouchableOpacity, View, Text, StyleSheet, FlatList } from "react-native";
 import { NativeSyntheticEvent, TextInputChangeEventData } from "react-native";
 import { Friend1 } from "../../../modules/chat/ui/friend1/friend";
+import { useUsers } from "../../../modules/friends/hooks/useUsers";
+import { IUser } from "../../../modules/auth/types";
+import SearchIcon from "../icons/search";
 
-export interface IContact {
-  id: string;
-  name: string;
-  surname: string;
-  image: string;
-}
+// export interface IContact {
+//   id: string;
+//   name: string;
+//   surname: string;
+//   image: string;
+// }
 
 export function Search() {
-  // const location = useLocation();
-  const scrollViewRef = useRef<ScrollView>(null);
-  const [buttonClicked, setButtonClicked] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
-  const [foundContacts, setFoundContacts] = useState<IContact[]>([]);
+  const [foundContacts, setFoundContacts] = useState<IUser[]>([]);
+  const { users } = useUsers();
+
+  //   useEffect(() => {
+  //     setFoundContacts(users);
+  //   }, [users]);
+
+  // function handleSearch() {
+  //     if (!searchTerm.trim()) {
+  //       setFoundContacts(users);
+  //       return;
+  //     }
+  //     const filteredContacts = users.filter((user) =>
+  //       user.name?.toLowerCase().includes(searchTerm.toLowerCase())
+  //     );
+  //     setFoundContacts(filteredContacts);
+  //   }
+
+  //   function handleInputChange(e: NativeSyntheticEvent<TextInputChangeEventData>) {
+  //     const text = e.nativeEvent.text;
+  //     setSearchTerm(text);
+  //     if (!text.trim()) {
+  //       setFoundContacts(users);
+  //     } else {
+  //       const filteredContacts = users.filter((user) =>
+  //         user.name?.toLowerCase().includes(text.toLowerCase())
+  //       );
+  //       setFoundContacts(filteredContacts);
+  //     }
+  //   }
 
   useEffect(() => {
-    if (location.hash === "#search-section") {
-      scrollViewRef.current?.scrollTo({ y: 0, animated: true });
-    }
-  }, [location]);
+    setFoundContacts(users);
+  }, [users]);
 
   function handleSearch() {
-    setButtonClicked(true);
     if (!searchTerm.trim()) {
-      setFoundContacts([]);
+      setFoundContacts(users);
       return;
     }
-    // Implement your contact filtering logic here, e.g.:
-    /*
-    const filteredContact = contacts.filter((contact) =>
-      contact.name.toLowerCase().includes(searchTerm.toLowerCase())
+    const filteredContacts = users.filter((user) =>
+      user.name?.toLowerCase().includes(searchTerm.toLowerCase())
     );
-    setFoundContacts(filteredContact);
-    */
+    setFoundContacts(filteredContacts);
   }
 
   function handleInputChange(e: NativeSyntheticEvent<TextInputChangeEventData>) {
     const text = e.nativeEvent.text;
     setSearchTerm(text);
+    if (!text.trim()) {
+      setFoundContacts(users);
+    } else {
+      const filteredContacts = users.filter((user) =>
+        user.name?.toLowerCase().includes(text.toLowerCase())
+      );
+      setFoundContacts(filteredContacts);
+    }
   }
 
   return (
-    <ScrollView ref={scrollViewRef} style={styles.scrollContainer}>
-      <View style={styles.search} id="search-section">
-        <Text style={styles.textSearch}>Search</Text>
-
-        <View style={styles.searchInput}>
-          <Image
-            style={styles.searchBunny}
-            source={{ uri: "https://via.placeholder.com/154x97" }}
-            accessibilityLabel="Search icon"
-          />
-          <TextInput
-            style={styles.input}
-            placeholder="Enter the user name"
-            value={searchTerm}
-            onChange={handleInputChange}
-            onSubmitEditing={handleSearch}
-            returnKeyType="search"
-          />
-        </View>
-
-        <TouchableOpacity style={styles.buttonFind} onPress={handleSearch}>
-          <Text style={styles.buttonText}>Find</Text>
-        </TouchableOpacity>
-
-        <View>
-          {buttonClicked &&
-            (foundContacts.length > 0 ? (
-              <View style={styles.filmsGrid}>
-                {foundContacts.slice(0, 6).map((contact) => (
-                  <Friend1 key={contact.id} user={name}/>
-                ))}
-              </View>
-            ) : (
-              <Text style={styles.noResults}>No results found. Please try again!</Text>
-            ))}
-        </View>
+    <View style={styles.container}>
+      <View style={styles.searchInput}>
+        <SearchIcon style={{ width: 17, height: 17, }} />
+        <TextInput
+          style={styles.input}
+          placeholder="Пошук"
+          value={searchTerm}
+          onChange={handleInputChange}
+          onSubmitEditing={handleSearch}
+          returnKeyType="search"
+        />
       </View>
-    </ScrollView>
+      <FlatList
+        data={foundContacts}
+        scrollEnabled={false}
+        keyExtractor={(item) => `${item.id}`}
+        contentContainerStyle={{ gap: 10, flexGrow: 1 }}
+        renderItem={({ item }) => <Friend1 user={item} />}
+        ListEmptyComponent={
+          <View>
+            <Text style={styles.noResults}>Немає контактів</Text>
+          </View>
+        }
+      />
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  scrollContainer: {
-    flex: 1,
-  },
-  search: {
-    width: "100%",
-    height: 473,
-    flexDirection: "column",
-    alignItems: "center",
-    gap: 41,
-    padding: 20,
-  },
-  searchBunny: {
-    height: 97,
-    width: 154,
-    zIndex: 2,
-    paddingBottom: 120,
-  },
-  input: {
-    zIndex: 1,
-    width: 629,
-    height: 83,
-    borderRadius: 15,
-    paddingLeft: 30,
-    backgroundColor: "#ffffff",
-    fontSize: 16,
+  container: {
+    // alignItems: "center",
   },
   searchInput: {
-    flexDirection: "column",
+    width: "100%",
     justifyContent: "center",
     alignItems: "center",
+    borderWidth: 1,
+    borderRadius: 10,
+    borderColor: "#CDCED2",
+    flexDirection: "row",
+    paddingLeft: 15,
+    marginBottom: 10
+  },
+  input: {
+    width: "95%",
+    height: 42,
+    borderRadius: 15,
+    paddingLeft: 15,
+    backgroundColor: "#ffffff",
+    fontSize: 16,
+    zIndex: 1,
   },
   textSearch: {
     fontFamily: "MochiyPopPOne-Regular",
@@ -152,3 +162,101 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
 });
+
+// import React, { useState, useEffect } from "react";
+// import { TextInput, TouchableOpacity, View, Text, StyleSheet, FlatList } from "react-native";
+// import { NativeSyntheticEvent, TextInputChangeEventData } from "react-native";
+// import { Friend1 } from "../../../modules/chat/ui/friend1/friend";
+// import { useUsers } from "../../../modules/friends/hooks/useUsers";
+// import { IUser } from "../../../modules/auth/types";
+// import SearchIcon from "../icons/search";
+
+// export function Search() {
+//   const [searchTerm, setSearchTerm] = useState("");
+//   const [foundContacts, setFoundContacts] = useState<IUser[]>([]);
+//   const { users } = useUsers();
+
+//   // Устанавливаем всех пользователей при монтировании компонента
+//   useEffect(() => {
+//     setFoundContacts(users);
+//   }, [users]);
+
+//   function handleSearch() {
+//     if (!searchTerm.trim()) {
+//       setFoundContacts(users);
+//       return;
+//     }
+//     const filteredContacts = users.filter((user) =>
+//       user.name?.toLowerCase().includes(searchTerm.toLowerCase())
+//     );
+//     setFoundContacts(filteredContacts);
+//   }
+
+//   function handleInputChange(e: NativeSyntheticEvent<TextInputChangeEventData>) {
+//     const text = e.nativeEvent.text;
+//     setSearchTerm(text);
+//     if (!text.trim()) {
+//       setFoundContacts(users);
+//     } else {
+//       const filteredContacts = users.filter((user) =>
+//         user.name?.toLowerCase().includes(text.toLowerCase())
+//       );
+//       setFoundContacts(filteredContacts);
+//     }
+//   }
+
+//   return (
+//     <View style={styles.container}>
+//       <View style={styles.searchInput}>
+//         <SearchIcon style={{ width: 15, height: 15 }} />
+//         <TextInput
+//           style={styles.input}
+//           placeholder="Enter the user name"
+//           value={searchTerm}
+//           onChange={handleInputChange}
+//           onSubmitEditing={handleSearch}
+//           returnKeyType="search"
+//         />
+//       </View>
+//       {/* <FlatList
+//         data={foundContacts}
+//         scrollEnabled={false}
+//         keyExtractor={(item) => `${item.id}`}
+//         contentContainerStyle={{ gap: 10, flexGrow: 1 }}
+//         renderItem={({ item }) => <Friend1 user={item} />}
+//         ListEmptyComponent={
+//           <View>
+//             <Text style={styles.noResults}>Немає контактів</Text>
+//           </View>
+//         }
+//       /> */}
+//     </View>
+//   );
+// }
+
+// const styles = StyleSheet.create({
+//   container: {
+//     // alignItems: "center",
+//   },
+//   searchInput: {
+//     width: "90%",
+//     justifyContent: "center",
+//     alignItems: "center",
+//     borderWidth: 1,
+//     borderRadius: 10,
+//     borderColor: "#CDCED2",
+//   },
+//   input: {
+//     width: "90%",
+//     height: 83,
+//     borderRadius: 15,
+//     paddingLeft: 30,
+//     backgroundColor: "#ffffff",
+//     fontSize: 16,
+//   },
+//   noResults: {
+//     color: "#ffffff",
+//     fontSize: 16,
+//     textAlign: "center",
+//   },
+// });

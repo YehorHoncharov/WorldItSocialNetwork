@@ -108,5 +108,36 @@ export const styles = StyleSheet.create({
 		color: "#543C52",
 		fontSize: 14,
 		fontWeight: 500,
-	}
+	},
+	noImagesText: {
+		color: "#333",
+		fontSize: 14,
+		textAlign: "center",
+	},
+	imageContainer: {
+		width: 200,
+		height: 200,
+		alignItems: "center",
+		justifyContent: "center",
+	}, imageGrid: {
+		flexDirection: "column",
+		gap: 8,
+	}, imageAdded: {
+		width: "100%",
+		height: 225,
+		borderRadius: 16,
+	},
+	removeImageButton: {
+		position: "absolute",
+		top: 10,
+		right: 10,
+		backgroundColor: "white",
+		width: 30,
+		height: 30,
+		borderRadius: 15,
+		justifyContent: "center",
+		alignItems: "center",
+		borderWidth: 1,
+		borderColor: "#543C52",
+	},
 });
