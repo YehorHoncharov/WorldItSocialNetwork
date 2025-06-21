@@ -61,7 +61,7 @@ export function Settings() {
 		try {
 			if (!user) return;
 			const response = await fetch(
-				`http://192.168.1.104:3000/user/${user.id}`,
+				`http://192.168.1.106:3000/user/${user.id}`,
 				{
 					method: "PUT",
 					headers: { "Content-Type": "application/json" },
@@ -109,8 +109,8 @@ export function Settings() {
 					name: user.name || "",
 					username: user.username || "",
 					surname: user.surname || "",
-					dateOfBirth: user.dateOfBirth
-						? new Date(user.dateOfBirth)
+					dateOfBirth: user.date_of_birth
+						? new Date(user.date_of_birth)
 						: new Date(),
 					email: user.email || "",
 					password: user.password || "",

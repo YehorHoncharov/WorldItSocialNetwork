@@ -59,7 +59,7 @@ export function ModalAlbum({
         }
         try {
             await DELETE({
-                endpoint: `http://192.168.1.104:3000/albums/${albumId}`,
+                endpoint: `http://192.168.1.106:3000/albums/${albumId}`,
                 headers: {
                     "Content-Type": "application/json",
                     Authorization: `Bearer ${tokenUser}`,

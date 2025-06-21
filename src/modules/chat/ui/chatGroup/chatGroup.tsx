@@ -8,16 +8,27 @@ import {
   StyleSheet,
 } from "react-native";
 import SendArrow from "../../../../shared/ui/icons/send-arrow";
+import BackArrowIcon from "../../../../shared/ui/icons/arrowBack";
+import { styles } from "./chatGroup.styles";
+import Dots from "../../../../shared/ui/icons/dots";
+import CheckMarkIcon from "../../../../shared/ui/icons/checkMark";
 
 export function ChatGroup() {
   return (
     <View style={styles.container}>
       {/* Chat Header */}
       <View style={styles.chatHeader}>
-        <Text style={styles.chatName}>New Group</Text>
-        <Text style={styles.chatInfo}>3 учасники, 1 в сети</Text>
+        <BackArrowIcon style={{width: 10, height: 15}}/>
+        <Image
+          source={require("../../../../shared/ui/images/groupAvatar.png")}
+          style={styles.avatar}
+        />
+        <View style={{}}>
+          <Text style={styles.chatName}>New Group</Text>
+          <Text style={styles.chatInfo}>3 учасники, 1 в сети</Text>
+        </View>
         <TouchableOpacity style={styles.menuBtn}>
-          <Text style={styles.menuText}>⋮</Text>
+          <Dots style={{width: 20, height: 20}}/>
         </TouchableOpacity>
       </View>
 
@@ -26,30 +37,41 @@ export function ChatGroup() {
 
       {/* Messages */}
       <View style={styles.messages}>
-        <View style={styles.message}>
-          <View style={styles.messageBubble}>
-            <Text style={styles.messageSender}>Wade Warren</Text>
+        <View style={[styles.message, {justifyContent: "flex-end"}]}>
+          <View style={styles.messageBubbleMy}>
             <Text style={styles.messageText}>Привіт!</Text>
+            <Text style={styles.messageTime}>10:01 <CheckMarkIcon style={{width: 10, height: 9}}/></Text>
           </View>
-          <Text style={styles.messageTime}>10:01</Text>
         </View>
         <View style={styles.message}>
+          <Image source={require('../../../../shared/ui/images/avatar.png')} style={{width: 50, height: 50}}/>
           <View style={styles.messageBubble}>
-            <Text style={styles.messageSender}>Wade Warren</Text>
-            <Text style={styles.messageText}>Привіт! Як справи?</Text>
+            <View style={{flexDirection: "column", gap: 5}}>
+              <Text style={styles.messageSender}>Wade Warren</Text>
+              <View style={{flexDirection: "row", gap: 20}}>
+                  <Text style={styles.messageText}>Привіт! Як справи?</Text>
+                  <Text style={styles.messageTime}>10:30 <CheckMarkIcon style={{width: 10, height: 9}}/></Text>
+              </View>
+            </View>
+           
           </View>
-          <Text style={styles.messageTime}>10:30</Text>
         </View>
         <View style={styles.message}>
+           <Image source={require('../../../../shared/ui/images/avatar.png')} style={{width: 50, height: 50}}/>
           <View style={styles.messageBubble}>
-            <Text style={styles.messageSender}>Cameron Williamson</Text>
-            <Text style={styles.messageText}>Чудово!</Text>
+            <View style={{flexDirection: "column", gap: 5}}>
+              <Text style={styles.messageSender}>Cameron Williamson</Text>
+              <View style={{flexDirection: "row", gap: 30}}>
+                <Text style={styles.messageText}>Чудово!</Text>
+                <Text style={styles.messageTime}>10:30 <CheckMarkIcon style={{width: 10, height: 9}}/></Text>
+              </View>
+            </View>
+           
           </View>
-          <Text style={styles.messageTime}>10:30</Text>
         </View>
       </View>
 
-      {/* Input Area */}
+      {/* Input */}
       <View style={styles.inputContainer}>
         <TextInput style={styles.input} placeholder="Повідомлення" />
         <TouchableOpacity style={styles.attachBtn}>
@@ -59,70 +81,9 @@ export function ChatGroup() {
           />
         </TouchableOpacity>
         <TouchableOpacity style={styles.sendBtn}>
-          <SendArrow style={{ width: 40, height: 40 }} />
+          <SendArrow style={{ width: 20, height: 20 }} />
         </TouchableOpacity>
       </View>
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#fff" },
-  chatHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    padding: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: "#ccc",
-  },
-  chatName: { fontSize: 18, fontWeight: "bold" },
-  chatInfo: { fontSize: 14, color: "#666" },
-  menuBtn: { padding: 5 },
-  menuText: { fontSize: 20 },
-  chatDate: { color: "#666", textAlign: "center", marginVertical: 10 },
-  messages: { flex: 1, paddingHorizontal: 10 },
-  message: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 10,
-  },
-  avatar: { width: 40, height: 40, borderRadius: 20, marginRight: 10 },
-  messageBubble: {
-    backgroundColor: "#e9ecef",
-    padding: 10,
-    borderRadius: 10,
-    maxWidth: "70%",
-  },
-  messageSender: { fontWeight: "bold", fontSize: 14 },
-  messageText: { fontSize: 16 },
-  messageTime: { marginLeft: "auto", color: "#666", fontSize: 12 },
-  inputContainer: {
-    flexDirection: "row",
-    padding: 10,
-    borderTopWidth: 1,
-    borderTopColor: "#ccc",
-    alignItems: "center",
-  },
-  input: {
-    flex: 1,
-    borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 20,
-    padding: 5,
-    marginRight: 5,
-  },
-  attachBtn: {
-    padding: 10,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  sendBtn: {
-    padding: 10,
-    backgroundColor: "#543C52",
-    borderRadius: 123456,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  attachText: { fontSize: 20 },
-  sendText: { fontSize: 20 },
-});

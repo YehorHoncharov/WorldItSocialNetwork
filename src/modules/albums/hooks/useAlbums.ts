@@ -11,7 +11,7 @@ export function useAlbums() {
       setIsLoading(true)
       setError(null)
 
-      const response = await fetch("http://192.168.1.104:3000/albums")
+      const response = await fetch("http://192.168.1.106:3000/albums")
       const result = await response.json()
       
     

@@ -8,7 +8,7 @@ export function useUsers() {
 	useEffect(() => {
 		const fetchUsers = async () => {
 			try {
-				const response = await fetch("http://192.168.1.104:3000/user/all");
+				const response = await fetch("http://192.168.1.106:3000/user/all");
 				const result = await response.json();
 				if (result.status === "error") {
 					return;
