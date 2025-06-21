@@ -7,7 +7,7 @@ export function useFriends() {
 	useEffect(() => {
 		const fetchFriends = async () => {
 			try {
-				const response = await fetch("http://192.168.1.106:3000/friendship/all");
+				const response = await fetch("http://192.168.1.104:3000/friendship/all");
 				const result = await response.json();
 				if (result.status === "error") {
 					return;

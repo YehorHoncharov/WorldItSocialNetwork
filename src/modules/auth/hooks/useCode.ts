@@ -3,7 +3,7 @@ import { Response } from "../context/types";
 export async function sendCode(email: string) {
 	try {
 		const response = await fetch(
-			"http://192.168.1.106:3000/user/sendCode",
+			"http://192.168.1.104:3000/user/sendCode",
 			{
 				method: "POST",
 				headers: { "Content-Type": "application/json" },

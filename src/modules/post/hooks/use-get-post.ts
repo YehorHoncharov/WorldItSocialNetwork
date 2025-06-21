@@ -11,7 +11,7 @@ export function usePosts() {
       setIsLoading(true);
       setError(null);
       
-      const response = await fetch("http://192.168.1.106:3000/posts");
+      const response = await fetch("http://192.168.1.104:3000/posts");
       const result = await response.json();
       
       if (!response.ok) {

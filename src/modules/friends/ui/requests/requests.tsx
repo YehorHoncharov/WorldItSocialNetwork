@@ -34,7 +34,7 @@ export function RequestsFriends({ scrollable = true }: { scrollable?: boolean })
             }
 
             const response = await fetch(
-                `http://192.168.1.106:3000/friendship/accept/${friendId}`, 
+                `http://192.168.1.104:3000/friendship/accept/${friendId}`, 
                 {
                     method: "PUT",
                     headers: {

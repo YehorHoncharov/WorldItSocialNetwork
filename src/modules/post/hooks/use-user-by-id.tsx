@@ -6,7 +6,7 @@ export function useUserByID(id: number) {
     useEffect(() => {
         async function getUser() {
             try {
-                const response = await fetch(`http://192.168.1.106:3000/user/${id}`)
+                const response = await fetch(`http://192.168.1.104:3000/user/${id}`)
                 const user = await response.json()
                 if (user.status === "error"){
                     return

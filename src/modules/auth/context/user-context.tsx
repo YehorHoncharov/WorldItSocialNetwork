@@ -56,7 +56,7 @@ export function UserContextProvider({ children }: IUserContextProviderProps) {
 
   async function getData(token: string): Promise<IUser | null> {
     try {
-      const response = await fetch("http://192.168.1.106:3000/user/me", {
+      const response = await fetch("http://192.168.1.104:3000/user/me", {
         headers: {
           Authorization: `Bearer ${token}`,
           // "Cache-Control": "no-cache",
@@ -77,7 +77,7 @@ export function UserContextProvider({ children }: IUserContextProviderProps) {
 
   async function login(email: string, password: string) {
     try {
-      const response = await fetch("http://192.168.1.106:3000/user/log", {
+      const response = await fetch("http://192.168.1.104:3000/user/log", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
