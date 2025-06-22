@@ -6,28 +6,71 @@ import { Button } from "../../../../shared/ui/button";
 import { useRouter } from "expo-router";
 import { useUserContext } from "../../../auth/context/user-context";
 import { API_BASE_URL } from "../../../../settings";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 type FriendsFormProps = IUser & {
     actionButton: {
         label: string;
-        onPress: () => void;
+        onPress?: () => void;
     };
+    deleteId: number
 };
 
 export function FriendsForm(props: FriendsFormProps) {
     const navigation = useRouter();
     const { user } = useUserContext();
 
+
     function onPress() {
-        const { date_of_birth, friendship, actionButton, ...rest } = props;
+        const { date_of_birth, actionButton, deleteId, friendship_from, friendship_to, ...rest } = props;
 
         navigation.navigate({
             pathname: "/friends-profile",
             params: {
                 ...rest,
-                dateOfBirth: date_of_birth ? new Date(date_of_birth).toISOString() : undefined
+                date_of_Birth: date_of_birth ? new Date(date_of_birth).toISOString() : undefined
             },
         });
+    }
+
+    async function handleDelete(clickedUserId: number) {
+        try {
+            if (!user) return;
+            const token = await AsyncStorage.getItem("token");
+            if (!token) {
+                Alert.alert("Помилка", "Користувач не авторизований");
+                return;
+            }
+
+            const response = await fetch(
+                `http://192.168.1.104:3000/friendship/deleteFriendship`,
+                {
+                    method: "DELETE",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${token}`,
+                    },
+                    body: JSON.stringify({
+                        //profile1 - кому, profile2 - ми
+                        id: clickedUserId
+
+                    })
+                }
+            );
+
+            const result = await response.json();
+
+            if (result.status === "error") {
+                Alert.alert("Помилка", result.message);
+                return;
+            }
+
+
+            Alert.alert("Успіх", "Запит прийнято");
+        } catch (error: any) {
+            Alert.alert("Помилка", "Не вдалося підтвердити запит");
+            console.log(error.message)
+        }
     }
 
     return (
@@ -51,9 +94,9 @@ export function FriendsForm(props: FriendsFormProps) {
                 <Button
                     style={styles.confirmButton}
                     label={props.actionButton.label}
-                    onPress={props.actionButton.onPress}
+                    onPress={props.actionButton.onPress?  props.actionButton.onPress : onPress}
                 />
-                <TouchableOpacity style={styles.deleteButton}>
+                <TouchableOpacity style={styles.deleteButton} onPress={() => handleDelete(props.deleteId)}>
                     <Text style={styles.buttonDeleteText}>Видалити</Text>
                 </TouchableOpacity>
             </View>

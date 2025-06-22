@@ -15,7 +15,11 @@ import { API_BASE_URL } from "../../../../settings";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useUserContext } from "../../../auth/context/user-context";
 import { useAlbums } from "../../hooks/useAlbums";
-import { IAlbumTag, IAlbumTheme } from "../../types/albums.types";
+import {
+  AlbumUpdateBody,
+  IAlbumTag,
+  IAlbumTheme,
+} from "../../types/albums.types";
 
 interface Props {
   modalVisible: boolean;
@@ -26,9 +30,9 @@ interface Props {
 export function AddAlbumModal({ modalVisible, onClose }: Props) {
   const [name, setName] = useState("");
   const [theme, setTheme] = useState<string>();
-  const { user } = useUserContext()
+  const { user } = useUserContext();
   const [openTheme, setOpenTheme] = useState(false);
-  const { refetch } = useAlbums()
+  const { refetch } = useAlbums();
   const [themeItems, setThemeItems] = useState<IAlbumTheme[]>([
     { label: "#Відпочинок", value: "#відпочинок" },
     { label: "#Натхнення", value: "#натхнення" },
@@ -42,13 +46,12 @@ export function AddAlbumModal({ modalVisible, onClose }: Props) {
     { label: "#Подорожі", value: "#подорожі" },
   ]);
 
-
   const resetForm = () => {
     setName("");
     setTheme(undefined);
   };
 
-const handleSubmit = async () => {
+  const handleSubmit = async () => {
     if (!name || !theme) {
       Alert.alert("Помилка", "Будь ласка, заповніть обов'язкові поля");
       return;
@@ -79,22 +82,19 @@ const handleSubmit = async () => {
         },
       });
 
-
       if (response.status === "success") {
         console.log("Album created, calling refetch");
         Alert.alert("Успіх", "Альбом успішно створено!");
-        resetForm();
-        await refetch();
-        refetch()
-        onClose();
       }
-      await refetch(); 
-      refetch()
-      onClose()
+      onClose();
+      resetForm();
+      await refetch();
     } catch (err) {
       console.error("Error creating album:", err);
       Alert.alert("Помилка", "Сталася помилка при створенні альбому");
     }
+    console.log("рефеч работает")
+    await refetch();
   };
 
   const handleCancel = () => {
@@ -149,7 +149,6 @@ const handleSubmit = async () => {
                     zIndex: 2000,
                   }}
                 />
-
               </View>
 
               {/* <View style={{ width: "100%", zIndex: 1000, marginTop: 10 }}>

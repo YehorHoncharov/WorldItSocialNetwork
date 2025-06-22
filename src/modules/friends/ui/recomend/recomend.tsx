@@ -83,6 +83,7 @@ export function RecomendFriends({
                             label: "Додати",
                             onPress: () => handleRequest(item),
                         }}
+                        deleteId={item.id}
                     />
                 )}
                 ListEmptyComponent={

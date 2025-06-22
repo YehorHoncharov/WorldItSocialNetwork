@@ -165,26 +165,12 @@ export function AlbumHeader() {
   const [activeTab, setActiveTab] = useState("personal");
   const translateX = useRef(new Animated.Value(0)).current;
   const { user } = useUserContext();
-  const { albums, isLoading, refetch } = useAlbums();
+  const { albums, isLoading, error } = useAlbums();
   const [userAlbums, setUserAlbums] = useState<IAlbum[]>([]);
 
-
-
-//   useEffect(() => {
-
-//   }, [user, albums]);
-  
-
   const filteredAlbums = useMemo(() => {
-    console.log("before ALBUMSSSS:", albums);
     if (!user) return [];
-    console.log("after ALBUMSSSS:", albums);
-    const filtered = albums.filter((album) => {
-      console.log(`album author_id: ${album.author_id}, user id: ${user.id}`);
-      return album.author_id.toString() === user.id.toString();
-    });
-    console.log("filtered albums:", filtered);
-    return filtered;
+    return albums.filter((album) => album.author_id.toString() === user.id.toString());
   }, [albums, user]);
 
   useEffect(() => {
@@ -205,6 +191,7 @@ export function AlbumHeader() {
     setActiveTab(tab);
   };
 
+  console.log("АЛЬБОМЫ",albums)
   return (
     <View style={{ flex: 1 }}>
       <View style={styles.tabContainer}>
@@ -234,29 +221,31 @@ export function AlbumHeader() {
 
           {isLoading ? (
             <ActivityIndicator size="large" color="#070A1C" style={{ flex: 1, width: screenWidth }} />
+          ) : error ? (
+            <View style={{ flex: 1, width: screenWidth, justifyContent: "center", alignItems: "center" }}>
+              <Text style={{ color: "#070A1C" }}>Помилка: {error}</Text>
+            </View>
           ) : (
             <FlatList
               style={{ width: screenWidth, flex: 1, backgroundColor: "#E9E5EE" }}
               contentContainerStyle={{ gap: 8, paddingBottom: 60 }}
-              data={userAlbums}
+              data={userAlbums.slice(1)}
               keyExtractor={(item) => `${item.id}`}
               ListHeaderComponent={() => (
                 <View style={{ alignItems: "center", justifyContent: "center", paddingTop: 16, backgroundColor: "#E9E5EE" }}>
                   <My albums={albums} />
                 </View>
               )}
-              renderItem={({ item }) => {
-                return (
-                  <Album
-                    id={item.id}
-                    name={item.name}
-                    topic={item.topic}
-                    created_at={item.created_at}
-                    author_id={item.author_id}
-                    images={item.images}
-                  />
-                );
-              }}
+              renderItem={({ item }) => (
+                <Album
+                  id={item.id}
+                  name={item.name}
+                  topic={item.topic}
+                  created_at={item.created_at}
+                  author_id={item.author_id}
+                  images={item.images}
+                />
+              )}
               ListEmptyComponent={<View><NoAlbums /></View>}
             />
           )}

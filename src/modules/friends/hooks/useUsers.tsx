@@ -20,6 +20,6 @@ export function useUsers() {
 			}
 		fetchUsers();
 	}, [])
-
+	
 	return { users};
 }

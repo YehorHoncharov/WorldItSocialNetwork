@@ -10,59 +10,29 @@ import { IUser } from "../../../auth/types";
 export function AllFriends({ scrollable = true, limit = undefined }: { scrollable?: boolean; limit?: number }) {
     const { users } = useUsers();
     const { user } = useUserContext();
-    const [correctUsers, setCorrectUsers] = useState<IUser[]>([])
+    const [displayedUsers, setDisplayedUsers] = useState<IUser[]>()
 
     useEffect(() => {
         if (!user) return;
         const cUsers = users.filter((userC) => userC.id !== user.id);
-        setCorrectUsers(cUsers);
+        setDisplayedUsers(cUsers);
     }, [users, user]);
 
-    useEffect(()=>{
-        console.log("=======================")
-        console.log(correctUsers)
-    },[correctUsers])
+    useEffect(() => {
 
-    const displayedUsers = limit ? correctUsers.slice(0, limit) : correctUsers;
+        if (!user || !user.friendship_to)
+            return;
+
+        const myFriends = users.filter((userF) =>
+            user.friendship_to?.some(
+                (f) => f.accepted === true && f.profile1_id === userF.id
+            )
+        );
+
+
+        setDisplayedUsers(limit ? myFriends.slice(0, limit) : myFriends)
+    }, [users, user]);
     
-
-    async function handleRequest(userId: number) {
-        try {
-            if (!user) return;
-            const token = await AsyncStorage.getItem("token");
-            if (!token) {
-                Alert.alert("Помилка", "Користувач не авторизований");
-                return;
-            }
-
-            const response = await fetch(
-                `http://192.168.1.104:3000/friendship/create`,
-                {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        Authorization: `Bearer ${token}`,
-                    },
-                    body: JSON.stringify({
-                        idFrom: user.id,
-                        status: false,
-                        userId: userId,
-                    }),
-                }
-            );
-
-            const result = await response.json();
-
-            if (result.status === "error") {
-                Alert.alert("Помилка", result.message);
-                return;
-            }
-
-            Alert.alert("Успіх", "Запит відправлено");
-        } catch (error) {
-            Alert.alert("Помилка", "Не вдалося зберегти дані");
-        }
-    }
 
     const content = (
         <View style={styles.container}>
@@ -82,11 +52,10 @@ export function AllFriends({ scrollable = true, limit = undefined }: { scrollabl
                     <FriendsForm
                         {...item}
                         actionButton={{
-                            label: "Додати",
-                            onPress: () => {
-                                console.log(item.id)
-                                handleRequest(item.id)},
+                            label: "Профіль",
+                            onPress: undefined
                         }}
+                        deleteId={item.id}
                     />
                 )}
                 ListEmptyComponent={

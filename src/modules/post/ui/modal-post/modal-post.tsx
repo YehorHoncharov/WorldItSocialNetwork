@@ -15,6 +15,7 @@ import { DELETE } from "../../../../shared/api/delete";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { usePosts } from "../../hooks/use-get-post";
 import { IPost, IPostImg } from "../../types/post";
+import { API_BASE_URL } from "../../../../settings";
 
 interface ModalPostProps {
 	visible: boolean;
@@ -66,10 +67,9 @@ export function ModalPost({
 		}
 		try {
 			await DELETE({
-				endpoint: `http://:3000/posts/${postId}`,
+				endpoint: `http://192.168.1.104:3000/posts/${postId}`,
 				headers: {
 					"Content-Type": "application/json",
-					// Authorization: `Bearer ${tokenUser}`,
 				},
 				token: tokenUser,
 			});

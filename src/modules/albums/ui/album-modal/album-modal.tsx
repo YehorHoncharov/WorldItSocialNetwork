@@ -36,7 +36,7 @@ export function ModalAlbum({
 }: ModalAlbumProps) {
     const [modalOpened, setModalOpened] = useState<boolean>(false);
     const [tokenUser, setTokenUser] = useState<string | null>(null);
-    const { albums, setAlbums } = useAlbums();
+    const { albums, setAlbums, refetch } = useAlbums();
     const { user } = useUserContext()
 
     const getToken = async (): Promise<string | null> => {
@@ -61,23 +61,28 @@ export function ModalAlbum({
             return;
         }
         try {
-            await DELETE({
-                endpoint: `http://192.168.1.104:3000/albums/${albumId}`,
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${tokenUser}`,
-                },
-                token: tokenUser,
-            });
-            setAlbums(albums.filter((album: IAlbum) => album.id !== albumId));
-            Alert.alert(
-                "Успіх",
-                "Ваш альбом успішно видалився!"
-            );
-            onClose();
-        } catch (error: any) {
-            console.error("Помилка видалення:", error.message);
-        }
+            setAlbums(prevAlbums => prevAlbums.filter((album: IAlbum) => album.id !== albumId));
+        
+        await DELETE({
+            endpoint: `http://192.168.1.104:3000/albums/${albumId}`,
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${tokenUser}`,
+            },
+            token: tokenUser,
+        });
+        
+        Alert.alert(
+            "Успіх",
+            "Ваш альбом успішно видалився!"
+        );
+        onClose();
+        await refetch(); 
+    } catch (error: any) {
+        console.error("Помилка видалення:", error.message);
+
+        await refetch();
+    }
     }
 
     const currentAlbum = albums.find((album: IAlbum) => album.id === albumId);

@@ -11,27 +11,25 @@ import { useFriends } from "../../hooks/useFriends";
 export function RequestsFriends({ scrollable = true, limit = undefined }: { scrollable?: boolean; limit?: number }) {
     const { users } = useUsers();
     const { user } = useUserContext();
-    const [isLoading, setIsLoading] = useState(true);
     const [refetch, setRefetch] = useState(false);
-    const [displayedUsers, setDidplayedUsers] = useState<IUser[]>()
-    
-    const {friends} = useFriends()
+    const [displayedUsers, setDisplayedUsers] = useState<IUser[]>()
+
+    const { friends } = useFriends()
 
     useEffect(() => {
-        setIsLoading(true);
-        if (!user || !user.friendship_from)
+
+        if (!user || !user.friendship_to)
             return;
-        console.log("beeeeeeeeeee")
-        console.log(users)
+
         const myFriends = users.filter((userF) =>
-            user.friendship_from?.some(
-                (f) => f.accepted === false && f.profile2_id === userF.id
+            user.friendship_to?.some(
+                (f) => f.accepted === false && f.profile1_id === userF.id
             )
         );
-    
-        setIsLoading(false);
-        setDidplayedUsers(limit ? myFriends.slice(0, limit) : myFriends)
-    }, [users, user, refetch]);
+
+
+        setDisplayedUsers(limit ? myFriends.slice(0, limit) : myFriends)
+    }, [users, user]);
 
 
     async function handleAccept(clickedUserId: number) {
@@ -44,7 +42,7 @@ export function RequestsFriends({ scrollable = true, limit = undefined }: { scro
             }
 
             const response = await fetch(
-                `http://192.168.1.104:3000/friendship/acceptFriedship`,
+                `http://192.168.1.104:3000/friendship/acceptFriendship`,
                 {
                     method: "PUT",
                     headers: {
@@ -66,8 +64,10 @@ export function RequestsFriends({ scrollable = true, limit = undefined }: { scro
                 return;
             }
 
+            setDisplayedUsers((prev) => prev?.filter((u) => u.id !== clickedUserId));
+
             Alert.alert("Успіх", "Запит прийнято");
-            // setRefetch(!refetch)
+            setRefetch(!refetch)
         } catch (error) {
             Alert.alert("Помилка", "Не вдалося підтвердити запит");
         }
@@ -93,8 +93,9 @@ export function RequestsFriends({ scrollable = true, limit = undefined }: { scro
                         actionButton={{
                             label: "Підтвердити",
                             onPress: () => handleAccept(item.id),
-                            
+
                         }}
+                        deleteId={item.id}
                     />
                 )}
                 ListEmptyComponent={
