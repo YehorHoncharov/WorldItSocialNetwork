@@ -37,7 +37,7 @@ const initialValue: IUserContext = {
   showWelcomeModal: false,
   logout: async () => { },
   refetchLogin: async () => null,
-  refetchLogout: async () => {},
+  refetchLogout: async () => { },
 };
 
 const userContext = createContext<IUserContext>(initialValue);
@@ -106,7 +106,7 @@ export function UserContextProvider({ children }: IUserContextProviderProps) {
     // image: string
   ) {
     try {
-      const response = await fetch("http://16:3000/user/reg", {
+      const response = await fetch(`${API_BASE_URL}/user/reg`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -122,6 +122,7 @@ export function UserContextProvider({ children }: IUserContextProviderProps) {
       getData(result.data);
 
       try {
+        console.log(user?.image)
         const create_start_album = await POST({
           endpoint: `${API_BASE_URL}/albums/create`,
           headers: {
@@ -131,10 +132,19 @@ export function UserContextProvider({ children }: IUserContextProviderProps) {
           token: result.data,
           body: {
             name: "Мої фото",
-            images: user?.image,
+            images: {
+              create: [{
+                image: {
+                  create: {
+                    filename: "uploads/user.png",
+                    file: "uploads/user.png"
+                  }
+                }
+              }]
+            },
           },
         });
-        
+
         if (create_start_album.status === "error") {
           console.log(create_start_album.message + " CREATED!");
           return;
@@ -174,7 +184,7 @@ export function UserContextProvider({ children }: IUserContextProviderProps) {
 
   async function refetchLogin(email: string, password: string): Promise<IUser | null> {
     try {
-      await AsyncStorage.multiRemove(["token", "user"]); 
+      await AsyncStorage.multiRemove(["token", "user"]);
       const response = await fetch("http://16:3000/user/log", {
         method: "POST",
         headers: {

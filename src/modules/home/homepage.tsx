@@ -66,7 +66,7 @@ const styles = StyleSheet.create({
     // paddingBottom: 20,
   },
   postContainer: {
-    backgroundColor: "#FAF8FF",
+    // backgroundColor: "#FAF8FF",
     borderRadius: 8,
     overflow: "hidden",
   },

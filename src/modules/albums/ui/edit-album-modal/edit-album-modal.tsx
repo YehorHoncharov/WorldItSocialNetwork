@@ -13,14 +13,14 @@ import { Input } from "../../../../shared/ui/input";
 import { API_BASE_URL } from "../../../../settings";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { styles } from "./edit-album-modal.style";
-import { IAlbum, IAlbumTag, IAlbumTheme, } from "../../types/albums.types";
+import { AlbumUpdateBody, IAlbum, IAlbumTag, IAlbumTheme, } from "../../types/albums.types";
 import { PUT } from "../../../../shared/api/put";
 import { useUserContext } from "../../../auth/context/user-context";
 
 interface Props {
   modalVisible: boolean;
   album_id: number;
-  initialData: { name: string; topic: string;};
+  initialData: { name: string; topic: string; };
   changeVisibility: () => void;
   onClose: () => void;
   onUpdate: (updatedAlbum: IAlbum) => void;
@@ -50,30 +50,39 @@ export function EditAlbumModal({
     { label: "Фільми", value: "#фільми" },
     { label: "Подорожі", value: "#подорожі" },
   ]);
-  
 
   useEffect(() => {
     setName(initialData.name);
     setTopic(initialData.topic);
   }, [initialData]);
 
+
   const resetForm = () => {
     setName(initialData.name);
     setTopic(initialData.topic);
-   
+
   };
 
   const handleSubmit = async () => {
-    if (!name || !topic) {
-      Alert.alert("Помилка", "Будь ласка, заповніть обов'язкові поля");
+    if (!name) {
+      Alert.alert("Помилка", "Будь ласка, введіть назву альбому");
       return;
     }
 
     try {
       const token = await AsyncStorage.getItem("token");
-      if (!token) {
+      if (!token || !user) {
         Alert.alert("Помилка", "Користувач не авторизований");
         return;
+      }
+
+      const updateData: AlbumUpdateBody = {
+        name,
+        author_id: user.id,
+      };
+
+      if (topic && topic !== initialData.topic) {
+        updateData.tags = [topic];
       }
 
       const response = await PUT({
@@ -83,30 +92,31 @@ export function EditAlbumModal({
           Authorization: `Bearer ${token}`,
         },
         token: token,
-        body: {
-          name,
-          topic,
-        },
+        body: updateData,
       });
-
-      if (!user) return
-      const author_id = user.id
 
       if (response.status === "success") {
         Alert.alert("Успіх", "Альбом успішно оновлено!");
-        onUpdate({ id: album_id, name, topic, author_id });
-        resetForm();
+        onUpdate({
+          id: album_id,
+          name,
+          topic: [{
+            tag: {
+              id: Date.now(),
+              name: "#"+topic
+            }
+          }],
+          author_id: user.id
+        });
         onClose();
       }
-      Alert.alert("Успіх", "Альбом успішно оновлено");
-      onUpdate({ id: album_id, name, topic, author_id });
-      resetForm();
-      onClose();
+      onClose()
     } catch (err) {
       console.error(err);
       Alert.alert("Помилка", "Сталася помилка при оновленні альбому");
     }
   };
+
 
   return (
     <Modal
@@ -178,7 +188,7 @@ export function EditAlbumModal({
               </View>
 
               {/* <View style={{ width: "100%", zIndex: 1000, marginTop: 10 }}> */}
-                {/* <DropDownPicker
+              {/* <DropDownPicker
                   open={openYear}
                   value={year}
                   items={yearItems}

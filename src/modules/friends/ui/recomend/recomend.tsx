@@ -5,10 +5,25 @@ import { styles } from "./recomend.style";
 import { useUsers } from "../../hooks/useUsers";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { IUser } from "../../../auth/types";
+import { useEffect, useState } from "react";
 
-export function RecomendFriends({ scrollable = true }: { scrollable?: boolean }) {
+export function RecomendFriends({
+    scrollable = true,
+    limit = undefined
+}: {
+    scrollable?: boolean;
+    limit?: number;
+}) {
     const { users } = useUsers();
     const { user } = useUserContext();
+    const [correctUsers, setCorrectUsers] = useState<IUser[]>([])
+    const displayedUsers = limit ? correctUsers.slice(0, limit) : correctUsers;
+
+    useEffect(() => {
+        if (!user) return;
+        const cUsers = users.filter((userC) => userC.id !== user.id);
+        setCorrectUsers(cUsers);
+    }, [users, user]);
 
     async function handleRequest(userTo: IUser) {
         try {
@@ -28,9 +43,8 @@ export function RecomendFriends({ scrollable = true }: { scrollable?: boolean })
                         Authorization: `Bearer ${token}`,
                     },
                     body: JSON.stringify({
-                        profile1: user,
-                        profile2: userTo,
-                        status: false,
+                        profile2_id: userTo.id,
+                        accepted: false,
                     }),
                 }
             );
@@ -58,7 +72,7 @@ export function RecomendFriends({ scrollable = true }: { scrollable?: boolean })
             </View>
 
             <FlatList
-                data={users}
+                data={displayedUsers}
                 scrollEnabled={false}
                 keyExtractor={(item) => `${item.id}`}
                 contentContainerStyle={{ gap: 10, flexGrow: 1 }}

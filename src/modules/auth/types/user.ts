@@ -1,6 +1,6 @@
 import { IFriendship } from '../../friends/types/friends.type';
 
-export interface IUser{
+export interface IUser {
     id: number,
     name?: string,
     username?: string,
@@ -10,5 +10,6 @@ export interface IUser{
     password: string,
     signature?: string,
     image?: string,
-    friendship?: IFriendship[]
+    friendship_from?: IFriendship[],
+    friendship_to?: IFriendship[]
 }

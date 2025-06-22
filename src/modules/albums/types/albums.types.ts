@@ -15,24 +15,26 @@ export interface IAlbumImageShow {
 	};
 }
 
-export interface IAlbumImageSend{
+export interface IAlbumImageSend {
 	image?: {
-		id?: number 
-		url: string 
+		id?: number
+		url: string
 	}
-	
+
 }
-export interface IAlbumImageDelete{
-	image?:{
-		id: number 
-		url?: string 
+export interface IAlbumImageDelete {
+	image?: {
+		id: number
+		url?: string
 	}
-	
+
 }
 
 export interface IAlbumTag {
-	id: number;
-	name: string;
+	tag: {
+		id: number;
+		name: string;
+	}
 }
 
 export interface IAlbumTheme {
@@ -82,7 +84,20 @@ export interface Props {
 export interface IAlbumEditProps {
 	id: number;
 	name: string;
-	theme: IAlbumTag[];
+	topic: IAlbumTag[];
 	// year: string;
-	authorId: number;
+	author_id?: number;
+}
+
+export type AlbumUpdateBody = {
+	name?: string,
+	tags?: string[],
+	images?: {
+		image: {
+			id?: number;
+			filename: string;
+		}
+	}[],
+	created_at?: Date
+	author_id?: number;
 }

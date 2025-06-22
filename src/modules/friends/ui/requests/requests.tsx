@@ -6,25 +6,35 @@ import { FlatList, TouchableOpacity, View, Text, ScrollView, Alert } from "react
 import { styles } from "./requests.style";
 import { FriendsForm } from "../friends-form/friends-form";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useFriends } from "../../hooks/useFriends";
 
-export function RequestsFriends({ scrollable = true }: { scrollable?: boolean }) {
+export function RequestsFriends({ scrollable = true, limit = undefined }: { scrollable?: boolean; limit?: number }) {
     const { users } = useUsers();
     const { user } = useUserContext();
-    const [userFriends, setUserFriends] = useState<IUser[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
+    const [refetch, setRefetch] = useState(false);
+    const [displayedUsers, setDidplayedUsers] = useState<IUser[]>()
+    
+    const {friends} = useFriends()
 
     useEffect(() => {
-        if (!user || !user.friendship) return;
-
+        setIsLoading(true);
+        if (!user || !user.friendship_from)
+            return;
+        console.log("beeeeeeeeeee")
+        console.log(users)
         const myFriends = users.filter((userF) =>
-            user.friendship?.some(
-                (f) => f.status === false && f.idFrom === userF.id
+            user.friendship_from?.some(
+                (f) => f.accepted === false && f.profile2_id === userF.id
             )
         );
+    
+        setIsLoading(false);
+        setDidplayedUsers(limit ? myFriends.slice(0, limit) : myFriends)
+    }, [users, user, refetch]);
 
-        setUserFriends(myFriends);
-    }, [users, user]);
 
-    async function handleAccept(friendId: number) {
+    async function handleAccept(clickedUserId: number) {
         try {
             if (!user) return;
             const token = await AsyncStorage.getItem("token");
@@ -34,13 +44,18 @@ export function RequestsFriends({ scrollable = true }: { scrollable?: boolean })
             }
 
             const response = await fetch(
-                `http://192.168.1.104:3000/friendship/accept/${friendId}`, 
+                `http://192.168.1.104:3000/friendship/acceptFriedship`,
                 {
                     method: "PUT",
                     headers: {
                         "Content-Type": "application/json",
                         Authorization: `Bearer ${token}`,
                     },
+                    body: JSON.stringify({
+                        //profile1 - кому, profile2 - ми
+                        id: clickedUserId
+
+                    })
                 }
             );
 
@@ -52,6 +67,7 @@ export function RequestsFriends({ scrollable = true }: { scrollable?: boolean })
             }
 
             Alert.alert("Успіх", "Запит прийнято");
+            // setRefetch(!refetch)
         } catch (error) {
             Alert.alert("Помилка", "Не вдалося підтвердити запит");
         }
@@ -67,7 +83,7 @@ export function RequestsFriends({ scrollable = true }: { scrollable?: boolean })
             </View>
 
             <FlatList
-                data={userFriends}
+                data={displayedUsers}
                 scrollEnabled={false}
                 keyExtractor={(item) => `${item.id}`}
                 contentContainerStyle={{ gap: 10, flexGrow: 1 }}
@@ -77,6 +93,7 @@ export function RequestsFriends({ scrollable = true }: { scrollable?: boolean })
                         actionButton={{
                             label: "Підтвердити",
                             onPress: () => handleAccept(item.id),
+                            
                         }}
                     />
                 )}

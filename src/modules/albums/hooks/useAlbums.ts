@@ -13,19 +13,20 @@ export function useAlbums() {
 
       const response = await fetch("http://192.168.1.104:3000/albums")
       const result = await response.json()
-      
-    
+      console.log("альбомы ХУК", result);
+
+
       if (result.status === "error") {
-					return;
-				}
+        return;
+      }
 
       setAlbums(result)
-      return result 
+      return result
     } catch (error) {
       const err = error instanceof Error ? error.message : "Unknown error"
       console.error(err)
       setError(err)
-      throw error 
+      throw error
     } finally {
       setIsLoading(false)
     }
@@ -35,11 +36,11 @@ export function useAlbums() {
     getAlbum()
   }, [getAlbum])
 
-  return { 
-    albums, 
-    isLoading, 
-    error, 
-    setAlbums, 
-    refetch: getAlbum 
+  return {
+    albums,
+    isLoading,
+    error,
+    setAlbums,
+    refetch: getAlbum
   }
 }

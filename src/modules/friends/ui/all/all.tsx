@@ -4,10 +4,27 @@ import { FriendsForm } from "../friends-form/friends-form";
 import { useUsers } from "../../hooks/useUsers";
 import { useUserContext } from "../../../auth/context/user-context";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useEffect, useState } from "react";
+import { IUser } from "../../../auth/types";
 
-export function AllFriends({ scrollable = true }: { scrollable?: boolean }) {
-	const { users } = useUsers();
+export function AllFriends({ scrollable = true, limit = undefined }: { scrollable?: boolean; limit?: number }) {
+    const { users } = useUsers();
     const { user } = useUserContext();
+    const [correctUsers, setCorrectUsers] = useState<IUser[]>([])
+
+    useEffect(() => {
+        if (!user) return;
+        const cUsers = users.filter((userC) => userC.id !== user.id);
+        setCorrectUsers(cUsers);
+    }, [users, user]);
+
+    useEffect(()=>{
+        console.log("=======================")
+        console.log(correctUsers)
+    },[correctUsers])
+
+    const displayedUsers = limit ? correctUsers.slice(0, limit) : correctUsers;
+    
 
     async function handleRequest(userId: number) {
         try {
@@ -57,7 +74,7 @@ export function AllFriends({ scrollable = true }: { scrollable?: boolean }) {
             </View>
 
             <FlatList
-                data={users}
+                data={displayedUsers}
                 scrollEnabled={false}
                 keyExtractor={(item) => `${item.id}`}
                 contentContainerStyle={{ gap: 10, flexGrow: 1 }}
@@ -66,7 +83,9 @@ export function AllFriends({ scrollable = true }: { scrollable?: boolean }) {
                         {...item}
                         actionButton={{
                             label: "Додати",
-                            onPress: () => handleRequest(item.id),
+                            onPress: () => {
+                                console.log(item.id)
+                                handleRequest(item.id)},
                         }}
                     />
                 )}

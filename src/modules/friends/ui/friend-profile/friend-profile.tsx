@@ -22,8 +22,6 @@ export function FriendProfile({ user }: FriendProfileProps) {
 	const { posts } = usePosts();
 	const [userAlbums, setUserAlbums] = useState<IAlbum[]>([]);
 	const [userPosts, setUserPosts] = useState<IPost[]>([]);
-	const { user: currentUser } = useUserContext();
-
 
 	useEffect(() => {
 		if (!user) return;
@@ -40,7 +38,7 @@ export function FriendProfile({ user }: FriendProfileProps) {
 					<View style={styles.profileImageContainer}>
 						<Image
 							style={styles.profileImage}
-							source={{ uri: API_BASE_URL+"/"+user.image }}
+							source={{ uri: API_BASE_URL + "/" + user.image }}
 						/>
 						<OfflineIcon style={styles.imageOnline} />
 					</View>
@@ -120,43 +118,43 @@ export function FriendProfile({ user }: FriendProfileProps) {
 					/>
 
 				</View>
-
-				<View style={styles.albumsContainer}>
-					<View style={styles.albumsSection}>
-						<View style={styles.albumsHeader}>
-							<View style={styles.albumsIcon}>
-								<Image
-									style={{ height: 17, width: 17 }}
-									source={require("../../../../shared/ui/images/album-image.png")}
-								/>
+				{userPosts.length > 0 ?
+					<View style={styles.albumsContainer}>
+						<View style={styles.albumsSection}>
+							<View style={styles.albumsHeader}>
+								<View style={styles.albumsIcon}>
+									<Image
+										style={{ height: 17, width: 17 }}
+										source={require("../../../../shared/ui/images/album-image.png")}
+									/>
+								</View>
+								<Text style={styles.albumsLabel}>Пости</Text>
 							</View>
-							<Text style={styles.albumsLabel}>Пости</Text>
+							<Text style={styles.viewAll}>Дивитись всі</Text>
 						</View>
-						<Text style={styles.viewAll}>Дивитись всі</Text>
-					</View>
 
-					<FlatList
-						data={userPosts}
-						scrollEnabled={false}
-						keyExtractor={(item) => item.id.toString()}
-						renderItem={({ item }) => (
+						<FlatList
+							data={userPosts}
+							scrollEnabled={false}
+							keyExtractor={(item) => item.id.toString()}
+							renderItem={({ item }) => (
 
-							<Post
-								id={item.id}
-								title={item.title}
-								content={item.content}
-								author_id={item.author_id}
-								likes={item.likes}
-								views={item.views}
-								tags={item.tags}
-								images={item.images}
-								links={item.links}
-							/>
-						)}
-						contentContainerStyle={styles.albumsList}
-					/>
+								<Post
+									id={item.id}
+									title={item.title}
+									content={item.content}
+									author_id={item.author_id}
+									likes={item.likes}
+									views={item.views}
+									tags={item.tags}
+									images={item.images}
+									links={item.links}
+								/>
+							)}
+							contentContainerStyle={styles.albumsList}
+						/>
 
-				</View>
+					</View> : null}
 			</View>
 		</ScrollView>
 	);

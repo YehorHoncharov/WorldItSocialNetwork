@@ -35,7 +35,6 @@ export function Album({ scrollOffset = 0, ...props }: IAlbum & { scrollOffset?: 
 	useEffect(() => {
 		getToken().then(setTokenUser);
 		if (props.images && Array.isArray(props.images)) {
-
 			setImages(props.images.map(image => ({ image: { id: image.image.id, filename: image.image.filename, file: image.image.file } })));
 		}
 	}, [props.images]);
@@ -136,22 +135,15 @@ export function Album({ scrollOffset = 0, ...props }: IAlbum & { scrollOffset?: 
 		}
 	}
 
-	const removeImage = (index: number) => {
-		setImages((prev) => prev.filter((_, i) => i !== index));
-	};
-
 	function renderImages() {
-		console.log(images)
 		return (
 			<View style={styles.imageGrid}>
 				{images.map((img, idx) => {
 					const correctImage = img.image.filename.startsWith("data:image")
 						? img.image.filename
 						: `${API_BASE_URL}/${img.image.filename.replace(/^\/+/, "")}`;
-					// console.log(correctImage.slice())
 					return (
 						<View key={img.image.id} style={styles.imageContainer}>
-							{/* <Text>{correctImage.slice(0,25)}</Text> */}
 							<Image
 								source={{ uri: correctImage }}
 								style={styles.imageAdded}
@@ -161,18 +153,32 @@ export function Album({ scrollOffset = 0, ...props }: IAlbum & { scrollOffset?: 
 									Alert.alert("Помилка", "Не вдалося завантажити зображення.");
 								}}
 							/>
-							<TouchableOpacity
-								style={styles.removeImageButton}
-								onPress={() => deleteImage(img.image.id)}
-							>
-								<Image
-									source={require("../../../../shared/ui/images/trash.png")}
-									style={{ width: 22, height: 22 }}
-								/>
-							</TouchableOpacity>
+							{user?.id === props.author_id ?
+								<TouchableOpacity
+									style={styles.removeImageButton}
+									onPress={() => deleteImage(img.image.id)}
+								>
+									<Image
+										source={require("../../../../shared/ui/images/trash.png")}
+										style={{ width: 22, height: 22 }}
+									/>
+								</TouchableOpacity>
+							: null }
 						</View>
 					);
 				})}
+				{user?.id === props.author_id ? (
+					<>
+						{images.length < 10 && (
+							<TouchableOpacity style={styles.addImage} onPress={onSearch}>
+								<Image
+									style={{ width: 40.6, height: 40 }}
+									source={require("../../../../shared/ui/images/plus-in-circle.png")}
+								/>
+							</TouchableOpacity>
+						)}
+					</>
+				) : null}
 			</View>
 		);
 	}
@@ -198,20 +204,11 @@ export function Album({ scrollOffset = 0, ...props }: IAlbum & { scrollOffset?: 
 
 	async function handleSubmit() {
 
-
 		try {
 			const formattedImages: IAlbumImageShow[] = [
 				...images,
 				...imagesToDelete.map((id) => ({ image: { id: id, filename: "" } }))
 			]
-			console.log(formattedImages)
-
-			// if (filteredImages.length > 0 || deletedImages.length > 0) {
-			// 	updatedData.images = [
-			// 		...newImages,
-			// 		...deletedImages.map((img) => ({ id: img.id, filename: "" })),
-			// 	];
-			// }
 
 			const response: IPutResponse = await PUT({
 				endpoint: `${API_BASE_URL}/albums/${props.id}`,
@@ -263,7 +260,8 @@ export function Album({ scrollOffset = 0, ...props }: IAlbum & { scrollOffset?: 
 								: null}
 						</View>
 						<View style={styles.theme}>
-							{/* <Text style={{ fontSize: 16 }}>{props.year}</Text> */}
+							<Text style={{ fontSize: 16 }}>{props.topic.map((topic) => topic.tag.name).join(", ") || "#моїфото"}</Text>
+							<Text style={{ fontSize: 16, color: "#81818D" }}>{props.created_at?.slice(0, 4)} рік</Text>
 						</View>
 						<View style={styles.separator} />
 					</View>
@@ -271,19 +269,6 @@ export function Album({ scrollOffset = 0, ...props }: IAlbum & { scrollOffset?: 
 						<Text style={styles.title}>Фотографії</Text>
 						<View style={styles.photoGrid}>
 							{images ? renderImages() : null}
-
-							{user?.id === props.author_id ? (
-								<>
-									{images.length < 10 && (
-										<TouchableOpacity style={styles.addImage} onPress={onSearch}>
-											<Image
-												style={{ width: 40.6, height: 40 }}
-												source={require("../../../../shared/ui/images/plus-in-circle.png")}
-											/>
-										</TouchableOpacity>
-									)}
-								</>
-							) : null}
 						</View>
 					</View>
 					{user?.id === props.author_id ?

@@ -12,7 +12,7 @@ import {
   requestMediaLibraryPermissionsAsync,
 } from "expo-image-picker";
 import { useEffect, useState } from "react";
-import { IAlbum, IAlbumImg, IAlbumProps, IPutResponse } from "../../types/albums.types";
+import { IAlbum, IAlbumImageShow, IAlbumImg, IAlbumProps, IPutResponse } from "../../types/albums.types";
 import { useUserContext } from "../../../auth/context/user-context";
 import { PUT } from "../../../../shared/api/put";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -25,9 +25,6 @@ export function My(props: IAlbumProps) {
     [key: string]: { width: number; height: number };
   }>({});
   const [tokenUser, setTokenUser] = useState<string>("");
-  const [userImageSource, setUserImageSource] = useState<
-    { uri: string } | NodeRequire
-  >();
   const { user } = useUserContext();
   const [changeImage, setChangeImage] = useState<boolean>(false);
   const { albums } = props;
@@ -54,13 +51,6 @@ export function My(props: IAlbumProps) {
     if (minAlbum?.images && Array.isArray(minAlbum.images)) {
       setImages(minAlbum.images);
     }
-    if (user?.image) {
-      setUserImageSource({
-        uri: `${API_BASE_URL}/${user.image.replace(/^\/?uploads\/*/i, "uploads/")}`,
-      });
-    } else {
-      setUserImageSource(require("../../../../shared/ui/images/user.png"));
-    }
   }, [minAlbum, user]);
 
   async function onSearch() {
@@ -77,7 +67,7 @@ export function My(props: IAlbumProps) {
       const result = await launchImageLibraryAsync({
         mediaTypes: ["images"],
         allowsMultipleSelection: true,
-        quality: 0.5,
+        quality: 0.8,
         allowsEditing: false,
         base64: true,
       });
@@ -86,61 +76,56 @@ export function My(props: IAlbumProps) {
         const allowedFormats = ["jpeg", "png", "gif"];
         const maxSizeInBytes = 5 * 1024 * 1024; // 5 MB
 
-        const newImages = await Promise.all(
-          result.assets
-            .filter((asset) => {
-              const type = asset.mimeType?.split("/")[1]?.toLowerCase() || "";
-              return asset.base64 && allowedFormats.includes(type);
-            })
-            .map(async (asset, index) => {
-              const base64String = asset.base64!;
-              const estimatedSizeInBytes = (base64String.length * 3) / 4;
-              if (estimatedSizeInBytes > maxSizeInBytes) {
-                Alert.alert(
-                  "Помилка",
-                  `Зображення занадто велике (макс. 5 МБ)`
-                );
-                return null;
-              }
-              const imageUrl = `data:image/${asset.mimeType?.split("/")[1] || "jpeg"
-                };base64,${base64String}`;
+        const newImages: IAlbumImageShow[] = result.assets
+          .map((asset, index) => {
+            if (!asset.mimeType || !asset.base64) {
+              Alert.alert(
+                "Помилка",
+                "Вибране зображення не підтримується або не містить даних."
+              );
+              return null;
+            }
+            const type = asset.mimeType.split("/")[1]?.toLowerCase();
+            if (!allowedFormats.includes(type)) {
+              Alert.alert(
+                "Помилка",
+                `Формат зображення ${type} не підтримується. Дозволені формати: ${allowedFormats.join(", ")}.`
+              );
+              return null;
+            }
+            const base64String = asset.base64;
+            const estimatedSizeInBytes = (base64String.length * 3) / 4;
+            if (estimatedSizeInBytes > maxSizeInBytes) {
+              Alert.alert(
+                "Помилка",
+                `Зображення занадто велике. Максимальний розмір: ${maxSizeInBytes / (1024 * 1024)} MB`
+              );
+              return null;
+            }
+            const url = `data:image/${type};base64,${base64String}`;
 
-              const imageKey = `${Date.now() + index}`;
-              setImageDimensions((prev) => ({
-                ...prev,
-                [imageKey]: { width: 150, height: 150 },
-              }));
-
-              return {
+            return {
+              image: {
                 id: Date.now() + index,
-                filename: imageUrl,
-              };
-            })
-        );
+                filename: url,
+              },
+            };
+          })
+          .filter((img): img is IAlbumImageShow => img !== null);
 
-        const filteredImages = newImages.filter(
-          (img): img is IAlbumImg => img !== null
-        );
-
-        if (
-          images.length + filteredImages.length - imagesToDelete.length >
-          10
-        ) {
+        if (images.length + newImages.length > 10) {
           Alert.alert("Увага", "Максимальна кількість зображень - 10");
           return;
         }
-
-        setImages((prev) => [...prev, ...filteredImages]);
-        setChangeImage(true);
+        setChangeImage(true)
+        setImages((prev) => [...prev, ...newImages]);
       } else if (result.canceled) {
         Alert.alert("Скасовано", "Вибір зображень було скасовано");
       }
     } catch (error) {
-      console.error("Помилка вибору зображення:", error);
       Alert.alert(
         "Помилка",
-        `Не вдалося вибрати зображення: ${error instanceof Error ? error.message : "Невідома помилка"
-        }`
+        `Не вдалося вибрати зображення: ${error instanceof Error ? error.message : "Невідома помилка"}`
       );
     }
   }
@@ -162,69 +147,15 @@ export function My(props: IAlbumProps) {
       delete updatedDimensions[id];
       return updatedDimensions;
     });
-    setChangeImage(true);
-  }
-
-  async function handleUserImageRemoval() {
-    if (!user || !user.image) {
-      Alert.alert("Помилка", "Немає зображення користувача для видалення");
-      return;
-    }
-
-    Alert.alert(
-      "Підтвердження",
-      "Ви впевнені, що хочете видалити зображення профілю?",
-      [
-        { text: "Скасувати", style: "cancel" },
-        {
-          text: "Видалити",
-          style: "destructive",
-          onPress: async () => {
-            try {
-              const response = await PUT({
-                endpoint: `${API_BASE_URL}/users/${user.id}`,
-                headers: {
-                  "Content-Type": "application/json",
-                  Authorization: `Bearer ${tokenUser}`,
-                },
-                token: tokenUser,
-                body: { image: null },
-              });
-
-              if (response.status === "success") {
-                // Оновлюємо userImageSource замість user
-                setUserImageSource(
-                  require("../../../../shared/ui/images/user.png")
-                );
-                Alert.alert("Успіх", "Зображення профілю видалено");
-              } else {
-                throw new Error(
-                  response.message || "Не вдалося видалити зображення профілю"
-                );
-              }
-            } catch (error) {
-              console.error("Помилка видалення зображення профілю:", error);
-              Alert.alert(
-                "Помилка",
-                `Не вдалося видалити зображення: ${error instanceof Error ? error.message : "Невідома помилка"
-                }`
-              );
-            }
-          },
-        },
-      ]
-    );
+    setChangeImage(true)
   }
 
   async function save() {
     try {
-      var formattedImages = {
-        create: images
-          .filter((img) => img.image.filename.startsWith("data:image"))
-          .map((img) => ({ url: img.image.filename })),
-        delete: imagesToDelete.map((id) => ({ id })),
-      };
-      // formattedImages.create.push(user?.image ? { url: user.image } : { url: "" });
+      const formattedImages: IAlbumImageShow[] = [
+        ...images,
+        ...imagesToDelete.map((id) => ({ image: { id: id, filename: "" } }))
+      ]
 
       const response: IPutResponse = await PUT({
         endpoint: `${API_BASE_URL}/albums/${minAlbum?.id}`,
@@ -235,8 +166,7 @@ export function My(props: IAlbumProps) {
         token: tokenUser,
         body: {
           images:
-            formattedImages.create.length > 0 ||
-              formattedImages.delete.length > 0
+            formattedImages.length > 0 || formattedImages.length > 0
               ? formattedImages
               : undefined,
         },
@@ -297,35 +227,9 @@ export function My(props: IAlbumProps) {
         </View>
 
         <View style={[styles.imageContainer, { flex: 1 }]}>
-          <View style={styles.imageWrapper}>
-            <Image
-              source={
-                userImageSource ||
-                require("../../../../shared/ui/images/user.png")
-              }
-              style={styles.avatar}
-            />
-            <View style={styles.actionButtons}>
-              <TouchableOpacity style={styles.actionButton}>
-                <Image
-                  source={require("../../../../shared/ui/images/eye-my-publication.png")}
-                  style={styles.actionIcon}
-                />
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={styles.actionButton}
-                onPress={handleUserImageRemoval}
-              >
-                <Image
-                  source={require("../../../../shared/ui/images/trash.png")}
-                  style={styles.actionIcon}
-                />
-              </TouchableOpacity>
-            </View>
-          </View>
 
           {images.length > 0 ? (
-            images.map((image) => (
+            images.reverse().map((image) => (
               <View key={image.image.filename} style={styles.imageWrapper}>
                 <Image
                   source={normalizeImageUrl(image.image.filename)}

@@ -12,7 +12,7 @@ export default function FriendsProfile() {
     name: typeof params.name === "string" ? params.name : undefined,
     username: typeof params.username === "string" ? params.username : undefined,
     surname: typeof params.surname === "string" ? params.surname : undefined,
-    dateOfBirth: typeof params.dateOfBirth === "string" ? new Date(params.dateOfBirth) : undefined,
+    date_of_birth: typeof params.dateOfBirth === "string" ? new Date(params.dateOfBirth) : undefined,
     email: typeof params.email === "string" ? params.email : "",
     password: typeof params.password === "string" ? params.password : "",
     signature: typeof params.signature === "string" ? params.signature : undefined,

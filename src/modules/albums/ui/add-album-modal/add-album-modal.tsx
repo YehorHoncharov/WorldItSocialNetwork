@@ -48,13 +48,17 @@ export function AddAlbumModal({ modalVisible, onClose }: Props) {
     setTheme(undefined);
   };
 
-  const handleSubmit = async () => {
+const handleSubmit = async () => {
     if (!name || !theme) {
       Alert.alert("Помилка", "Будь ласка, заповніть обов'язкові поля");
       return;
     }
 
-    if (!user) return
+    if (!user) {
+      Alert.alert("Помилка", "Користувач не авторизований");
+      return;
+    }
+
     try {
       const token = await AsyncStorage.getItem("token");
       if (!token) {
@@ -75,17 +79,20 @@ export function AddAlbumModal({ modalVisible, onClose }: Props) {
         },
       });
 
+
       if (response.status === "success") {
-        Alert.alert("Успіх", "Альбом успішно оновлено!");
+        console.log("Album created, calling refetch");
+        Alert.alert("Успіх", "Альбом успішно створено!");
         resetForm();
+        await refetch();
+        refetch()
         onClose();
       }
-      Alert.alert("Успіх", "Альбом успішно оновлено");
-      resetForm();
-      onClose();
-
+      await refetch(); 
+      refetch()
+      onClose()
     } catch (err) {
-      console.error(err);
+      console.error("Error creating album:", err);
       Alert.alert("Помилка", "Сталася помилка при створенні альбому");
     }
   };

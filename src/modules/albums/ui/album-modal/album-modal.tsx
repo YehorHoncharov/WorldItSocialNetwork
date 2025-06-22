@@ -5,6 +5,7 @@ import {
     Modal,
     Image,
     Dimensions,
+    Alert,
 } from "react-native";
 import Pencil from "../../../../shared/ui/icons/pencil";
 import Dots from "../../../../shared/ui/icons/dots";
@@ -14,7 +15,8 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useAlbums } from "../../hooks/useAlbums";
 import { styles } from "../../../post/ui/modal-post/modal-post.style";
 import { EditAlbumModal } from "../edit-album-modal/edit-album-modal";
-import { IAlbum, IAlbumEditProps } from "../../types/albums.types";
+import { AlbumUpdateBody, IAlbum, IAlbumEditProps } from "../../types/albums.types";
+import { useUserContext } from "../../../auth/context/user-context";
 
 interface ModalAlbumProps {
     visible: boolean;
@@ -35,6 +37,7 @@ export function ModalAlbum({
     const [modalOpened, setModalOpened] = useState<boolean>(false);
     const [tokenUser, setTokenUser] = useState<string | null>(null);
     const { albums, setAlbums } = useAlbums();
+    const { user } = useUserContext()
 
     const getToken = async (): Promise<string | null> => {
         return await AsyncStorage.getItem("token");
@@ -67,6 +70,10 @@ export function ModalAlbum({
                 token: tokenUser,
             });
             setAlbums(albums.filter((album: IAlbum) => album.id !== albumId));
+            Alert.alert(
+                "Успіх",
+                "Ваш альбом успішно видалився!"
+            );
             onClose();
         } catch (error: any) {
             console.error("Помилка видалення:", error.message);
@@ -79,28 +86,52 @@ export function ModalAlbum({
         return null;
     }
 
+    const prepareUpdateData = (albumData: IAlbumEditProps): AlbumUpdateBody => {
+        return {
+            name: albumData.name,
+            tags: albumData.topic ? albumData.topic.map((topic) => topic.tag.name) : undefined,
+            images: currentAlbum.images?.map(img => ({
+                image: {
+                    id: img.image.id,
+                    filename: img.image.filename
+                }
+            })),
+            author_id: user?.id
+        };
+    };
+
     return (
         <>
             {modalOpened && (
                 <EditAlbumModal
                     modalVisible={modalOpened}
-                    albumId={albumId}
+                    album_id={albumId}
                     initialData={{
                         name: currentAlbum.name,
-                        theme: currentAlbum.topic,
-
+                        topic: currentAlbum.topic?.find?.name,
                     }}
                     changeVisibility={() => setModalOpened(false)}
                     onClose={() => {
                         setModalOpened(false);
                         onClose();
                     }}
-                    onUpdate={(updatedAlbum: IAlbumEditProps) => {
+                    onUpdate={(updatedAlbum: IAlbum) => {
+                        const updateData = prepareUpdateData(updatedAlbum);
+
                         setAlbums(
-                            albums.map((album: IAlbumEditProps) =>
-                                album.id === updatedAlbum.id ? updatedAlbum : album
+                            albums.map((album: IAlbum) =>
+                                album.id === updatedAlbum.id
+                                    ? {
+                                        ...album,
+                                        name: updatedAlbum.name,
+                                        topic: updatedAlbum.topic
+                                            ? updatedAlbum.topic
+                                            : album.topic
+                                    }
+                                    : album
                             )
                         );
+
                     }}
                 />
             )}

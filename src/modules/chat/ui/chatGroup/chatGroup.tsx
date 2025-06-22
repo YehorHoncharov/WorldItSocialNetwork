@@ -18,7 +18,9 @@ export function ChatGroup() {
     <View style={styles.container}>
       {/* Chat Header */}
       <View style={styles.chatHeader}>
-        <BackArrowIcon style={{width: 10, height: 15}}/>
+        <TouchableOpacity>
+          <BackArrowIcon style={{ width: 10, height: 15 }} />
+        </TouchableOpacity>
         <Image
           source={require("../../../../shared/ui/images/groupAvatar.png")}
           style={styles.avatar}
@@ -28,7 +30,7 @@ export function ChatGroup() {
           <Text style={styles.chatInfo}>3 учасники, 1 в сети</Text>
         </View>
         <TouchableOpacity style={styles.menuBtn}>
-          <Dots style={{width: 20, height: 20}}/>
+          <Dots style={{ width: 20, height: 20 }} />
         </TouchableOpacity>
       </View>
 
@@ -37,36 +39,36 @@ export function ChatGroup() {
 
       {/* Messages */}
       <View style={styles.messages}>
-        <View style={[styles.message, {justifyContent: "flex-end"}]}>
+        <View style={[styles.message, { justifyContent: "flex-end" }]}>
           <View style={styles.messageBubbleMy}>
             <Text style={styles.messageText}>Привіт!</Text>
-            <Text style={styles.messageTime}>10:01 <CheckMarkIcon style={{width: 10, height: 9}}/></Text>
+            <Text style={styles.messageTime}>10:01 <CheckMarkIcon style={{ width: 10, height: 9 }} /></Text>
           </View>
         </View>
         <View style={styles.message}>
-          <Image source={require('../../../../shared/ui/images/avatar.png')} style={{width: 50, height: 50}}/>
+          <Image source={require('../../../../shared/ui/images/avatar.png')} style={{ width: 50, height: 50 }} />
           <View style={styles.messageBubble}>
-            <View style={{flexDirection: "column", gap: 5}}>
+            <View style={{ flexDirection: "column", gap: 5 }}>
               <Text style={styles.messageSender}>Wade Warren</Text>
-              <View style={{flexDirection: "row", gap: 20}}>
-                  <Text style={styles.messageText}>Привіт! Як справи?</Text>
-                  <Text style={styles.messageTime}>10:30 <CheckMarkIcon style={{width: 10, height: 9}}/></Text>
+              <View style={{ flexDirection: "row", gap: 20 }}>
+                <Text style={styles.messageText}>Привіт! Як справи?</Text>
+                <Text style={styles.messageTime}>10:30 <CheckMarkIcon style={{ width: 10, height: 9 }} /></Text>
               </View>
             </View>
-           
+
           </View>
         </View>
         <View style={styles.message}>
-           <Image source={require('../../../../shared/ui/images/avatar.png')} style={{width: 50, height: 50}}/>
+          <Image source={require('../../../../shared/ui/images/avatar.png')} style={{ width: 50, height: 50 }} />
           <View style={styles.messageBubble}>
-            <View style={{flexDirection: "column", gap: 5}}>
+            <View style={{ flexDirection: "column", gap: 5 }}>
               <Text style={styles.messageSender}>Cameron Williamson</Text>
-              <View style={{flexDirection: "row", gap: 30}}>
+              <View style={{ flexDirection: "row", gap: 30 }}>
                 <Text style={styles.messageText}>Чудово!</Text>
-                <Text style={styles.messageTime}>10:30 <CheckMarkIcon style={{width: 10, height: 9}}/></Text>
+                <Text style={styles.messageTime}>10:30 <CheckMarkIcon style={{ width: 10, height: 9 }} /></Text>
               </View>
             </View>
-           
+
           </View>
         </View>
       </View>

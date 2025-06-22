@@ -1,7 +1,7 @@
 
 export interface IFriendship {
     id: number
-    idFrom: number 
-    status: boolean
-    userId: number
+    profile1_id: number 
+    accepted: boolean
+    profile2_id: number
 }

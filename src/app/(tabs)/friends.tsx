@@ -39,9 +39,9 @@ export default function Friends() {
 
       {activeTab === 'main' ? (
         <ScrollView contentContainerStyle={{alignItems:"center", gap: 10}} overScrollMode="never">
-          <RequestsFriends scrollable={true} />
-          <RecomendFriends scrollable={true} />
-          <AllFriends scrollable={true} />
+          <RequestsFriends limit={3} scrollable={true} />
+          <RecomendFriends limit={2} scrollable={true} />
+          <AllFriends limit={2} scrollable={true} />
         </ScrollView>
       ) : (
         <View style={{ flex: 1, overflow: 'hidden' }}>
