@@ -2,13 +2,14 @@ import { StyleSheet } from "react-native";
 
 export const styles = StyleSheet.create({
     tabText: {
-		fontSize: 15,
-		fontWeight: "500",
+		fontSize: 16,
+		fontWeight: "700",
 		color: "#81818D",
 	},
 	tabContainer: {
 		flexDirection: "row",
-		justifyContent: "space-around",
+		justifyContent: "space-between",
+		ali
 		padding: 20
 		gap: 24,
         marginTop: 10 
@@ -21,6 +22,6 @@ export const styles = StyleSheet.create({
         tabItem: {
         // flex: 1, 
         alignItems: 'center',
-        paddingVertical: 16, // Вертикальные отступы
+        paddingVertical: 16,
     },
 })

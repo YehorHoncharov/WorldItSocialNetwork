@@ -16,7 +16,6 @@ import CheckMarkIcon from "../../../../shared/ui/icons/checkMark";
 export function ChatGroup() {
   return (
     <View style={styles.container}>
-      {/* Chat Header */}
       <View style={styles.chatHeader}>
         <TouchableOpacity>
           <BackArrowIcon style={{ width: 10, height: 15 }} />

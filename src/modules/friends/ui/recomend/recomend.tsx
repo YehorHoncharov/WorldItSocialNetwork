@@ -21,8 +21,21 @@ export function RecomendFriends({
 
     useEffect(() => {
         if (!user) return;
+        
         const cUsers = users.filter((userC) => userC.id !== user.id);
-        setCorrectUsers(cUsers);
+
+        const firstUsers = cUsers.filter((userF) =>
+            user.friendship_to?.some(
+                (f) => f.profile1_id !== userF.id 
+            )
+        );
+        const secondUsers = cUsers.filter((userF) =>
+            user.friendship_from?.some(
+                (f) => f.profile2_id !== userF.id 
+            )
+        );
+        const rightUsers = firstUsers.concat(secondUsers)
+        setCorrectUsers(rightUsers);
     }, [users, user]);
 
     async function handleRequest(userTo: IUser) {

@@ -14,7 +14,7 @@ export function AllFriends({ scrollable = true, limit = undefined }: { scrollabl
 
     useEffect(() => {
         if (!user) return;
-        const cUsers = users.filter((userC) => userC.id !== user.id);
+        const cUsers = users.filter((userC) => userC.id !== user.id );
         setDisplayedUsers(cUsers);
     }, [users, user]);
 
@@ -25,12 +25,18 @@ export function AllFriends({ scrollable = true, limit = undefined }: { scrollabl
 
         const myFriends = users.filter((userF) =>
             user.friendship_to?.some(
-                (f) => f.accepted === true && f.profile1_id === userF.id
+                (f) => f.accepted === true && f.profile1_id === userF.id 
             )
         );
+        const friendsToAdd = users.filter((userF) =>
+            user.friendship_from?.some(
+                (f) => f.accepted === true && f.profile2_id === userF.id 
+            )
+        );
+        
+        const finalFriends = myFriends.concat(friendsToAdd)
 
-
-        setDisplayedUsers(limit ? myFriends.slice(0, limit) : myFriends)
+        setDisplayedUsers(limit ? finalFriends.slice(0, limit) : finalFriends)
     }, [users, user]);
     
 

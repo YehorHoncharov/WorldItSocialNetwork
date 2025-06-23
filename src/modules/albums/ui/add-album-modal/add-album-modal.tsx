@@ -27,7 +27,7 @@ interface Props {
   changeVisibility: () => void;
 }
 
-export function AddAlbumModal({ modalVisible, onClose }: Props) {
+export function AddAlbumModal({ modalVisible, onClose }: Props, {onAlbumCreated}: any) {
   const [name, setName] = useState("");
   const [theme, setTheme] = useState<string>();
   const { user } = useUserContext();
@@ -82,25 +82,29 @@ export function AddAlbumModal({ modalVisible, onClose }: Props) {
         },
       });
 
+      onAlbumCreated(response)
+
       if (response.status === "success") {
         console.log("Album created, calling refetch");
         Alert.alert("Успіх", "Альбом успішно створено!");
       }
       onClose();
       resetForm();
-      await refetch();
+      // await refetch();
     } catch (err) {
       console.error("Error creating album:", err);
       Alert.alert("Помилка", "Сталася помилка при створенні альбому");
     }
-    console.log("рефеч работает")
-    await refetch();
+    // await refetch();
+    // console.log("рефеч работает")
   };
 
   const handleCancel = () => {
     resetForm();
     onClose();
   };
+
+  
 
   return (
     <Modal

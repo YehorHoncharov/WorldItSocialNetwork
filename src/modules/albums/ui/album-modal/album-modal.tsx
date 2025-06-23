@@ -77,12 +77,11 @@ export function ModalAlbum({
             "Ваш альбом успішно видалився!"
         );
         onClose();
-        await refetch(); 
+        setTimeout(await refetch(), 3000)
     } catch (error: any) {
         console.error("Помилка видалення:", error.message);
-
-        await refetch();
     }
+        await refetch();
     }
 
     const currentAlbum = albums.find((album: IAlbum) => album.id === albumId);

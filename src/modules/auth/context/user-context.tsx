@@ -23,7 +23,6 @@ interface IUserContext {
   showWelcomeModal: boolean;
   logout: () => void;
   refetchLogin: (email: string, password: string) => Promise<IUser | null>;
-  refetchLogout: () => Promise<void>;
 }
 
 const initialValue: IUserContext = {
@@ -37,7 +36,6 @@ const initialValue: IUserContext = {
   showWelcomeModal: false,
   logout: async () => { },
   refetchLogin: async () => null,
-  refetchLogout: async () => { },
 };
 
 const userContext = createContext<IUserContext>(initialValue);
@@ -161,7 +159,7 @@ export function UserContextProvider({ children }: IUserContextProviderProps) {
     try {
       const token = await AsyncStorage.getItem("token");
       if (token) {
-        const response = await fetch("http://16:3000/user/logout", {
+        const response = await fetch("http://192.168.1.104:3000/user/logout", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -185,7 +183,7 @@ export function UserContextProvider({ children }: IUserContextProviderProps) {
   async function refetchLogin(email: string, password: string): Promise<IUser | null> {
     try {
       await AsyncStorage.multiRemove(["token", "user"]);
-      const response = await fetch("http://16:3000/user/log", {
+      const response = await fetch("http://192.168.1.104:3000/user/log", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -205,25 +203,6 @@ export function UserContextProvider({ children }: IUserContextProviderProps) {
     }
   }
 
-  async function refetchLogout(): Promise<void> {
-    try {
-      const token = await AsyncStorage.getItem("token");
-      if (token) {
-        await fetch("http://16:3000/user/logout", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            // "Cache-Control": "no-cache",
-          },
-        });
-      }
-      await AsyncStorage.multiRemove(["token", "user"]);
-      setUser(null);
-    } catch (error) {
-      console.error(error)
-
-    }
-  }
 
   async function updateUser(updatedUser: IUser) {
     try {
@@ -274,7 +253,7 @@ export function UserContextProvider({ children }: IUserContextProviderProps) {
         setShowWelcomeModal,
         logout,
         refetchLogin,
-        refetchLogout,
+
       }}
     >
       {children}

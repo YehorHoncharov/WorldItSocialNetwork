@@ -33,8 +33,9 @@
     "react-native-signature-canvas": "^4.7.4",
     "react-native-svg": "15.11.2",
     "react-native-toast-message": "^2.3.0",
+    "react-native-web": "^0.20.0",
     "react-router-dom": "6",
-    "react-native-web": "^0.20.0"
+    "socket.io-client": "^4.8.1"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",
@@ -42,5 +43,9 @@
     "@types/react-native": "^0.73.0",
     "typescript": "^5.8.3"
   },
-  "private": true
+  "private": true,
+  "optionalDependencies": {
+    "bufferutil": "^4.0.9",
+    "utf-8-validate": "^5.0.10"
+  }
 }
