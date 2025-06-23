@@ -14,7 +14,7 @@ export function Search() {
   const [foundContacts, setFoundContacts] = useState<IUser[]>([]);
   const { users } = useUsers();
   const { user } = useUserContext();
-  
+
   useEffect(() => {
 
     if (!user) return

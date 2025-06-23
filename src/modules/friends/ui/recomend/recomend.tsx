@@ -1,41 +1,53 @@
-import { ScrollView, View, Text, TouchableOpacity, FlatList, Alert } from "react-native";
+import {
+    ScrollView,
+    View,
+    Text,
+    TouchableOpacity,
+    FlatList,
+    Alert,
+    RefreshControl,
+} from "react-native";
 import { FriendsForm } from "../friends-form/friends-form";
 import { useUserContext } from "../../../auth/context/user-context";
 import { styles } from "./recomend.style";
 import { useUsers } from "../../hooks/useUsers";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { IUser } from "../../../auth/types";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
+import { useFriends } from "../../hooks/useFriends";
 
 export function RecomendFriends({
     scrollable = true,
-    limit = undefined
+    limit = undefined,
 }: {
     scrollable?: boolean;
     limit?: number;
 }) {
     const { users } = useUsers();
     const { user } = useUserContext();
-    const [correctUsers, setCorrectUsers] = useState<IUser[]>([])
+    const { refetchFriends } = useFriends()
+    const { refetchUsers } = useUsers()
+    const [correctUsers, setCorrectUsers] = useState<IUser[]>([]);
+    const [refreshing, setRefreshing] = useState(false);
     const displayedUsers = limit ? correctUsers.slice(0, limit) : correctUsers;
 
     useEffect(() => {
         if (!user) return;
         
-        const cUsers = users.filter((userC) => userC.id !== user.id);
 
-        const firstUsers = cUsers.filter((userF) =>
-            user.friendship_to?.some(
-                (f) => f.profile1_id !== userF.id 
-            )
+         const friendIds = [
+          ...(user.friendship_to?.map(f => f.profile1_id) || []),
+          ...(user.friendship_from?.map(f => f.profile2_id) || [])
+        ];
+
+        // исключаем самого себя и друзей
+        const filtered = users.filter(u =>
+          u.id !== user.id && !friendIds.includes(u.id)
         );
-        const secondUsers = cUsers.filter((userF) =>
-            user.friendship_from?.some(
-                (f) => f.profile2_id !== userF.id 
-            )
-        );
-        const rightUsers = firstUsers.concat(secondUsers)
-        setCorrectUsers(rightUsers);
+
+        setCorrectUsers(filtered);
+        
+      
     }, [users, user]);
 
     async function handleRequest(userTo: IUser) {
@@ -75,6 +87,19 @@ export function RecomendFriends({
         }
     }
 
+    const onRefresh = useCallback(async () => {
+      setRefreshing(true);
+      try {
+        await refetchFriends();
+        await refetchUsers()
+      } catch (error) {
+        console.error(" Ошибка при обновлении:", error);
+        Alert.alert("Ошибка", "Не удалось обновить данные. Попробуйте снова.");
+      } finally {
+        setRefreshing(false);
+      }
+    }, [refetchFriends, refetchUsers]);
+
     const content = (
         <View style={styles.container}>
             <View style={styles.buttonContainer}>
@@ -99,6 +124,14 @@ export function RecomendFriends({
                         deleteId={item.id}
                     />
                 )}
+                  refreshControl={
+                  <RefreshControl
+                    refreshing={refreshing}
+                    onRefresh={onRefresh}
+                    colors={["#543C52"]}
+                    progressBackgroundColor="#e9e5ee"
+                  />
+                }
                 ListEmptyComponent={
                     <View>
                         <Text>Немає друзів</Text>
@@ -108,5 +141,9 @@ export function RecomendFriends({
         </View>
     );
 
-    return scrollable ? <ScrollView overScrollMode="never">{content}</ScrollView> : content;
+    return scrollable ? (
+        <ScrollView overScrollMode="never">{content}</ScrollView>
+    ) : (
+        content
+    );
 }

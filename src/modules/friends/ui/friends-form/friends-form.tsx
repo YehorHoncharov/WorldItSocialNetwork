@@ -22,7 +22,7 @@ export function FriendsForm(props: FriendsFormProps) {
 
 
     function onPress() {
-        const { date_of_birth, actionButton, deleteId, friendship_from, friendship_to, ...rest } = props;
+        const { date_of_birth, actionButton, deleteId, friendship_from, friendship_to, chat_group_members, chat_messages, administered_groups, ...rest } = props;
 
         navigation.navigate({
             pathname: "/friends-profile",

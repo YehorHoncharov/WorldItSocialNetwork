@@ -1,3 +1,4 @@
+import { Chat } from '../../chat/types/socket';
 import { IFriendship } from '../../friends/types/friends.type';
 
 export interface IUser {
@@ -11,5 +12,9 @@ export interface IUser {
     signature?: string,
     image?: string,
     friendship_from?: IFriendship[],
-    friendship_to?: IFriendship[]
+    friendship_to?: IFriendship[],
+    chat_group_members?: IUser[],
+    chat_messages?: Chat[], 
+    administered_groups?: Chat[]
+    
 }

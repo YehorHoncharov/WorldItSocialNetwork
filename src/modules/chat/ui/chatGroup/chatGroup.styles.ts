@@ -2,13 +2,13 @@ import { StyleSheet } from "react-native";
 
 export const styles = StyleSheet.create({
 	container: {
-		flex: 1,
-		backgroundColor: "#fff",
+		// flex: 1,
+		// backgroundColor: "#fff",
 	},
 	chatHeader: {
 		// width: "90%",
 		flexDirection: "row",
-		// justifyContent: "space-between",
+		justifyContent: "space-between",
 		gap: 10,
 		paddingTop: 16,
 		paddingLeft: 16,
@@ -19,10 +19,10 @@ export const styles = StyleSheet.create({
 		alignItems: "center",
 	},
 	chatName: {
-		// fontFamily: "GTWalsheimPro",
+		color: "#123456",
 		fontWeight: 500,
 		fontSize: 24,
-		width: 120,
+		// width: 120,
 	},
 	chatInfo: {
 		fontSize: 14,
@@ -30,7 +30,7 @@ export const styles = StyleSheet.create({
 	},
 	menuBtn: {
 		padding: 5,
-		paddingLeft: 110,
+		paddingLeft: 80,
 	},
 	menuText: {
 		fontSize: 20,
@@ -39,11 +39,11 @@ export const styles = StyleSheet.create({
 		color: "#666",
 		textAlign: "center",
 		marginVertical: 10,
-		paddingTop: 150,
+		// paddingTop: 150,
 	},
 	messages: {
 		// flex: 1,
-		height: 290,
+		height: 320,
 		paddingHorizontal: 10,
 	},
 	message: {

@@ -27,7 +27,7 @@ interface Props {
   changeVisibility: () => void;
 }
 
-export function AddAlbumModal({ modalVisible, onClose }: Props, {onAlbumCreated}: any) {
+export function AddAlbumModal({ modalVisible, onClose }: Props) {
   const [name, setName] = useState("");
   const [theme, setTheme] = useState<string>();
   const { user } = useUserContext();
@@ -82,7 +82,7 @@ export function AddAlbumModal({ modalVisible, onClose }: Props, {onAlbumCreated}
         },
       });
 
-      onAlbumCreated(response)
+      // onAlbumCreated(response)
 
       if (response.status === "success") {
         console.log("Album created, calling refetch");

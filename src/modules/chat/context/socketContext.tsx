@@ -35,14 +35,14 @@ export function SocketContextProvider({
 
 	useEffect(() => {
 		if (!token) return
-		const newSocket = io(`ws://${API_BASE_URL}`, { auth: { token } })
+		const newSocket = io(`ws://192.168.1.104:3000`, { auth: { token } })
 
 		newSocket.on("connect", () => {
-			Alert.alert("Socket connected")
+			// Alert.alert("Socket connected")
 		})
 
 		newSocket.on("disconnect", () => {
-			Alert.alert("Socket disconnected")
+			// Alert.alert("Socket disconnected")
 		})
 
 		setSocket(newSocket)

@@ -15,14 +15,13 @@ export interface ChatGroupMembers {
 }
 
 export type ChatWithMessagesAndParticipants = {
-    messages: MessagePayload[];
+    chat_messages: MessagePayload[];
     members: ChatGroupMembers[];
 } & {
     id: number;
 };
 
 export type MessagePayload = {
-    id: number
     content: string
     sent_at: Date
     author_id: number
@@ -31,14 +30,12 @@ export type MessagePayload = {
 }
 
 export type CreateMessage = {
-    id?: number;
-    type: string;
-    text?: string | null;
-    mediaUrl?: string | null;
-    senderId: number;
-    chatId: number;
-    chatAsLastMessageId: number;
-    timestamp?: Date | string;
+    content?: string ;
+    attached_image?: string;
+    author_id: number;
+    chat_groupId: number;
+    sent_at?: Date
+   
 };
 
 type IChatUpdatePayload = Chat;
