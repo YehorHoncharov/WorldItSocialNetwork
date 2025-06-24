@@ -9,6 +9,7 @@ import {
   ActivityIndicator,
   Alert,
   RefreshControl,
+  ScrollView,
 } from "react-native";
 import { useRef, useState, useEffect, useMemo, useCallback } from "react";
 import { useAlbums } from "../../hooks/useAlbums";
@@ -44,35 +45,6 @@ export function AlbumHeader() {
     setUserAlbums(filteredAlbums);
   }, [filteredAlbums]);
 
-  const onRefresh = useCallback(async () => {
-    setRefreshing(true);
-    try {
-      await refetch();
-    } catch (error) {
-      console.error(" Ошибка при обновлении:", error);
-      Alert.alert("Ошибка", "Не удалось обновить данные. Попробуйте снова.");
-    } finally {
-      setRefreshing(false);
-    }
-  }, [refetch]);
-
-  // useEffect(()=>{
-  //   router.reload()
-  // })
-
-  // useEffect(() => {
-  //   async function fetchData() {
-  //     try {
-  //       const res = await refetch()
-  //     } catch (error: any) {
-  //       console.error("error retfching data")
-  //     } finally {
-  //       setTimeout(await refetch(), 4000)
-  //       router.reload()
-  //     }
-  //   }
-  //     fetchData()
-  // }, [])
 
   useEffect(() => {
     translateX.setValue(0);
@@ -93,12 +65,12 @@ export function AlbumHeader() {
       <View style={styles.tabContainer}>
         <TouchableOpacity
           style={styles.tabItem}
-          onPress={() => handleTabPress("personal")}
+          onPress={() => handleTabPress('personal')}
         >
           <Text
             style={[
               styles.tabText,
-              activeTab === "personal" && styles.tabTextActive,
+              activeTab === 'personal' && styles.tabTextActive,
             ]}
           >
             Особиста інформація
@@ -106,12 +78,12 @@ export function AlbumHeader() {
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.tabItem}
-          onPress={() => handleTabPress("albums")}
+          onPress={() => handleTabPress('albums')}
         >
           <Text
             style={[
               styles.tabText,
-              activeTab === "albums" && styles.tabTextActive,
+              activeTab === 'albums' && styles.tabTextActive,
             ]}
           >
             Альбоми
@@ -119,16 +91,16 @@ export function AlbumHeader() {
         </TouchableOpacity>
       </View>
 
-      <View style={{ flex: 1, width: screenWidth * 2, flexDirection: "row" }}>
+      <View style={{ flex: 1, width: screenWidth * 2, flexDirection: 'row' }}>
         <Animated.View
           style={{
-            flexDirection: "row",
+            flexDirection: 'row',
             width: screenWidth * 2,
             transform: [{ translateX }],
           }}
         >
           <View
-            style={{ width: screenWidth, flex: 1, backgroundColor: "#E9E5EE" }}
+            style={{ width: screenWidth, flex: 1, backgroundColor: '#E9E5EE' }}
           >
             <Settings />
           </View>
@@ -144,58 +116,50 @@ export function AlbumHeader() {
               style={{
                 flex: 1,
                 width: screenWidth,
-                justifyContent: "center",
-                alignItems: "center",
+                justifyContent: 'center',
+                alignItems: 'center',
               }}
             >
-              <Text style={{ color: "#070A1C" }}>Помилка: {error}</Text>
+              <Text style={{ color: '#070A1C' }}>Помилка: {error}</Text>
             </View>
           ) : (
-            <FlatList
+            <ScrollView
               style={{
                 width: screenWidth,
                 flex: 1,
-                backgroundColor: "#E9E5EE",
+                backgroundColor: '#E9E5EE',
               }}
               contentContainerStyle={{ gap: 8, paddingBottom: 60 }}
-              data={userAlbums.slice(1)}
-              keyExtractor={(item) => `${item.id}`}
-              ListHeaderComponent={() => (
-                <View
-                  style={{
-                    alignItems: "center",
-                    justifyContent: "center",
-                    paddingTop: 16,
-                    backgroundColor: "#E9E5EE",
-                  }}
-                >
-                  <My albums={albums} />
-                </View>
-              )}
-              renderItem={({ item }) => (
-                <Album
-                  id={item.id}
-                  name={item.name}
-                  topic={item.topic}
-                  created_at={item.created_at}
-                  author_id={item.author_id}
-                  images={item.images}
-                />
-              )}
-              refreshControl={
-                <RefreshControl
-                  refreshing={refreshing}
-                  onRefresh={onRefresh}
-                  colors={["#543C52"]}
-                  progressBackgroundColor="#e9e5ee"
-                />
-              }
-              ListEmptyComponent={
+              overScrollMode="never"
+            >
+              <View
+                style={{
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  paddingTop: 16,
+                  backgroundColor: '#E9E5EE',
+                }}
+              >
+                <My albums={albums} />
+              </View>
+              {userAlbums.slice(1).length === 0 ? (
                 <View>
                   <NoAlbums />
                 </View>
-              }
-            />
+              ) : (
+                userAlbums.slice(1).map((item) => (
+                  <Album
+                    key={`${item.id}`}
+                    id={item.id}
+                    name={item.name}
+                    topic={item.topic}
+                    created_at={item.created_at}
+                    author_id={item.author_id}
+                    images={item.images}
+                  />
+                ))
+              )}
+            </ScrollView>
           )}
         </Animated.View>
       </View>

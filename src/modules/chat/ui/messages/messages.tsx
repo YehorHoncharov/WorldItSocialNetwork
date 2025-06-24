@@ -84,7 +84,7 @@ export function MessagesScreen({ scrollable = true }: { scrollable?: boolean }) 
                         });
                     }
                     }}>
-                    <Friend2 user={item} lastMessage={lastMessage?.content} />
+                    <Friend2 user={{name: item.name ?? "User", image: item.image ?? "uploads/user.png"}} lastMessage={lastMessage?.content} />
                     </TouchableOpacity>
                 );
                 }}

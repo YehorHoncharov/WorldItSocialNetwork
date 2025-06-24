@@ -6,7 +6,7 @@ export function useAlbums() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const getAlbum = useCallback(async ()=>{
+  async function getAlbum(){
     try {
       setIsLoading(true);
       setError(null);
@@ -27,12 +27,11 @@ export function useAlbums() {
     } finally {
       setIsLoading(false);
     }
-  }, [])
-    
+  }
 
   useEffect(() => {
     getAlbum();
-  }, [getAlbum]);
+  }, []);
 
   return {
     albums,

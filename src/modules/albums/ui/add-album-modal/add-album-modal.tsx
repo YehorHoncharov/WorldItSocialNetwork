@@ -82,7 +82,7 @@ export function AddAlbumModal({ modalVisible, onClose }: Props) {
         },
       });
 
-      // onAlbumCreated(response)
+
 
       if (response.status === "success") {
         console.log("Album created, calling refetch");
@@ -90,13 +90,11 @@ export function AddAlbumModal({ modalVisible, onClose }: Props) {
       }
       onClose();
       resetForm();
-      // await refetch();
+      await refetch();
     } catch (err) {
       console.error("Error creating album:", err);
       Alert.alert("Помилка", "Сталася помилка при створенні альбому");
     }
-    // await refetch();
-    // console.log("рефеч работает")
   };
 
   const handleCancel = () => {
