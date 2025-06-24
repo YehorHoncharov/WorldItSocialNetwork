@@ -7,6 +7,7 @@ export type Chat = {
     admin_id: number,
     avatar: string,
     members: ChatGroupMembers[]
+    chat_messages: MessagePayload[]
 };
 
 export interface ChatGroupMembers {

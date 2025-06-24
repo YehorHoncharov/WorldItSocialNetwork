@@ -2,7 +2,7 @@ import { StyleSheet } from "react-native";
 
 export const styles = StyleSheet.create({
 	container: {
-		// flex: 1,
+		flexGrow: 1,
 		// backgroundColor: "#fff",
 	},
 	chatHeader: {
@@ -88,7 +88,7 @@ export const styles = StyleSheet.create({
 		paddingTop: 7,
 	},
 	inputContainer: {
-        flexGrow: 10,
+		flexGrow: 1,
 		flexDirection: "row",
 		padding: 10,
 		borderTopWidth: 1,

@@ -6,11 +6,11 @@ export default function ChatsLayout() {
 
 	return (
 		<SafeAreaView style={{ flex: 1, backgroundColor: "#ffffff" }} edges={["top",]}>
-			<Header />
 			<Stack
 				screenOptions={{
 					headerShown: false,
 				}}
+				
 			/>
 		</SafeAreaView>
 	);

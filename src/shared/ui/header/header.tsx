@@ -14,9 +14,10 @@ import { MyPublicationModal } from "../../../modules/my_publications/modal/modal
 import { useUserContext } from "../../../modules/auth/context/user-context";
 import { AddAlbumModal } from "../../../modules/albums/ui/add-album-modal/add-album-modal";
 import { IInputPasswordProps } from "../input/input.type";
+import { AddFriendModal } from "../../../modules/chat/ui/modals/createGroupModal/firstStepModal/firstStepModal";
 
 interface HeaderProps {
-  actionType?: 1 | 2; // 1 пости, 2 фльбоми
+  actionType?: 1 | 2 | 3; // 1 пости, 2 фльбоми, 3 групові чати
 }
 
 function Header({ actionType }: HeaderProps) {
@@ -50,6 +51,13 @@ function Header({ actionType }: HeaderProps) {
       )}
       {modalOpened && actionType === 2 && (
         <AddAlbumModal
+          modalVisible={modalOpened}
+          changeVisibility={toggleModal}
+          onClose={toggleModal}
+        />
+      )}
+      {modalOpened && actionType === 3 && (
+        <AddFriendModal
           modalVisible={modalOpened}
           changeVisibility={toggleModal}
           onClose={toggleModal}

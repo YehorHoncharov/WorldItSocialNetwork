@@ -7,7 +7,7 @@ import {
   TouchableOpacity,
   ScrollView,
   KeyboardAvoidingView,
-  Platform
+  Platform,
 } from "react-native";
 import SendArrow from "../../../../shared/ui/icons/send-arrow";
 import BackArrowIcon from "../../../../shared/ui/icons/arrowBack";
@@ -30,17 +30,17 @@ export function ChatGroup() {
   const [messages, setMessages] = useState<MessagePayload[]>([]);
   const [input, setInput] = useState("");
   const scrollViewRef = useRef<ScrollView>(null);
-  const router = useRouter()
+  const router = useRouter();
 
   useEffect(() => {
     if (!socket) return;
 
-    socket.emit("joinChat", { chatId: +params.chat_id }, (res) => {
+    const chatId = +params.chat_id;
+    socket.emit("joinChat", { chatId }, (res) => {
       if (res.status === "success" && Array.isArray(res.data?.chat_messages)) {
         setMessages(res.data.chat_messages);
       }
     });
-    console.log(messages)
 
     socket.on("newMessage", (data: CreateMessage) => {
       const newMessage: MessagePayload = {
@@ -50,15 +50,15 @@ export function ChatGroup() {
         chat_groupId: data.chat_groupId,
         attached_image: data.attached_image || "",
       };
-      setMessages(prev => [...prev, newMessage]);
+      setMessages((prev) => [...prev, newMessage]);
       scrollViewRef.current?.scrollToEnd({ animated: true });
     });
 
     return () => {
       socket.off("newMessage");
-      socket.emit("leaveChat", { chatId: +params.chat_id });
+      socket.emit("leaveChat", { chatId });
     };
-  }, [socket]);
+  }, [socket, params.chat_id]);
 
   const sendMessage = () => {
     if (!socket || !input.trim() || !user) return;
@@ -68,24 +68,29 @@ export function ChatGroup() {
       author_id: user.id,
       chat_groupId: +params.chat_id,
       sent_at: new Date(),
-      attached_image: ""
-  };
+      attached_image: "",
+    };
 
     socket.emit("sendMessage", newMessage as MessagePayload);
     setInput("");
   };
 
   function onBack() {
-    router.back()
+    router.back();
   }
 
   return (
-    <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : undefined} style={styles.container}>
+    <KeyboardAvoidingView
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      contentContainerStyle={styles.container}
+      // style={styles.container}
+      keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 20}
+    >
       <View style={styles.chatHeader}>
         <TouchableOpacity onPress={onBack}>
           <BackArrowIcon style={{ width: 25, height: 25 }} />
         </TouchableOpacity>
-        <View style={{ flexDirection: "row", justifyContent: "center"}}>
+        <View style={{ flexDirection: "row", justifyContent: "center" }}>
           <Image
             source={{ uri: API_BASE_URL + "/" + params.avatar }}
             style={styles.avatar}
@@ -102,18 +107,32 @@ export function ChatGroup() {
 
       <Text style={styles.chatDate}>25 травня 2025</Text>
 
-      <ScrollView style={styles.messages} ref={scrollViewRef} overScrollMode="never">
+      <ScrollView
+        style={styles.messages}
+        ref={scrollViewRef}
+        overScrollMode="never"
+        contentContainerStyle={{ paddingBottom: 10 }}
+      >
         {messages?.map((msg, index) => {
           const isMyMessage = msg.author_id === user?.id;
           return (
-            <View key={index} style={[styles.message, isMyMessage ? { justifyContent: "flex-end" } : {}]}>
+            <View
+              key={index}
+              style={[styles.message, isMyMessage ? { justifyContent: "flex-end" } : {}]}
+            >
               {!isMyMessage && (
-                <Image source={{ uri: API_BASE_URL + "/" + params.avatar }} style={{ width: 40, height: 40, borderRadius: 12345 }} />
+                <Image
+                  source={{ uri: API_BASE_URL + "/" + params.avatar }}
+                  style={{ width: 40, height: 40, borderRadius: 12345 }}
+                />
               )}
               <View style={isMyMessage ? styles.messageBubbleMy : styles.messageBubble}>
                 <Text style={styles.messageText}>{msg.content}</Text>
                 <Text style={styles.messageTime}>
-                  {new Date(msg.sent_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                  {new Date(msg.sent_at).toLocaleTimeString([], {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  })}
                   <CheckMarkIcon style={{ width: 10, height: 9 }} />
                 </Text>
               </View>

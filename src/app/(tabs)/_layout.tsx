@@ -113,7 +113,7 @@ export default function TabsLayout() {
 								}
 							/>
 						),
-						header: () => <Header />,
+						header: () => <Header actionType={3}/>,
 					}}
 				/>
 				{ }

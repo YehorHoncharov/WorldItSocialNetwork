@@ -13,8 +13,10 @@ export interface IUser {
     image?: string,
     friendship_from?: IFriendship[],
     friendship_to?: IFriendship[],
-    chat_group_members?: IUser[],
+    chat_group_members?: {
+        chat_groupId: number,
+        profile_id: 7
+    }[],
     chat_messages?: Chat[], 
     administered_groups?: Chat[]
-    
 }

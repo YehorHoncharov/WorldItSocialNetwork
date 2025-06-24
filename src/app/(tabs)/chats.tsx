@@ -1,26 +1,22 @@
 import { View, Alert, ScrollView, Dimensions, Animated } from "react-native";
-import { useUserContext } from "../../modules/auth/context/user-context";
-import {ContactsScreen} from "../../modules/chat/ui/contacts/contacts";
+import { ContactsScreen } from "../../modules/chat/ui/contacts/contacts";
 import { useRef, useState } from "react";
 import { ChatHeader } from "../../modules/chat/ui/chat-header/chat-header";
-import { RecomendFriends } from "../../modules/friends/ui/recomend/recomend";
-import { AllFriends } from "../../modules/friends/ui/all/all";
 import { MessagesScreen } from "../../modules/chat/ui/messages/messages";
-import { ChatGroup } from "../../modules/chat/ui/chatGroup/chatGroup";
-
+import { GroupChats } from "../../modules/chat/ui/group-chats/groupChats";
 
 
 
 const screenWidth = Dimensions.get("window").width;
 
 export default function Chats() {
-    // const {user} = useUserContext()
-    // if (!user){
-    //     Alert.alert("Будь ласка, зареєструйтесь")
-    //     return
-    // } 
-    const [activeTab, setActiveTab] = useState('contacts');
-    const translateX = useRef(new Animated.Value(0)).current;
+  // const {user} = useUserContext()
+  // if (!user){
+  //     Alert.alert("Будь ласка, зареєструйтесь")
+  //     return
+  // } 
+  const [activeTab, setActiveTab] = useState('contacts');
+  const translateX = useRef(new Animated.Value(0)).current;
 
   const handleTabPress = (tab: string) => {
     if (tab === 'contacts') {
@@ -49,7 +45,7 @@ export default function Chats() {
       <ChatHeader activeTab={activeTab} onTabPress={handleTabPress} />
 
       {activeTab === 'contacts' ? (
-        <ScrollView contentContainerStyle={{gap: 10}} overScrollMode="never">
+        <ScrollView contentContainerStyle={{ gap: 10 }} overScrollMode="never">
           <ContactsScreen scrollable={true} />
         </ScrollView>
       ) : (
@@ -66,7 +62,7 @@ export default function Chats() {
               <MessagesScreen />
             </ScrollView>
             <ScrollView style={{ width: screenWidth }} overScrollMode="never">
-              <ChatGroup />
+              <GroupChats />
             </ScrollView>
           </Animated.View>
         </View>
