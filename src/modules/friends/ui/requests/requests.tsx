@@ -38,8 +38,6 @@ export function RequestsFriends({
       )
     );
 
-
-    console.log(friends)
     setDisplayedUsers(limit ? myFriends.slice(0, limit) : myFriends);
   }
 

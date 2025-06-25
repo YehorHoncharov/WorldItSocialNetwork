@@ -70,7 +70,9 @@ export function UserContextProvider({ children }: IUserContextProviderProps) {
       await AsyncStorage.setItem("user", JSON.stringify(result.data));
       return result.data;
     } catch (error) {
-      console.error("[getData] Error:", error);
+      router.push({
+        pathname: "/registration/step-one"
+      })
       return null;
     }
   }
@@ -92,7 +94,7 @@ export function UserContextProvider({ children }: IUserContextProviderProps) {
       await AsyncStorage.setItem("token", result.data);
       await getData(result.data);
     } catch (error) {
-      console.error("[login] Error:", error);
+      // console.error("[login] Error:", error);
     }
   }
 
@@ -123,7 +125,6 @@ export function UserContextProvider({ children }: IUserContextProviderProps) {
       getData(result.data);
 
       try {
-        console.log(user?.image)
         const create_start_album = await POST({
           endpoint: `${API_BASE_URL}/albums/create`,
           headers: {
@@ -238,6 +239,10 @@ export function UserContextProvider({ children }: IUserContextProviderProps) {
       const token = await AsyncStorage.getItem("token");
       if (token) {
         await getData(token);
+      } else {
+        router.push({
+          pathname: "/registration/step-one"
+        })
       }
     }
     checkToken();
