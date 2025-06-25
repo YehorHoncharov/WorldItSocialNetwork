@@ -9,7 +9,7 @@ import T from "../icons/logo/t";
 import { styles } from "./header.styles";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useRouter } from "expo-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { MyPublicationModal } from "../../../modules/my_publications/modal/modal";
 import { useUserContext } from "../../../modules/auth/context/user-context";
 import { AddAlbumModal } from "../../../modules/albums/ui/add-album-modal/add-album-modal";
@@ -22,14 +22,20 @@ interface HeaderProps {
 
 function Header({ actionType }: HeaderProps) {
   const router = useRouter();
-  const { user } = useUserContext();
+  const { user, refreshUser } = useUserContext();
   const [modalOpened, setModalOpened] = useState<boolean>(false);
 
   const Logout = async () => {
     try {
       await AsyncStorage.removeItem("token");
+
     } catch {
       console.log("Помилка виходу");
+    } finally {
+      await refreshUser()
+      router.push({
+        pathname: "/registration/step-one"
+      })
     }
   };
 
@@ -59,7 +65,7 @@ function Header({ actionType }: HeaderProps) {
       {modalOpened && actionType === 3 && (
         <AddFriendModal
           modalVisible={modalOpened}
-          changeVisibility={toggleModal}
+          // changeVisibility={toggleModal}
           onClose={toggleModal}
         />
       )}

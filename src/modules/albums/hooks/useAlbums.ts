@@ -1,17 +1,18 @@
 import { useState, useEffect, useCallback } from "react";
 import { IAlbum } from "../types/albums.types";
+import { API_BASE_URL } from "../../../settings";
 
 export function useAlbums() {
   const [albums, setAlbums] = useState<IAlbum[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const getAlbum = useCallback(async ()=>{
+  async function getAlbum(){
     try {
       setIsLoading(true);
       setError(null);
 
-      const response = await fetch("http://192.168.1.104:3000/albums");
+      const response = await fetch(`${API_BASE_URL}/albums`);
       const result = await response.json();
 
       if (result.status === "error") {
@@ -27,12 +28,11 @@ export function useAlbums() {
     } finally {
       setIsLoading(false);
     }
-  }, [])
+  }
     
-
   useEffect(() => {
     getAlbum();
-  }, [getAlbum]);
+  }, [albums]);
 
   return {
     albums,

@@ -3,12 +3,14 @@ import { StyleSheet } from "react-native";
 export const styles = StyleSheet.create({
     footer: {
         height: 70, 
-        paddingBottom: 40, 
+        // paddingBottom: 35, 
+        marginTop: 15,
         flexDirection: 'row',
-        justifyContent: 'center',
-        alignItems: 'center',
+        justifyContent: 'space-around',
+        // alignItems: 'center',
         backgroundColor: '#FFFFFF',
-        gap: 5,
+        gap: 10,
+        // paddingLeft: 20
     },
     home: {
         width: 68,
@@ -25,6 +27,6 @@ export const styles = StyleSheet.create({
     chats: {
         width: 47,
         height: 54,
-        paddingRight: 40,
+        // paddingRight: 20,
     },
 });

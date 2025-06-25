@@ -17,6 +17,7 @@ import { styles } from "../../../post/ui/modal-post/modal-post.style";
 import { EditAlbumModal } from "../edit-album-modal/edit-album-modal";
 import { AlbumUpdateBody, IAlbum, IAlbumEditProps } from "../../types/albums.types";
 import { useUserContext } from "../../../auth/context/user-context";
+import { API_BASE_URL } from "../../../../settings";
 
 interface ModalAlbumProps {
     visible: boolean;
@@ -36,7 +37,7 @@ export function ModalAlbum({
 }: ModalAlbumProps) {
     const [modalOpened, setModalOpened] = useState<boolean>(false);
     const [tokenUser, setTokenUser] = useState<string | null>(null);
-    const { albums, setAlbums, refetch } = useAlbums();
+    const { albums, setAlbums} = useAlbums();
     const { user } = useUserContext()
 
     const getToken = async (): Promise<string | null> => {
@@ -64,7 +65,7 @@ export function ModalAlbum({
             setAlbums(prevAlbums => prevAlbums.filter((album: IAlbum) => album.id !== albumId));
         
         await DELETE({
-            endpoint: `http://192.168.1.104:3000/albums/${albumId}`,
+            endpoint: `${API_BASE_URL}/albums/${albumId}`,
             headers: {
                 "Content-Type": "application/json",
                 Authorization: `Bearer ${tokenUser}`,
@@ -77,11 +78,11 @@ export function ModalAlbum({
             "Ваш альбом успішно видалився!"
         );
         onClose();
-        setTimeout(await refetch(), 3000)
+        
     } catch (error: any) {
         console.error("Помилка видалення:", error.message);
     }
-        await refetch();
+     
     }
 
     const currentAlbum = albums.find((album: IAlbum) => album.id === albumId);

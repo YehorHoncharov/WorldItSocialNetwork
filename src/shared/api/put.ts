@@ -22,30 +22,23 @@ export async function PUT<T>(params: IPutRequestParams): Promise<Result<T>> {
             method: "PUT",
         });
 
-
         const text = await response.text();
-
 
         let responseData: any;
         try {
             responseData = text ? JSON.parse(text) : {};
         } catch (e) {
-
-            return {
-                status: "error",
-                message: "Некоректний формат відповіді сервера",
-                code: response.status || 500,
-            };
+            console.log(e)
         }
 
-        if (!response.ok) {
+        // if (!response.ok) {
 
-            return {
-                status: "error",
-                message: responseData.message || `HTTP помилка: ${response.status}`,
-                code: response.status,
-            };
-        }
+        //     return {
+        //         status: "error",
+        //         message: responseData.message || `HTTP помилка: ${response.status}`,
+        //         code: response.status,
+        //     };
+        // }
 
         if (responseData.status === "success" || responseData.status === "error") {
             return responseData as Result<T>;
@@ -65,13 +58,14 @@ export async function PUT<T>(params: IPutRequestParams): Promise<Result<T>> {
             };
         }
 
-
         return {
             status: "error",
             message: "Невідомий формат відповіді сервера",
             code: 500,
         };
-    } catch (err) {        console.error("Помилка в PUT:", err);
+        
+    } catch (err) {
+        console.error("Помилка в PUT:", err);
 
         return {
             status: "error",

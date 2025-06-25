@@ -54,7 +54,7 @@ export function EditAlbumModal({
   useEffect(() => {
     setName(initialData.name);
     setTopic(initialData.topic);
-  }, [initialData]);
+  }, []);
 
 
   const resetForm = () => {

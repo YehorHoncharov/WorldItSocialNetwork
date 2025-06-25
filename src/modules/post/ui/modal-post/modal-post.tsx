@@ -67,7 +67,7 @@ export function ModalPost({
 		}
 		try {
 			await DELETE({
-				endpoint: `http://192.168.1.104:3000/posts/${postId}`,
+				endpoint: `${API_BASE_URL}/posts/${postId}`,
 				headers: {
 					"Content-Type": "application/json",
 				},

@@ -50,7 +50,6 @@ export function ChangePostModal({
   changeVisibility,
   postData,
 }: Props) {
-  const { refetch } = usePosts();
   const [name, setName] = useState("");
   const [theme, setTheme] = useState("");
   const [text, setText] = useState("");
@@ -121,7 +120,7 @@ export function ChangePostModal({
     if (modalVisible) {
       loadData();
     }
-  }, [modalVisible, postData]);
+  }, [modalVisible]);
 
   const handleSubmit = async () => {
     if (!postData || !postData.id) {
@@ -214,14 +213,13 @@ export function ChangePostModal({
         endpoint: `${API_BASE_URL}/posts/${postData.id}`,
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${tokenUser}`,
         },
+        token: tokenUser,
         body: updatedData,
       });
 
       if (response.status === "success") {
         Alert.alert("Успіх", "Пост успішно оновлено");
-        await refetch();
         changeVisibility();
       } else {
         Alert.alert("Помилка", response.message || "Не вдалося оновити пост");

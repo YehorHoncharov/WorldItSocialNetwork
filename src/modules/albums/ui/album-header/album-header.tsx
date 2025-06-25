@@ -9,6 +9,7 @@ import {
   ActivityIndicator,
   Alert,
   RefreshControl,
+  ScrollView,
 } from "react-native";
 import { useRef, useState, useEffect, useMemo, useCallback } from "react";
 import { useAlbums } from "../../hooks/useAlbums";
@@ -38,41 +39,12 @@ export function AlbumHeader() {
     return albums.filter(
       (album) => album.author_id.toString() === user.id.toString()
     );
-  }, [albums, user]);
+  }, [albums, user])
 
   useEffect(() => {
     setUserAlbums(filteredAlbums);
   }, [filteredAlbums]);
 
-  const onRefresh = useCallback(async () => {
-    setRefreshing(true);
-    try {
-      await refetch();
-    } catch (error) {
-      console.error(" Ошибка при обновлении:", error);
-      Alert.alert("Ошибка", "Не удалось обновить данные. Попробуйте снова.");
-    } finally {
-      setRefreshing(false);
-    }
-  }, [refetch]);
-
-  // useEffect(()=>{
-  //   router.reload()
-  // })
-
-  // useEffect(() => {
-  //   async function fetchData() {
-  //     try {
-  //       const res = await refetch()
-  //     } catch (error: any) {
-  //       console.error("error retfching data")
-  //     } finally {
-  //       setTimeout(await refetch(), 4000)
-  //       router.reload()
-  //     }
-  //   }
-  //     fetchData()
-  // }, [])
 
   useEffect(() => {
     translateX.setValue(0);
@@ -151,51 +123,41 @@ export function AlbumHeader() {
               <Text style={{ color: "#070A1C" }}>Помилка: {error}</Text>
             </View>
           ) : (
-            <FlatList
+            <ScrollView
               style={{
                 width: screenWidth,
                 flex: 1,
                 backgroundColor: "#E9E5EE",
               }}
               contentContainerStyle={{ gap: 8, paddingBottom: 60 }}
-              data={userAlbums.slice(1)}
-              keyExtractor={(item) => `${item.id}`}
-              ListHeaderComponent={() => (
-                <View
-                  style={{
-                    alignItems: "center",
-                    justifyContent: "center",
-                    paddingTop: 16,
-                    backgroundColor: "#E9E5EE",
-                  }}
-                >
-                  <My albums={albums} />
-                </View>
+              
+            >
+              <View
+                style={{
+                  alignItems: "center",
+                  justifyContent: "center",
+                  paddingTop: 16,
+                  backgroundColor: "#E9E5EE",
+                }}
+              >
+                <My albums={albums} />
+              </View>
+              {userAlbums.length > 1 ? (
+                userAlbums.slice(1).map((item) => (
+                  <Album
+                    key={`${item.id}`}
+                    id={item.id}
+                    name={item.name}
+                    topic={item.topic}
+                    created_at={item.created_at}
+                    author_id={item.author_id}
+                    images={item.images}
+                  />
+                ))
+              ) : (
+                <NoAlbums />
               )}
-              renderItem={({ item }) => (
-                <Album
-                  id={item.id}
-                  name={item.name}
-                  topic={item.topic}
-                  created_at={item.created_at}
-                  author_id={item.author_id}
-                  images={item.images}
-                />
-              )}
-              refreshControl={
-                <RefreshControl
-                  refreshing={refreshing}
-                  onRefresh={onRefresh}
-                  colors={["#543C52"]}
-                  progressBackgroundColor="#e9e5ee"
-                />
-              }
-              ListEmptyComponent={
-                <View>
-                  <NoAlbums />
-                </View>
-              }
-            />
+            </ScrollView>
           )}
         </Animated.View>
       </View>
