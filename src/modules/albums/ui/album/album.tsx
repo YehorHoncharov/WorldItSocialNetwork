@@ -37,7 +37,7 @@ export function Album({ scrollOffset = 0, ...props }: IAlbum & { scrollOffset?: 
 		if (props.images && Array.isArray(props.images)) {
 			setImages(props.images.map(image => ({ image: { id: image.image.id, filename: image.image.filename, file: image.image.file } })));
 		}
-	}, [props.images]);
+	}, []);
 
 	const measureDots = () => {
 		if (dotsRef.current) {

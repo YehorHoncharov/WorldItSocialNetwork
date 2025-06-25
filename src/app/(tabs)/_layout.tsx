@@ -12,7 +12,7 @@ export default function TabsLayout() {
 	const [isChatsActive, setIsChatsActive] = useState(false);
 
 	return (
-		<SafeAreaView style={{ flex: 1, backgroundColor: "#ffffff" }} edges={["top"]}>
+		<SafeAreaView style={{ flex: 1, backgroundColor: "#ffffff"}} edges={["top"]}>
 			<Tabs
 				screenOptions={{
 					tabBarStyle: styles.footer,

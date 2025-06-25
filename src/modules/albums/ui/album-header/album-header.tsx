@@ -39,7 +39,7 @@ export function AlbumHeader() {
     return albums.filter(
       (album) => album.author_id.toString() === user.id.toString()
     );
-  }, [albums, user]);
+  }, [albums, user])
 
   useEffect(() => {
     setUserAlbums(filteredAlbums);
@@ -130,23 +130,19 @@ export function AlbumHeader() {
                 backgroundColor: '#E9E5EE',
               }}
               contentContainerStyle={{ gap: 8, paddingBottom: 60 }}
-              overScrollMode="never"
+              
             >
               <View
                 style={{
-                  alignItems: 'center',
-                  justifyContent: 'center',
+                  alignItems: "center",
+                  justifyContent: "center",
                   paddingTop: 16,
-                  backgroundColor: '#E9E5EE',
+                  backgroundColor: "#E9E5EE",
                 }}
               >
                 <My albums={albums} />
               </View>
-              {userAlbums.slice(1).length === 0 ? (
-                <View>
-                  <NoAlbums />
-                </View>
-              ) : (
+              {userAlbums.length > 1 ? (
                 userAlbums.slice(1).map((item) => (
                   <Album
                     key={`${item.id}`}
@@ -158,6 +154,8 @@ export function AlbumHeader() {
                     images={item.images}
                   />
                 ))
+              ) : (
+                <NoAlbums />
               )}
             </ScrollView>
           )}

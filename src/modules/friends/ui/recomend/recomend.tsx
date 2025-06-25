@@ -3,9 +3,7 @@ import {
     View,
     Text,
     TouchableOpacity,
-    FlatList,
     Alert,
-    RefreshControl,
 } from "react-native";
 import { FriendsForm } from "../friends-form/friends-form";
 import { useUserContext } from "../../../auth/context/user-context";
@@ -13,8 +11,8 @@ import { styles } from "./recomend.style";
 import { useUsers } from "../../hooks/useUsers";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { IUser } from "../../../auth/types";
-import { useCallback, useEffect, useState } from "react";
-import { useFriends } from "../../hooks/useFriends";
+import { useEffect, useState } from "react";
+import { API_BASE_URL } from "../../../../settings";
 
 export function RecomendFriends({
     scrollable = true,
@@ -25,30 +23,30 @@ export function RecomendFriends({
 }) {
     const { users } = useUsers();
     const { user } = useUserContext();
-    const { refetchFriends } = useFriends()
-    const { refetchUsers } = useUsers()
+
     const [correctUsers, setCorrectUsers] = useState<IUser[]>([]);
-    const [refreshing, setRefreshing] = useState(false);
     const displayedUsers = limit ? correctUsers.slice(0, limit) : correctUsers;
+    const { refreshUser } = useUserContext();
 
-    useEffect(() => {
+
+    function updateRecommendations() {
         if (!user) return;
-        
 
-         const friendIds = [
-          ...(user.friendship_to?.map(f => f.profile1_id) || []),
-          ...(user.friendship_from?.map(f => f.profile2_id) || [])
+        const friendIds = [
+            ...(user.friendship_to?.map((f) => f.profile1_id) || []),
+            ...(user.friendship_from?.map((f) => f.profile2_id) || []),
         ];
 
-        // исключаем самого себя и друзей
-        const filtered = users.filter(u =>
-          u.id !== user.id && !friendIds.includes(u.id)
+        const filtered = users.filter(
+            (u) => u.id !== user.id && !friendIds.includes(u.id)
         );
 
         setCorrectUsers(filtered);
-        
-      
-    }, [users, user]);
+    }
+
+    useEffect(() => {
+        updateRecommendations();
+    }, [users]);
 
     async function handleRequest(userTo: IUser) {
         try {
@@ -59,20 +57,17 @@ export function RecomendFriends({
                 return;
             }
 
-            const response = await fetch(
-                `http://192.168.1.104:3000/friendship/create`,
-                {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        Authorization: `Bearer ${token}`,
-                    },
-                    body: JSON.stringify({
-                        profile2_id: userTo.id,
-                        accepted: false,
-                    }),
-                }
-            );
+            const response = await fetch(`${API_BASE_URL}/friendship/create`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`,
+                },
+                body: JSON.stringify({
+                    profile2_id: userTo.id,
+                    accepted: false,
+                }),
+            });
 
             const result = await response.json();
 
@@ -80,27 +75,15 @@ export function RecomendFriends({
                 Alert.alert("Помилка", result.message);
                 return;
             }
+            await refreshUser();
+            updateRecommendations();
 
             Alert.alert("Успіх", "Запит відправлено");
         } catch (error) {
             Alert.alert("Помилка", "Не вдалося зберегти дані");
         }
     }
-
-    const onRefresh = useCallback(async () => {
-      setRefreshing(true);
-      try {
-        await refetchFriends();
-        await refetchUsers()
-      } catch (error) {
-        console.error(" Ошибка при обновлении:", error);
-        Alert.alert("Ошибка", "Не удалось обновить данные. Попробуйте снова.");
-      } finally {
-        setRefreshing(false);
-      }
-    }, [refetchFriends, refetchUsers]);
-
-    const content = (
+    return (
         <View style={styles.container}>
             <View style={styles.buttonContainer}>
                 <Text style={[styles.text, { color: "#070A1C" }]}>Рекомендації</Text>
@@ -109,41 +92,47 @@ export function RecomendFriends({
                 </TouchableOpacity>
             </View>
 
-            <FlatList
-                data={displayedUsers}
-                scrollEnabled={false}
-                keyExtractor={(item) => `${item.id}`}
-                contentContainerStyle={{ gap: 10, flexGrow: 1 }}
-                renderItem={({ item }) => (
-                    <FriendsForm
-                        {...item}
-                        actionButton={{
-                            label: "Додати",
-                            onPress: () => handleRequest(item),
-                        }}
-                        deleteId={item.id}
-                    />
-                )}
-                  refreshControl={
-                  <RefreshControl
-                    refreshing={refreshing}
-                    onRefresh={onRefresh}
-                    colors={["#543C52"]}
-                    progressBackgroundColor="#e9e5ee"
-                  />
-                }
-                ListEmptyComponent={
-                    <View>
+            {scrollable ? (
+                <ScrollView
+                    contentContainerStyle={{ gap: 10 }}
+                    overScrollMode="never"
+                    nestedScrollEnabled
+                >
+                    {displayedUsers.length > 0 ? (
+                        displayedUsers.map((item) => (
+                            <FriendsForm
+                                key={item.id}
+                                {...item}
+                                actionButton={{
+                                    label: "Додати",
+                                    onPress: () => handleRequest(item),
+                                }}
+                                deleteId={item.id}
+                            />
+                        ))
+                    ) : (
                         <Text>Немає друзів</Text>
-                    </View>
-                }
-            />
+                    )}
+                </ScrollView>
+            ) : (
+                <View style={{ gap: 10 }}>
+                    {displayedUsers.length > 0 ? (
+                        displayedUsers.map((item) => (
+                            <FriendsForm
+                                key={item.id}
+                                {...item}
+                                actionButton={{
+                                    label: "Додати",
+                                    onPress: () => handleRequest(item),
+                                }}
+                                deleteId={item.id}
+                            />
+                        ))
+                    ) : (
+                        <Text>Немає друзів</Text>
+                    )}
+                </View>
+            )}
         </View>
-    );
-
-    return scrollable ? (
-        <ScrollView overScrollMode="never">{content}</ScrollView>
-    ) : (
-        content
     );
 }

@@ -51,7 +51,7 @@ export function My(props: IAlbumProps) {
     if (minAlbum?.images && Array.isArray(minAlbum.images)) {
       setImages(minAlbum.images);
     }
-  }, [minAlbum, user]);
+  }, [user]);
 
   async function onSearch() {
     try {
@@ -117,7 +117,7 @@ export function My(props: IAlbumProps) {
           Alert.alert("Увага", "Максимальна кількість зображень - 10");
           return;
         }
-        setChangeImage(true)
+        setChangeImage(true);
         setImages((prev) => [...prev, ...newImages]);
       } else if (result.canceled) {
         Alert.alert("Скасовано", "Вибір зображень було скасовано");
@@ -147,7 +147,7 @@ export function My(props: IAlbumProps) {
       delete updatedDimensions[id];
       return updatedDimensions;
     });
-    setChangeImage(true)
+    setChangeImage(true);
   }
 
   async function save() {
@@ -155,7 +155,7 @@ export function My(props: IAlbumProps) {
       const formattedImages: IAlbumImageShow[] = [
         ...images,
         ...imagesToDelete.map((id) => ({ image: { id: id, filename: "" } }))
-      ]
+      ];
 
       const response: IPutResponse = await PUT({
         endpoint: `${API_BASE_URL}/albums/${minAlbum?.id}`,
@@ -178,11 +178,11 @@ export function My(props: IAlbumProps) {
         setChangeImage(false);
         Alert.alert("Успіх", "Зміни успішно збережено");
       } else {
-        console.log("Помилка збереження!")
+        console.log("Помилка збереження!");
       }
-      Alert.alert("Успіх", "Зміни успішно збережено");
     } catch (err) {
       console.error("Помилка збереження:", err);
+      Alert.alert("Помилка", "Не вдалося зберегти зміни");
     }
   }
 
@@ -207,7 +207,6 @@ export function My(props: IAlbumProps) {
     );
   }
 
-
   return (
     <View style={styles.container}>
       <ScrollView
@@ -227,10 +226,9 @@ export function My(props: IAlbumProps) {
         </View>
 
         <View style={[styles.imageContainer, { flex: 1 }]}>
-
           {images.length > 0 ? (
-            images.reverse().map((image) => (
-              <View key={image.image.filename} style={styles.imageWrapper}>
+            [...images].map((image) => (
+              <View key={image.image.id} style={styles.imageWrapper}>
                 <Image
                   source={normalizeImageUrl(image.image.filename)}
                   style={styles.avatar}
@@ -254,17 +252,17 @@ export function My(props: IAlbumProps) {
                 </View>
               </View>
             ))
-          ) : null}
+          ) : (
+            <Text>Немає доданих зображень</Text>
+          )}
         </View>
 
         {changeImage && (
-          <View
-            style={{
+          <View style={{
               width: "100%",
               alignItems: "center",
               justifyContent: "center",
-            }}
-          >
+            }}>
             <TouchableOpacity style={[styles.addButton, { width: "50%" }]} onPress={save}>
               <Text style={styles.addButtonText}>Зберегти</Text>
             </TouchableOpacity>

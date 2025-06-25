@@ -61,7 +61,7 @@ export function Settings() {
 		try {
 			if (!user) return;
 			const response = await fetch(
-				`http://192.168.1.104:3000/user/${user.id}`,
+				`${API_BASE_URL}/user/${user.id}`,
 				{
 					method: "PUT",
 					headers: { "Content-Type": "application/json" },

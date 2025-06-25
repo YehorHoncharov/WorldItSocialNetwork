@@ -1,13 +1,14 @@
 import { useCallback, useEffect, useState } from "react";
 import { IUser } from "../../auth/types";
+import { API_BASE_URL } from "../../../settings";
 
 
 export function useUsers() {
 	const [users, setUsers] = useState<IUser[]>([]);
 
-	const getUsers = useCallback(async () => {
+	async function getUsers(){
 		try {
-			const response = await fetch("http://192.168.1.104:3000/user/all");
+			const response = await fetch(`${API_BASE_URL}/user/all`);
 			const result = await response.json();
 			if (result.status === "error") {
 				return;
@@ -16,37 +17,11 @@ export function useUsers() {
 		} catch (err) {
 			console.error(err);
 		}
+	}
 
-	}, [])
 	useEffect(()=>{
 		getUsers()
-	}, [getUsers])
+	}, [users])
 
-	return { users, refetchUsers: getUsers }
+	return { users }
 }
-
-// import { useEffect, useState } from "react";
-// import { IUser } from "../../auth/types";
-
-
-// export function useUsers() {
-// 	const [users, setUsers] = useState<IUser[]>([]);
-
-// 	useEffect(() => {
-// 		const fetchUsers = async () => {
-// 			try {
-// 				const response = await fetch("http://192.168.1.104:3000/user/all");
-// 				const result = await response.json();
-// 				if (result.status === "error") {
-// 					return;
-// 				}
-// 				setUsers(result)
-// 			} catch (err) {
-// 				console.error(err);}
-			
-// 			}
-// 		fetchUsers();
-// 	}, [])
-	
-// 	return { users};
-// }

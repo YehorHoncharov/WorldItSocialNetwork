@@ -4,6 +4,7 @@ import { IUser } from "../types/user";
 import { Response } from "./types";
 import { API_BASE_URL } from "../../../settings";
 import { POST } from "../../../shared/api/post";
+import { useRouter } from "expo-router";
 
 interface IUserContext {
   user: IUser | null;
@@ -22,7 +23,7 @@ interface IUserContext {
   setShowWelcomeModal: (value: boolean) => void;
   showWelcomeModal: boolean;
   logout: () => void;
-  refetchLogin: (email: string, password: string) => Promise<IUser | null>;
+  // refetchLogin: (email: string, password: string) => Promise<IUser | null>;
 }
 
 const initialValue: IUserContext = {
@@ -35,7 +36,7 @@ const initialValue: IUserContext = {
   setShowWelcomeModal: () => { },
   showWelcomeModal: false,
   logout: async () => { },
-  refetchLogin: async () => null,
+  // refetchLogin: async () => null,
 };
 
 const userContext = createContext<IUserContext>(initialValue);
@@ -51,10 +52,11 @@ interface IUserContextProviderProps {
 export function UserContextProvider({ children }: IUserContextProviderProps) {
   const [user, setUser] = useState<IUser | null>(null);
   const [showWelcomeModal, setShowWelcomeModal] = useState(false);
+  const router = useRouter()
 
   async function getData(token: string): Promise<IUser | null> {
     try {
-      const response = await fetch("http://192.168.1.104:3000/user/me", {
+      const response = await fetch(`${API_BASE_URL}/user/me`, {
         headers: {
           Authorization: `Bearer ${token}`,
           // "Cache-Control": "no-cache",
@@ -75,7 +77,7 @@ export function UserContextProvider({ children }: IUserContextProviderProps) {
 
   async function login(email: string, password: string) {
     try {
-      const response = await fetch("http://192.168.1.104:3000/user/log", {
+      const response = await fetch(`${API_BASE_URL}/user/log`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -93,6 +95,7 @@ export function UserContextProvider({ children }: IUserContextProviderProps) {
       console.error("[login] Error:", error);
     }
   }
+
 
   async function register(
     email: string,
@@ -159,11 +162,11 @@ export function UserContextProvider({ children }: IUserContextProviderProps) {
     try {
       const token = await AsyncStorage.getItem("token");
       if (token) {
-        const response = await fetch("http://192.168.1.104:3000/user/logout", {
+        const response = await fetch(`${API_BASE_URL}/user/logout`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            // Authorization: `Bearer ${token}`,
+            Authorization: `Bearer ${token}`,
           },
         });
         const result = await response.json();
@@ -171,7 +174,7 @@ export function UserContextProvider({ children }: IUserContextProviderProps) {
           console.error("[logout] Server error:", result.message);
         }
       }
-      // Clear all session-related data
+
       await AsyncStorage.multiRemove(["token", "user"]);
       setUser(null);
     } catch (error) {
@@ -180,28 +183,28 @@ export function UserContextProvider({ children }: IUserContextProviderProps) {
     }
   }
 
-  async function refetchLogin(email: string, password: string): Promise<IUser | null> {
-    try {
-      await AsyncStorage.multiRemove(["token", "user"]);
-      const response = await fetch("http://192.168.1.104:3000/user/log", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          // "Cache-Control": "no-cache",
-        },
-        body: JSON.stringify({ email, password }),
-      });
-      const result: Response<string> = await response.json();
-      if (result.status === "error") {
-        throw new Error(result.message);
-      }
-      await AsyncStorage.setItem("token", result.data);
-      return await getData(result.data);
-    } catch (error) {
-      console.error("[refetchLogin] Error:", error);
-      throw error;
-    }
-  }
+  // async function refetchLogin(email: string, password: string): Promise<IUser | null> {
+  //   try {
+  //     await AsyncStorage.multiRemove(["token", "user"]);
+  //     const response = await fetch(`${API_BASE_URL}/user/log`, {
+  //       method: "POST",
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //         // "Cache-Control": "no-cache",
+  //       },
+  //       body: JSON.stringify({ email, password }),
+  //     });
+  //     const result: Response<string> = await response.json();
+  //     if (result.status === "error") {
+  //       throw new Error(result.message);
+  //     }
+  //     await AsyncStorage.setItem("token", result.data);
+  //     return await getData(result.data);
+  //   } catch (error) {
+  //     console.error("[refetchLogin] Error:", error);
+  //     throw error;
+  //   }
+  // }
 
 
   async function updateUser(updatedUser: IUser) {
@@ -252,7 +255,7 @@ export function UserContextProvider({ children }: IUserContextProviderProps) {
         showWelcomeModal,
         setShowWelcomeModal,
         logout,
-        refetchLogin,
+        // refetchLogin,
 
       }}
     >

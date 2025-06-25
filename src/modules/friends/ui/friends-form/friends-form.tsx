@@ -19,6 +19,8 @@ type FriendsFormProps = IUser & {
 export function FriendsForm(props: FriendsFormProps) {
     const navigation = useRouter();
     const { user } = useUserContext();
+    const { refreshUser } = useUserContext();
+
 
 
     function onPress() {
@@ -43,7 +45,7 @@ export function FriendsForm(props: FriendsFormProps) {
             }
 
             const response = await fetch(
-                `http://192.168.1.104:3000/friendship/deleteFriendship`,
+                `${API_BASE_URL}/friendship/deleteFriendship`,
                 {
                     method: "DELETE",
                     headers: {
@@ -64,6 +66,7 @@ export function FriendsForm(props: FriendsFormProps) {
                 Alert.alert("Помилка", result.message);
                 return;
             }
+            await refreshUser()
 
 
             Alert.alert("Успіх", "Запит прийнято");
@@ -79,7 +82,7 @@ export function FriendsForm(props: FriendsFormProps) {
             onPress={onPress}
         >
             <View style={styles.profileContainer}>
-                <Image style={styles.profileImage} source={{ uri: API_BASE_URL+"/"+props.image }} />
+                <Image style={styles.profileImage} source={{ uri: API_BASE_URL + "/" + props.image }} />
                 <OfflineIcon style={styles.imageOnline} />
             </View>
 
@@ -94,7 +97,7 @@ export function FriendsForm(props: FriendsFormProps) {
                 <Button
                     style={styles.confirmButton}
                     label={props.actionButton.label}
-                    onPress={props.actionButton.onPress?  props.actionButton.onPress : onPress}
+                    onPress={props.actionButton.onPress ? props.actionButton.onPress : onPress}
                 />
                 <TouchableOpacity style={styles.deleteButton} onPress={() => handleDelete(props.deleteId)}>
                     <Text style={styles.buttonDeleteText}>Видалити</Text>
