@@ -69,7 +69,7 @@ export function GroupChats({ scrollable = true }: { scrollable?: boolean }) {
                 }}
                 ListEmptyComponent={
                     <View>
-                        <Text>Немає контактів</Text>
+                        <Text>Немає повідомлень</Text>
                     </View>
                 }
             />

@@ -6,7 +6,7 @@ export default function ChatApp() {
   
   return (
     <Providers>
-      <View style={{backgroundColor: "#ffffff"}}>
+      <View style={{backgroundColor: "#ffffff", flexGrow: 1}}>
         <ChatGroup></ChatGroup>
       </View>
     </Providers>

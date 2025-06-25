@@ -2,12 +2,12 @@ import { StyleSheet } from "react-native";
 
 export const styles = StyleSheet.create({
     footer: {
-        height: 70, 
+        height: 72, 
         // paddingBottom: 35, 
-        marginTop: 15,
+        // marginTop: 15,
         flexDirection: 'row',
         justifyContent: 'space-around',
-        // alignItems: 'center',
+        alignItems: 'center',
         backgroundColor: '#FFFFFF',
         gap: 10,
         // paddingLeft: 20

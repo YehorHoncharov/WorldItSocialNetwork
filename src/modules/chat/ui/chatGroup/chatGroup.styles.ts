@@ -1,56 +1,51 @@
-import { StyleSheet } from "react-native";
+import { StyleSheet, Dimensions } from "react-native";
+
+const { width } = Dimensions.get("window");
 
 export const styles = StyleSheet.create({
 	container: {
-		flexGrow: 1,
-		// backgroundColor: "#fff",
+		flex: 1,
+		backgroundColor: "#ffffff",
 	},
 	chatHeader: {
-		// width: "90%",
 		flexDirection: "row",
-		justifyContent: "space-between",
-		gap: 10,
-		paddingTop: 16,
-		paddingLeft: 16,
-		paddingRight: 16,
-		paddingBottom: 10,
-		borderBottomWidth: 1,
-		borderBottomColor: "#ccc",
+		justifyContent: "space-around",
 		alignItems: "center",
+		// paddingHorizontal: 16,
+		paddingVertical: 12,
+		borderBottomWidth: 1,
+		borderBottomColor: "#e0e0e0",
 	},
 	chatName: {
 		color: "#123456",
-		fontWeight: 500,
+		fontWeight: "500",
 		fontSize: 24,
-		// width: 120,
 	},
 	chatInfo: {
 		fontSize: 14,
 		color: "#666",
 	},
 	menuBtn: {
-		padding: 5,
+		padding: 8,
 		paddingLeft: 80,
 	},
-	menuText: {
-		fontSize: 20,
-	},
 	chatDate: {
-		color: "#666",
+		color: "#666666",
 		textAlign: "center",
 		marginVertical: 10,
-		// paddingTop: 150,
+		fontSize: 14,
 	},
 	messages: {
-		// flex: 1,
-		height: 320,
+		flexGrow: 1,
 		paddingHorizontal: 10,
+		paddingBottom: 20,
+		gap: 5,
 	},
 	message: {
 		flexDirection: "row",
-		alignItems: "center",
+		alignItems: "flex-end",
 		marginBottom: 10,
-		gap: 6,
+		gap: 8,
 	},
 	avatar: {
 		width: 46,
@@ -59,7 +54,6 @@ export const styles = StyleSheet.create({
 		marginRight: 10,
 	},
 	messageBubble: {
-		// backgroundColor: "#e9ecef",
 		borderWidth: 1,
 		borderColor: "#E9E5EE",
 		padding: 10,
@@ -71,41 +65,37 @@ export const styles = StyleSheet.create({
 		backgroundColor: "#CDCED2",
 		padding: 10,
 		borderRadius: 10,
-		maxWidth: "70%",
+		maxWidth: width * 0.7,
 		flexDirection: "row",
-	},
-	messageSender: {
-		fontWeight: "bold",
-		fontSize: 14,
 	},
 	messageText: {
 		fontSize: 16,
 	},
 	messageTime: {
-		paddingLeft: 6,
 		color: "#666",
 		fontSize: 12,
-		paddingTop: 7,
+		marginTop: 4,
+		marginLeft: 8,
+		flexDirection: "row",
+		alignItems: "center",
 	},
 	inputContainer: {
-		flexGrow: 1,
 		flexDirection: "row",
-		padding: 10,
+		alignItems: "center",
+		paddingHorizontal: 16,
+		paddingVertical: 15,
 		borderTopWidth: 1,
 		borderTopColor: "#ccc",
-		alignItems: "center",
-		justifyContent: "center",
 	},
 	input: {
-		// flex: 1,
-		width: 223,
-		height: 42,
+		flex: 1,
+		height: 44,
 		borderWidth: 1,
 		borderColor: "#ccc",
 		borderRadius: 10,
-		padding: 5,
-		marginRight: 5,
 		paddingHorizontal: 16,
+		marginRight: 8,
+		backgroundColor: "#f9f9f9",
 	},
 	attachBtn: {
 		padding: 10,
@@ -114,15 +104,9 @@ export const styles = StyleSheet.create({
 	},
 	sendBtn: {
 		padding: 10,
-		backgroundColor: "#543C52",
+		backgroundColor: "#543c52",
 		borderRadius: 123456,
 		alignItems: "center",
 		justifyContent: "center",
-	},
-	attachText: {
-		fontSize: 20,
-	},
-	sendText: {
-		fontSize: 20,
 	},
 });

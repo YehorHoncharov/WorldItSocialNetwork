@@ -80,24 +80,21 @@ export function ChatGroup() {
   }
 
   return (
-    <KeyboardAvoidingView
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
-      contentContainerStyle={styles.container}
-      // style={styles.container}
-      keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 20}
-    >
+    <View style={styles.container}>
       <View style={styles.chatHeader}>
-        <TouchableOpacity onPress={onBack}>
-          <BackArrowIcon style={{ width: 25, height: 25 }} />
-        </TouchableOpacity>
-        <View style={{ flexDirection: "row", justifyContent: "center" }}>
-          <Image
-            source={{ uri: API_BASE_URL + "/" + params.avatar }}
-            style={styles.avatar}
-          />
-          <View style={{}}>
-            <Text style={styles.chatName}>{params.name}</Text>
-            <Text style={styles.chatInfo}>👽🤖👾</Text>
+        <View style={{flexDirection: 'row', alignItems: "center",  gap: 20}}>
+          <TouchableOpacity onPress={onBack}>
+            <BackArrowIcon style={{ width: 20, height: 20 }} />
+          </TouchableOpacity>
+          <View style={{ flexDirection: "row", justifyContent: "center" }}>
+            <Image
+              source={{ uri: API_BASE_URL + "/" + params.avatar }}
+              style={styles.avatar}
+            />
+            <View style={{}}>
+              <Text style={styles.chatName}>{params.name}</Text>
+              <Text style={styles.chatInfo}>👽🤖👾</Text>
+            </View>
           </View>
         </View>
         <TouchableOpacity style={styles.menuBtn}>
@@ -107,57 +104,63 @@ export function ChatGroup() {
 
       <Text style={styles.chatDate}>25 травня 2025</Text>
 
-      <ScrollView
-        style={styles.messages}
-        ref={scrollViewRef}
-        overScrollMode="never"
-        contentContainerStyle={{ paddingBottom: 10 }}
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        style={{flex: 1}}
+        keyboardVerticalOffset={Platform.OS === "ios" ? 50 : 20}
       >
-        {messages?.map((msg, index) => {
-          const isMyMessage = msg.author_id === user?.id;
-          return (
-            <View
-              key={index}
-              style={[styles.message, isMyMessage ? { justifyContent: "flex-end" } : {}]}
-            >
-              {!isMyMessage && (
-                <Image
-                  source={{ uri: API_BASE_URL + "/" + params.avatar }}
-                  style={{ width: 40, height: 40, borderRadius: 12345 }}
-                />
-              )}
-              <View style={isMyMessage ? styles.messageBubbleMy : styles.messageBubble}>
-                <Text style={styles.messageText}>{msg.content}</Text>
-                <Text style={styles.messageTime}>
-                  {new Date(msg.sent_at).toLocaleTimeString([], {
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  })}
-                  <CheckMarkIcon style={{ width: 10, height: 9 }} />
-                </Text>
+        <ScrollView
+          ref={scrollViewRef}
+          overScrollMode="never"
+          contentContainerStyle={styles.messages}
+          keyboardShouldPersistTaps="handled"
+        >
+          {messages?.map((msg, index) => {
+            const isMyMessage = msg.author_id === user?.id;
+            return (
+              <View
+                key={index}
+                style={[styles.message, isMyMessage ? { justifyContent: "flex-end" } : {}]}
+              >
+                {!isMyMessage && (
+                  <Image
+                    source={{ uri: API_BASE_URL + "/" + params.avatar }}
+                    style={{ width: 40, height: 40, borderRadius: 12345 }}
+                  />
+                )}
+                <View style={isMyMessage ? styles.messageBubbleMy : styles.messageBubble}>
+                  <Text style={styles.messageText}>{msg.content}</Text>
+                  <Text style={styles.messageTime}>
+                    {new Date(msg.sent_at).toLocaleTimeString([], {
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })}
+                    <CheckMarkIcon style={{ width: 10, height: 9 }} />
+                  </Text>
+                </View>
               </View>
-            </View>
-          );
-        })}
-      </ScrollView>
+            );
+          })}
+        </ScrollView>
 
-      <View style={styles.inputContainer}>
-        <TextInput
-          style={styles.input}
-          placeholder="Повідомлення"
-          value={input}
-          onChangeText={setInput}
-        />
-        <TouchableOpacity style={styles.attachBtn}>
-          <Image
-            source={require("../../../../shared/ui/images/pictures-modal.png")}
-            style={{ width: 40, height: 40 }}
+        <View style={styles.inputContainer}>
+          <TextInput
+            style={styles.input}
+            placeholder="Повідомлення"
+            value={input}
+            onChangeText={setInput}
           />
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.sendBtn} onPress={sendMessage}>
-          <SendArrow style={{ width: 20, height: 20 }} />
-        </TouchableOpacity>
-      </View>
-    </KeyboardAvoidingView>
+          <TouchableOpacity style={styles.attachBtn}>
+            <Image
+              source={require("../../../../shared/ui/images/pictures-modal.png")}
+              style={{ width: 40, height: 40 }}
+            />
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.sendBtn} onPress={sendMessage}>
+            <SendArrow style={{ width: 20, height: 20 }} />
+          </TouchableOpacity>
+        </View>
+      </KeyboardAvoidingView>
+    </View>
   );
 }
