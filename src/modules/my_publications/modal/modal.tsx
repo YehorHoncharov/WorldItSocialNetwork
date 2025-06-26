@@ -132,7 +132,7 @@ export function MyPublicationModal({ modalVisible, changeVisibility }: Props) {
         token: tokenUser,
         body: {
           title: name.trim(),
-          theme: theme.trim(),
+          topic: theme.trim(),
           content: text.trim(),
           links: correctLinks ? correctLinks : undefined,
           tags: sanitizedTags.length > 0 ? sanitizedTags : undefined,

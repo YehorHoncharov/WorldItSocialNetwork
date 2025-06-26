@@ -20,7 +20,7 @@ export function usePosts() {
         return;
       }
 
-      setPosts(result);
+      setPosts(result.data);
       return result;
     } catch (error) {
       const err = error instanceof Error ? error.message : "Unknown error";

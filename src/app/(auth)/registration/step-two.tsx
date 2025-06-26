@@ -78,6 +78,8 @@ export default function RegStepTwoModal({ modalVisible, changeVisibility }: Prop
                 placeholder="Введіть ваше ім'я"
                 value={name}
                 onChangeText={setName}
+                autoCapitalize="none"
+                autoCorrect={false}
               />
               <Input
                 style={{width: "100%"}}
@@ -85,6 +87,8 @@ export default function RegStepTwoModal({ modalVisible, changeVisibility }: Prop
                 placeholder="Введіть ваше прізвище"
                 value={surname}
                 onChangeText={setSurname}
+                autoCapitalize="none"
+                autoCorrect={false}
               />
               <Input
                 style={{width: "100%"}}
@@ -92,6 +96,8 @@ export default function RegStepTwoModal({ modalVisible, changeVisibility }: Prop
                 placeholder="@"
                 value={username}
                 onChangeText={setUsername}
+                autoCapitalize="none"
+                autoCorrect={false}
               />
               <Text style={{ fontSize: 12 }}>
                 Або оберіть:

@@ -69,7 +69,7 @@ export function Author({ scrollOffset = 0, ...props }: IPost & { scrollOffset?: 
               source={require("../../../../shared/ui/images/avatar-indicator.png")}
             />
           </View>
-          <Text>{user?.name} {user?.surname}</Text>
+          <Text>{user?.first_name} {user?.last_name}</Text>
         </View>
 
         <Image

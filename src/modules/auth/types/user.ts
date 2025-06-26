@@ -3,9 +3,9 @@ import { IFriendship } from '../../friends/types/friends.type';
 
 export interface IUser {
     id: number,
-    name?: string,
+    first_name?: string,
     username?: string,
-    surname?: string,
+    last_name?: string,
     date_of_birth?: Date,
     email: string,
     password: string,
@@ -15,7 +15,7 @@ export interface IUser {
     friendship_to?: IFriendship[],
     chat_group_members?: {
         chat_groupId: number,
-        profile_id: 7
+        profile_id: number
     }[],
     chat_messages?: Chat[], 
     administered_groups?: Chat[]

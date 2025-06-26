@@ -103,8 +103,8 @@ export function UserContextProvider({ children }: IUserContextProviderProps) {
     email: string,
     password: string,
     code: string,
-    name: string,
-    surname: string,
+    first_name: string,
+    last_name: string,
     username: string,
     // image: string
   ) {
@@ -115,7 +115,7 @@ export function UserContextProvider({ children }: IUserContextProviderProps) {
           "Content-Type": "application/json",
           // "Cache-Control": "no-cache",
         },
-        body: JSON.stringify({ email, password, code, name, surname, username }),
+        body: JSON.stringify({ email, password, code, first_name, last_name, username }),
       });
       const result: Response<string> = await response.json();
       if (result.status === "error") {

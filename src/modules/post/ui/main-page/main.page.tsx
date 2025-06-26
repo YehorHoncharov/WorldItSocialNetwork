@@ -9,10 +9,11 @@ export default function Post(props: IPost) {
 		id,
 		title,
 		content,
-		images,
+		topic,
+		post_app_post_images,
 		likes,
 		views,
-		tags,
+		post_app_post_tags,
 		links,
 		author_id,
 	} = props;
@@ -23,24 +24,26 @@ export default function Post(props: IPost) {
 				<Author
 					id={id}
 					title={title}
+					topic={topic}
 					content={content}
-					images={images}
+					post_app_post_images={post_app_post_images}
 					likes={likes}
 					links={links}
 					author_id={author_id}
 					views={views}
-					tags={tags}
+					post_app_post_tags={post_app_post_tags}
 				/>
 				<Content
 					id={id}
 					title={title}
+					topic={topic}
 					content={content}
 					likes={likes}
 					links={links}
 					author_id={author_id}
 					views={views}
-					tags={tags}
-					images={images}
+					post_app_post_tags={post_app_post_tags}
+					post_app_post_images={post_app_post_images}
 				/>
 			</View>
 

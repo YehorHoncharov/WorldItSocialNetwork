@@ -64,6 +64,8 @@ export function RegFormOne() {
 								onChangeText={field.onChange}
 								onChange={field.onChange}
 								error={fieldState.error?.message}
+								autoCapitalize="none"
+								autoCorrect={false}
 							/>
 						);
 					}}
