@@ -7,14 +7,14 @@ export interface IPostImg {
     filename: string;
     file?: string,
   }
-  
+
 }
 
 export interface PostTag {
-
+  post_app_tag: {
     id: number;
     name: string;
-  
+  }
 }
 
 export interface IPost {

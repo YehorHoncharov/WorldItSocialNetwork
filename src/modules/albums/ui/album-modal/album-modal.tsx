@@ -58,7 +58,7 @@ export function ModalAlbum({
 
     async function handleDelete(albumId: number) {
         if (!tokenUser) {
-            console.error("No token found");
+            console.log("No token found");
             return;
         }
         try {
@@ -80,7 +80,7 @@ export function ModalAlbum({
         onClose();
         
     } catch (error: any) {
-        console.error("Помилка видалення:", error.message);
+        console.log("Помилка видалення:", error.message);
     }
      
     }

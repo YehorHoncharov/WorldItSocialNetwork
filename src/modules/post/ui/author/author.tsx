@@ -44,7 +44,7 @@ export function Author({ scrollOffset = 0, ...props }: IPost & { scrollOffset?: 
     const { width, height } = event.nativeEvent.layout;
     setContainerSize({ width, height });
   };
-
+  
   return (
     <View
       style={styles.container}
@@ -56,7 +56,7 @@ export function Author({ scrollOffset = 0, ...props }: IPost & { scrollOffset?: 
           <View style={{ position: "relative" }}>
             <Image
               style={{ width: 50, height: 50, borderRadius: 200 }}
-              source={{ uri: `${API_BASE_URL}/${user?.image}` }}
+              source={{ uri: `${API_BASE_URL}/${user?.avatar?.at(-1)?.image}` }}
             />
             <Image
               style={{
@@ -69,7 +69,7 @@ export function Author({ scrollOffset = 0, ...props }: IPost & { scrollOffset?: 
               source={require("../../../../shared/ui/images/avatar-indicator.png")}
             />
           </View>
-          <Text>{user?.first_name} {user?.last_name}</Text>
+          <Text>{user?.auth_user.first_name} {user?.auth_user.last_name}</Text>
         </View>
 
         <Image

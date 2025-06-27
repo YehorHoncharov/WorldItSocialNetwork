@@ -22,26 +22,27 @@ import {
 	requestMediaLibraryPermissionsAsync,
 } from "expo-image-picker";
 import { API_BASE_URL } from "../../settings";
+import { Avatar } from "../auth/types/user";
 
 
 interface IUserForm {
 	id: number;
-	name?: string;
+	first_name?: string;
 	username?: string;
-	surname?: string;
-	dateOfBirth?: Date;
+	last_name?: string;
+	date_of_birth?: Date;
 	email: string;
 	password: string;
 	signature?: string;
-	image?: string;
+	images?: string;
 }
 
 
 export function Settings() {
 	const { control, handleSubmit, reset } = useForm<IUserForm>({
 		defaultValues: {
-			dateOfBirth: new Date(),
-			image: "",
+			date_of_birth: new Date(),
+			images: "",
 		},
 	});
 	const { user } = useUserContext();
@@ -56,7 +57,7 @@ export function Settings() {
 	}
 
 	async function handleSave(data: IUserForm) {
-		const formattedImage = data.image ? data.image : ""
+		const formattedImage = data.images ? [{image: data.images, active: true, shown: true, profile_id: user?.id}]: ""
 
 		try {
 			if (!user) return;
@@ -66,11 +67,11 @@ export function Settings() {
 					method: "PUT",
 					headers: { "Content-Type": "application/json" },
 					body: JSON.stringify({
-						name: data.name,
+						first_name: data.first_name,
 						username: data.username,
-						surname: data.surname,
-						dateOfBirth: data.dateOfBirth
-							? new Date(data.dateOfBirth)
+						last_name: data.last_name,
+						date_of_birth: data.date_of_birth
+							? new Date(data.date_of_birth)
 							: new Date(),
 						email: data.email,
 						password: data.password,
@@ -100,22 +101,22 @@ export function Settings() {
 	}
 
 	const handleSignatureSave = (signature: string) => {
-		console.log("")
+
 	};
 	useEffect(() => {
 		async function loadData() {
 			if (user) {
 				reset({
-					name: user.name || "",
-					username: user.username || "",
-					surname: user.surname || "",
-					dateOfBirth: user.date_of_birth
+					first_name: user.auth_user.first_name || "",
+					username: user.auth_user.username || "",
+					last_name: user.auth_user.last_name || "",
+					date_of_birth: user.date_of_birth
 						? new Date(user.date_of_birth)
 						: new Date(),
-					email: user.email || "",
-					password: user.password || "",
+					email: user.auth_user.email || "",
+					password: user.auth_user.password || "",
 					signature: user.signature || "",
-					image: `${API_BASE_URL}/${user.image}` || "",
+					images: `${API_BASE_URL}/${user.avatar?.at(-1)?.image}` || "",
 				});
 			}
 		}
@@ -254,7 +255,7 @@ export function Settings() {
 					<View style={{ gap: 24, alignItems: "center" }}>
 						<Controller
 							control={control}
-							name="image"
+							name="images"
 							render={({ field }) => (
 								<TouchableOpacity
 									onPress={async () => {
@@ -294,7 +295,7 @@ export function Settings() {
 
 									}}
 								>
-									{user.name} {user.surname}
+									{user.auth_user.first_name} {user.auth_user.last_name}
 								</Text>
 								: null}
 
@@ -326,7 +327,7 @@ export function Settings() {
 											alignSelf: "center",
 										}}
 									>
-										@{user.username}
+										@{user.auth_user.username}
 									</Text>
 								</TouchableOpacity>
 							)}
@@ -370,7 +371,7 @@ export function Settings() {
 					<View>
 						<Controller
 							control={control}
-							name="name"
+							name="first_name"
 							render={({ field }) => (
 								<Input
 									style={{ width: "100%" }}
@@ -385,7 +386,7 @@ export function Settings() {
 						/>
 						<Controller
 							control={control}
-							name="surname"
+							name="last_name"
 							render={({ field }) => (
 								<Input
 									style={{ width: "100%" }}
@@ -400,7 +401,7 @@ export function Settings() {
 						/>
 						<Controller
 							control={control}
-							name="dateOfBirth"
+							name="date_of_birth"
 							render={({ field }) => {
 								const [show, setShow] = useState(false);
 								const showDatepicker = () => setShow(true);
@@ -517,7 +518,7 @@ export function Settings() {
 									color: "#070A1C",
 								}}
 							>
-								{user.name} {user.surname}
+								{user.auth_user.first_name} {user.auth_user.last_name}
 							</Text>
 						</View>
 						<View>

@@ -112,7 +112,7 @@ export function EditAlbumModal({
       }
       onClose()
     } catch (err) {
-      console.error(err);
+      console.log(err);
       Alert.alert("Помилка", "Сталася помилка при оновленні альбому");
     }
   };

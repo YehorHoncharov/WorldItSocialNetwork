@@ -15,7 +15,7 @@ export function useGetChatById(id: number) {
                 }
                 setChat(result)
             } catch (err) {
-                console.error(err);}
+                console.log(err);}
             
             }
         getChat();

@@ -1,12 +1,9 @@
 import { ScrollView, View, Text, StyleSheet } from "react-native";
 import Post from "../post/ui/main-page/main.page";
 import { usePosts } from "../post/hooks/use-get-post";
-import { useEffect } from "react";
 
 export function Homepage() {
   const { posts } = usePosts();
-
-console.log(posts)
 
   return (
     <ScrollView

@@ -77,13 +77,13 @@ export function MessagesScreen({ scrollable = true }: { scrollable?: boolean }) 
                         pathname: "/chat",
                         params: {
                             chat_id: chat.id,
-                            name: item.name,
-                            avatar: item.image
+                            name: item.auth_user.first_name,
+                            avatar: item.avatar?.at(-1)?.image
                         }
                         });
                     }
                     }}>
-                    <Friend2 user={{name: item.name ?? "User", image: item.image ?? "uploads/user.png"}} lastMessage={lastMessage?.content} />
+                    <Friend2 user={{name: item.auth_user.first_name ?? "User", image: item.avatar?.at(-1)?.image ?? "uploads/user.png"}} lastMessage={lastMessage?.content} />
                     </TouchableOpacity>
                 );
                 }}

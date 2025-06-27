@@ -24,7 +24,7 @@ export function usePosts() {
       return result;
     } catch (error) {
       const err = error instanceof Error ? error.message : "Unknown error";
-      console.error(err);
+      console.log(err);
       setError(err);
       throw error; 
     } finally {

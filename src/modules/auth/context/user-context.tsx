@@ -63,10 +63,12 @@ export function UserContextProvider({ children }: IUserContextProviderProps) {
         },
       });
       const result: Response<IUser> = await response.json();
+      console.log(result)
       if (result.status === "error") {
         throw new Error(result.message);
       }
       setUser(result.data);
+      
       await AsyncStorage.setItem("user", JSON.stringify(result.data));
       return result.data;
     } catch (error) {
@@ -77,7 +79,7 @@ export function UserContextProvider({ children }: IUserContextProviderProps) {
     }
   }
 
-  async function login(email: string, password: string) {
+  async function login(username: string, password: string) {
     try {
       const response = await fetch(`${API_BASE_URL}/user/log`, {
         method: "POST",
@@ -85,16 +87,17 @@ export function UserContextProvider({ children }: IUserContextProviderProps) {
           "Content-Type": "application/json",
           // "Cache-Control": "no-cache",
         },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ username, password }),
       });
       const result: Response<string> = await response.json();
       if (result.status === "error") {
         throw new Error(result.message);
       }
+      console.log(result.data)
       await AsyncStorage.setItem("token", result.data);
       await getData(result.data);
     } catch (error) {
-      // console.error("[login] Error:", error);
+      // console.log("[login] Error:", error);
     }
   }
 
@@ -134,16 +137,17 @@ export function UserContextProvider({ children }: IUserContextProviderProps) {
           token: result.data,
           body: {
             name: "Мої фото",
-            images: {
-              create: [{
-                image: {
-                  create: {
-                    filename: "uploads/user.png",
-                    file: "uploads/user.png"
-                  }
-                }
-              }]
-            },
+            topic: "#моїфото",
+            created_at: new Date,
+            preview_image: "uploads/user.png",
+            shown: true,
+            autor_id: user?.id,
+            images: [{
+              image: {
+                filename: "uploads/user.png",
+                file: "uploads/user.png"
+              }
+            }],
           },
         });
 
@@ -155,7 +159,7 @@ export function UserContextProvider({ children }: IUserContextProviderProps) {
         console.log(err);
       }
     } catch (error) {
-      console.error("Registration error:", error);
+      console.log("Registration error:", error);
     }
   }
 
@@ -172,48 +176,24 @@ export function UserContextProvider({ children }: IUserContextProviderProps) {
         });
         const result = await response.json();
         if (result.status === "error") {
-          console.error("[logout] Server error:", result.message);
+          console.log("[logout] Server error:", result.message);
         }
       }
 
       await AsyncStorage.multiRemove(["token", "user"]);
       setUser(null);
     } catch (error) {
-      console.error("[logout] Error:", error);
+      console.log("[logout] Error:", error);
       throw error;
     }
   }
-
-  // async function refetchLogin(email: string, password: string): Promise<IUser | null> {
-  //   try {
-  //     await AsyncStorage.multiRemove(["token", "user"]);
-  //     const response = await fetch(`${API_BASE_URL}/user/log`, {
-  //       method: "POST",
-  //       headers: {
-  //         "Content-Type": "application/json",
-  //         // "Cache-Control": "no-cache",
-  //       },
-  //       body: JSON.stringify({ email, password }),
-  //     });
-  //     const result: Response<string> = await response.json();
-  //     if (result.status === "error") {
-  //       throw new Error(result.message);
-  //     }
-  //     await AsyncStorage.setItem("token", result.data);
-  //     return await getData(result.data);
-  //   } catch (error) {
-  //     console.error("[refetchLogin] Error:", error);
-  //     throw error;
-  //   }
-  // }
-
 
   async function updateUser(updatedUser: IUser) {
     try {
       setUser(updatedUser);
       await AsyncStorage.setItem("user", JSON.stringify(updatedUser));
     } catch (error) {
-      console.error("[updateUser] Error:", error);
+      console.log("[updateUser] Error:", error);
     }
   }
 
@@ -226,7 +206,7 @@ export function UserContextProvider({ children }: IUserContextProviderProps) {
         setUser(null);
       }
     } catch (error) {
-      console.error("[refreshUser] Error:", error);
+      console.log("[refreshUser] Error:", error);
     }
   }
 

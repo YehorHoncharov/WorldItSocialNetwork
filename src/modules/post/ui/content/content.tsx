@@ -118,11 +118,11 @@ export function Content(props: IPost) {
 					<View style={styles.tagsContainer}>
 						{props.post_app_post_tags.map((tagItem, index) => (
 							<View
-								key={`tag-${tagItem.id || `temp-${index}`}`}
+								key={`tag-${tagItem.post_app_tag.id || `temp-${index}`}`}
 								style={styles.tag}
 							>
 								<Text style={styles.tagText}>
-									{tagItem.name}
+									{tagItem.post_app_tag.name}
 								</Text>
 							</View>
 						))}

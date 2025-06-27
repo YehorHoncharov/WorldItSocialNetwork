@@ -56,7 +56,7 @@ export function AddFriendModal({ modalVisible, onClose }: Props) {
   }, [users, currentUser]);
 
   const filteredFriends = friends.filter((friend) =>
-    friend.name?.toLowerCase().includes(searchTerm.toLowerCase())
+    friend.auth_user.first_name?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const handleToggleFriend = (id: number) => {
@@ -127,7 +127,7 @@ export function AddFriendModal({ modalVisible, onClose }: Props) {
         });
       }
     } catch (err) {
-      console.error("Error creating chat/group:", err);
+      console.log("Error creating chat/group:", err);
       Alert.alert("Помилка", "Сталася помилка при створенні групи");
     }
   };

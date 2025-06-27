@@ -11,7 +11,7 @@ import { useEffect } from "react";
 export function LoginFormOne() {
   const { control, handleSubmit } = useForm<ILogin>({
     defaultValues: {
-      email: "",
+      username: "",
       password: ""
     }
   });
@@ -28,9 +28,8 @@ export function LoginFormOne() {
 
   const onNext = async (data: ILogin) => {
     try {
-      await login(data.email, data.password);
+      await login(data.username, data.password);
     } catch (err) {
-
       console.log("login error:", err);
     }
   };
@@ -44,22 +43,19 @@ export function LoginFormOne() {
       <View>
         <Controller
           control={control}
-          name="email"
+          name="username"
           rules={{
-            required: "Email обов'язковий",
-            pattern: {
-              value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-              message: "Невірний формат email"
-            }
+            required: "Username обов'язковий",
+            
           }}
           render={({ field, fieldState }) => (
             <Input
-              placeholder="you@example.com"
+              placeholder="@username"
               value={field.value}
               onChangeText={field.onChange}
               error={fieldState.error?.message}
               autoCapitalize="none"
-              keyboardType="email-address"
+          
             />
           )}
         />

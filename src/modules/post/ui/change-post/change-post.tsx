@@ -187,7 +187,7 @@ export function ChangePostModal({
 
           return { url: img.image.filename };
         } catch (error) {
-          console.error("Помилка обробки зображення:", error);
+          console.log("Помилка обробки зображення:", error);
           return null;
         }
       })
@@ -225,7 +225,7 @@ export function ChangePostModal({
         Alert.alert("Помилка", response.message || "Не вдалося оновити пост");
       }
     } catch (error) {
-      console.error("Помилка оновлення поста:", error);
+      console.log("Помилка оновлення поста:", error);
       Alert.alert(
         "Помилка",
         error instanceof Error ? error.message : "Не вдалося оновити пост"
@@ -358,7 +358,7 @@ export function ChangePostModal({
                 style={styles.imageAdded}
                 resizeMode="cover"
                 onError={(error) => {
-                  console.error("Помилка завантаження зображення:", error.nativeEvent);
+                  console.log("Помилка завантаження зображення:", error.nativeEvent);
                   Alert.alert("Помилка", "Не вдалося завантажити зображення.");
                 }}
               />

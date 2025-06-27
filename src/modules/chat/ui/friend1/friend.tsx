@@ -43,8 +43,8 @@ export function Friend1({ userContact }: { userContact: IUser }) {
         pathname: "/chat",
         params: {
           chat_id: existingChat.id,
-          name: userContact.name,
-          avatar: userContact.image,
+          name: userContact.auth_user.first_name,
+          avatar: userContact.avatar?.at(-1)?.image,
        
         },
       });
@@ -57,9 +57,9 @@ export function Friend1({ userContact }: { userContact: IUser }) {
         },
         token: token,
         body: {
-          name: userContact.name,
+          name: userContact.auth_user.first_name,
           is_personal_chat: true,
-          avatar: userContact.image || "uploads/user.png",
+          avatar: userContact.avatar?.at(-1)?.image || "uploads/user.png",
           members: [user, userContact],
         },
       });
@@ -70,8 +70,8 @@ export function Friend1({ userContact }: { userContact: IUser }) {
           pathname: "/chat",
           params: {
             chat_id: createdChat.id,
-            name: userContact.name,
-            avatar: userContact.image,
+            name: userContact.auth_user.first_name,
+            avatar: userContact.avatar?.at(-1)?.image,
           
           },
         });
@@ -85,14 +85,14 @@ export function Friend1({ userContact }: { userContact: IUser }) {
         <Image
           source={{
             uri:
-              API_BASE_URL + "/" + userContact?.image ||
+              API_BASE_URL + "/" + userContact.avatar?.at(-1)?.image ||
               "../../../../shared/ui/images/user.png",
           }}
           style={styles.avatar}
         />
         <View style={{flexDirection: "row", gap: 4}}>
-          <Text style={styles.name}>{userContact?.name || "Anonymous"}</Text>
-          <Text style={styles.name}>{userContact?.surname || "Anonymous"}</Text>
+          <Text style={styles.name}>{userContact.auth_user.first_name || "Anonymous"}</Text>
+          <Text style={styles.name}>{userContact.auth_user.last_name || "Anonymous"}</Text>
         </View>
       </View>
     </TouchableOpacity>

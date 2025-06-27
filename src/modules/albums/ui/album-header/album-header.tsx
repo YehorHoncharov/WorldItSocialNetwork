@@ -19,7 +19,6 @@ import { Album } from "../album/album";
 import { NoAlbums } from "../no-albums/no-albums";
 import { useUserContext } from "../../../auth/context/user-context";
 import { IAlbum } from "../../types/albums.types";
-import { useRouter } from "expo-router";
 
 const screenWidth = Dimensions.get("window").width;
 
@@ -27,12 +26,10 @@ export function AlbumHeader() {
   const [activeTab, setActiveTab] = useState("personal");
   const translateX = useRef(new Animated.Value(0)).current;
   const { user } = useUserContext();
-  const { albums, refetch, setAlbums } = useAlbums();
+  const { albums } = useAlbums();
   const [userAlbums, setUserAlbums] = useState<IAlbum[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [error, setError] = useState<boolean>(false);
-  const [refreshing, setRefreshing] = useState(false);
-  const router = useRouter();
+  const [error, setError] = useState<boolean>(false);;
 
   const filteredAlbums = useMemo(() => {
     if (!user) return [];
@@ -152,6 +149,7 @@ export function AlbumHeader() {
                     created_at={item.created_at}
                     author_id={item.author_id}
                     images={item.images}
+                    shown={item.shown}
                   />
                 ))
               ) : (

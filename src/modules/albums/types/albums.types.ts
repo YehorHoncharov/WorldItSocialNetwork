@@ -31,7 +31,7 @@ export interface IAlbumImageDelete {
 }
 
 export interface IAlbumTag {
-	tag: {
+	post_app_tag: {
 		id: number;
 		name: string;
 	}
@@ -46,8 +46,9 @@ export interface IAlbum {
 	id: number;
 	name: string;
 	images?: IAlbumImg[];
-	topic: IAlbumTag[];
-	created_at?: string;
+	shown: boolean,
+	topic: IAlbumTag;
+	created_at?: Date;
 	author_id: number;
 }
 
