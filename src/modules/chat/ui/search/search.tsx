@@ -50,7 +50,7 @@ export function Search() {
     );
     const contacts = myFriends.concat(friendsToAdd)
     const filteredContacts = contacts.filter((user) =>
-      user.name?.toLowerCase().includes(searchTerm.toLowerCase())
+      user.auth_user.first_name?.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
     setFoundContacts(filteredContacts);
@@ -76,7 +76,7 @@ export function Search() {
       setFoundContacts(contacts);
     } else {
       const filteredContacts = contacts.filter((user) =>
-        user.name?.toLowerCase().includes(text.toLowerCase())
+        user.auth_user.first_name?.toLowerCase().includes(text.toLowerCase())
       );
       setFoundContacts(filteredContacts);
     }
