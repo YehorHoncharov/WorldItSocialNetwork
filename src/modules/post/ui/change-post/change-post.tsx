@@ -25,6 +25,7 @@ import SendArrow from "../../../../shared/ui/icons/send-arrow";
 import { styles } from "./change-post.styles";
 import { IPost, IPostImg } from "../../types/post";
 import { API_BASE_URL } from "../../../../settings";
+import { useUserContext } from "../../../auth/context/user-context";
 
 interface TagItem {
   label: string;
@@ -34,9 +35,21 @@ interface TagItem {
 interface UpdateData {
   title: string;
   content: string;
-  links?: string;
+  topic: string
+  links?: string[];
   tags?: string[];
-  images?: ({ id?: number; url: string } | { id: number; url?: string })[];
+  images?: {
+    id?: number;
+    url: string;
+  }[]
+  author_id: number;
+}
+
+interface IUpdateImage {
+  images?: {
+    id?: bigint;
+    url: string;
+  }[]
 }
 
 interface Props {
@@ -71,6 +84,7 @@ export function ChangePostModal({
     { label: "Фільми", value: "#фільми" },
     { label: "Подорожі", value: "#подорожі" },
   ]);
+  const { user } = useUserContext()
 
   const isValidUrl = (url: string): boolean => {
     const urlPattern = /^(https?:\/\/)([\w.-]+)\.([a-z]{2,})(\/.*)?$/i;
@@ -101,14 +115,14 @@ export function ChangePostModal({
 
         const tagsFromPost = Array.from(
           new Set(
-            postData.tags
-              ?.map((tag) => tag.tag.name)
+            postData.post_app_post_tags
+              ?.map((tag) => tag.post_app_tag.name)
               .filter((tag): tag is string => tag !== null) || []
           )
         );
 
         setValue(tagsFromPost);
-        setImages(postData.images || []);
+        setImages(postData.post_app_post_images || []);
 
         const additionalTags = tagsFromPost
           .filter((tag) => !items.some((item) => item.value === tag))
@@ -152,27 +166,29 @@ export function ChangePostModal({
 
     const formattedLinks = links
       .filter((link) => link.trim() !== "")
-      .filter(isValidUrl)
-      .join(",");
+
+    if (!user) return
 
     const updatedData: UpdateData = {
       title: name.trim(),
       content: text.trim(),
-      links: formattedLinks || undefined,
+      links: formattedLinks || [],
       tags: sanitizedTags,
-    };
+      topic: theme,
+      author_id: user.id
+    }
 
-    const existingImages = postData.images || [];
+    const existingImages = postData.post_app_post_images || [];
 
     const remainingImages = images.filter((img) =>
-      existingImages.some((ei) => ei.image.id === img.image.id)
+      existingImages.some((ei) => ei.post_app_image.id === img.post_app_image.id)
     );
 
     const newImages = images
-      .filter((img) => img.image.filename.startsWith("data:image"))
+      .filter((img) => img.post_app_image.filename.startsWith("data:image"))
       .map((img) => {
         try {
-          const matches = img.image.filename.match(
+          const matches = img.post_app_image.filename.match(
             /^data:image\/(\w+);base64,(.+)$/
           );
           if (!matches || !["jpeg", "png", "gif"].includes(matches[1].toLowerCase())) {
@@ -185,7 +201,7 @@ export function ChangePostModal({
             return null;
           }
 
-          return { url: img.image.filename };
+          return { url: img.post_app_image.filename };
         } catch (error) {
           console.log("Помилка обробки зображення:", error);
           return null;
@@ -194,8 +210,8 @@ export function ChangePostModal({
       .filter((img): img is { url: string } => img !== null);
 
     const deletedImages = existingImages
-      .filter((ei) => !images.some((img) => img.image.id === ei.image.id))
-      .map((ei) => ({ id: ei.image.id }));
+      .filter((ei) => !images.some((img) => img.post_app_image.id === ei.post_app_image.id))
+      .map((ei) => ({ id: ei.post_app_image.id, url: ei.post_app_image.filename }));
 
     if (remainingImages.length + newImages.length > 10) {
       Alert.alert("Помилка", "Максимум 10 зображень дозволено");
@@ -301,7 +317,7 @@ export function ChangePostModal({
             const url = `data:image/${type};base64,${base64String}`;
 
             return {
-              image: {
+              post_app_image: {
                 id: Date.now() + index,
                 filename: url,
               },
@@ -347,12 +363,12 @@ export function ChangePostModal({
       <View style={styles.imageGrid}>
         {images.map((img, idx) => {
           // Перевіряємо, чи є filename у форматі base64 чи це шлях до серверного зображення
-          const correctImage = img.image.filename.startsWith("data:image")
-            ? img.image.filename
-            : `${API_BASE_URL}/${img.image.filename.replace(/^\/+/, "")}`; // Видаляємо зайві слеші
+          const correctImage = img.post_app_image.filename.startsWith("data:image")
+            ? img.post_app_image.filename
+            : `${API_BASE_URL}/${img.post_app_image.filename.replace(/^\/+/, "")}`; // Видаляємо зайві слеші
 
           return (
-            <View key={`image-${img.image.id}-${idx}`} style={styles.imageContainer}>
+            <View key={`image-${img.post_app_image.id}-${idx}`} style={styles.imageContainer}>
               <Image
                 source={{ uri: correctImage }}
                 style={styles.imageAdded}

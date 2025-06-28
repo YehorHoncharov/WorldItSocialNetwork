@@ -7,7 +7,6 @@ export interface IPostImg {
     filename: string;
     file?: string,
   }
-
 }
 
 export interface PostTag {

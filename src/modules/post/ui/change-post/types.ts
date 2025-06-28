@@ -13,8 +13,8 @@ export interface PostData {
   theme: string | null;
   text: string;
   links: string | null;
-  images: IPostImg[];
-  tags: PostTag[];
+  post_app_post_images: IPostImg[];
+  post_app_post_tags: PostTag[];
   authorId: number;
   views: number | null;
   likes: number | null;
@@ -36,14 +36,3 @@ export interface ImageUpdate {
   delete?: string[];
 }
 
-export interface UpdateData {
-  name?: string;
-  theme?: string;
-  text?: string;
-  links?: string;
-  tags?: string[];
-  images?: {
-    create?: { url: string }[];
-    delete?: { id: number }[];
-  };
-}

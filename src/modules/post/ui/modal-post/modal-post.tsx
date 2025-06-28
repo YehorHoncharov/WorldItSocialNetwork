@@ -94,10 +94,11 @@ export function ModalPost({
 					postData={{
 						id: post_id,
 						title: currentPost.title || "",
+						topic: currentPost.topic || "",
 						content: currentPost.content || "",
 						links: currentPost.links || [],
-						images: currentPost.images || [],
-						tags: currentPost.tags || [],
+						post_app_post_images: currentPost.post_app_post_images || [],
+						post_app_post_tags: currentPost.post_app_post_tags || [],
 						author_id: currentPost.author_id || 0,
 						views: currentPost.views || null,
 						likes: currentPost.likes || null,

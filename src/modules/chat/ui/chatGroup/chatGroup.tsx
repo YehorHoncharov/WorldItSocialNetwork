@@ -88,7 +88,7 @@ export function ChatGroup() {
           </TouchableOpacity>
           <View style={{ flexDirection: "row", justifyContent: "center" }}>
             <Image
-              source={{ uri: API_BASE_URL + "/" + params.avatar }}
+              source={{ uri: API_BASE_URL + "/" + params.avatar || API_BASE_URL + "/" + "upload/group.png"}}
               style={styles.avatar}
             />
             <View style={{}}>
@@ -102,7 +102,7 @@ export function ChatGroup() {
         </TouchableOpacity>
       </View>
 
-      <Text style={styles.chatDate}>25 травня 2025</Text>
+      <Text style={styles.chatDate}>29 червня 2025</Text>
 
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
