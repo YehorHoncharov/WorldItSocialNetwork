@@ -19,7 +19,8 @@ export function useAlbums() {
         return
       }
 
-      setAlbums(result);
+
+      setAlbums(result.data);
       return result
     } catch (error) {
       const err = error instanceof Error ? error.message : "Unknown error";

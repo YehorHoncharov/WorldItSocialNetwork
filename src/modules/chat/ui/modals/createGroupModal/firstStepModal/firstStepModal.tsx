@@ -107,7 +107,7 @@ export function AddFriendModal({ modalVisible, onClose }: Props) {
           name: groupName,
           is_personal_chat: false,
           admin_id: currentUser.id,
-          members: members,
+          chat_app_chatgroup_members: members,
           avatar: "uploads/user.png"
         },
       });

@@ -145,7 +145,7 @@ export function AlbumHeader() {
                     key={`${item.id}`}
                     id={item.id}
                     name={item.name}
-                    topic={item.topic}
+                    post_app_tag={item.post_app_tag}
                     created_at={item.created_at}
                     author_id={item.author_id}
                     images={item.images}

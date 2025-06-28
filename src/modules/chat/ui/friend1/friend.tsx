@@ -30,11 +30,11 @@ export function Friend1({ userContact }: { userContact: IUser }) {
     if (!user) return;
 
     const existingChat = chats.find((chat) => {
-      const memberIds = chat.members.map((m) => m.profile_id);
+      const memberIds = chat.chat_app_chatgroup_members.map((m) => m.profile_id);
       return (
         memberIds.includes(user.id) &&
         memberIds.includes(userContact.id) &&
-        chat.members.length === 2 
+        chat.chat_app_chatgroup_members.length === 2
       );
     });
 
@@ -45,7 +45,7 @@ export function Friend1({ userContact }: { userContact: IUser }) {
           chat_id: existingChat.id,
           name: userContact.auth_user.first_name,
           avatar: userContact.avatar?.at(-1)?.image,
-       
+          username: userContact.auth_user.username
         },
       });
     } else {
@@ -60,7 +60,7 @@ export function Friend1({ userContact }: { userContact: IUser }) {
           name: userContact.auth_user.first_name,
           is_personal_chat: true,
           avatar: userContact.avatar?.at(-1)?.image || "uploads/user.png",
-          members: [user, userContact],
+          chat_app_chatgroup_members: [user, userContact],
         },
       });
 
@@ -72,7 +72,7 @@ export function Friend1({ userContact }: { userContact: IUser }) {
             chat_id: createdChat.id,
             name: userContact.auth_user.first_name,
             avatar: userContact.avatar?.at(-1)?.image,
-          
+            username: userContact.auth_user.username
           },
         });
       }
@@ -90,7 +90,7 @@ export function Friend1({ userContact }: { userContact: IUser }) {
           }}
           style={styles.avatar}
         />
-        <View style={{flexDirection: "row", gap: 4}}>
+        <View style={{ flexDirection: "row", gap: 4 }}>
           <Text style={styles.name}>{userContact.auth_user.first_name || "Anonymous"}</Text>
           <Text style={styles.name}>{userContact.auth_user.last_name || "Anonymous"}</Text>
         </View>

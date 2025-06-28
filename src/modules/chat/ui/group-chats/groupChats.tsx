@@ -21,7 +21,7 @@ export function GroupChats({ scrollable = true }: { scrollable?: boolean }) {
 
         const userGroupChats = chats.filter(chat =>
             !chat.is_personal_chat &&
-            chat.members.some(member => member.profile_id === user.id)
+            chat.chat_app_chatgroup_members.some(member => member.profile_id === user.id)
         );
 
         setGroupChats(userGroupChats);
@@ -44,7 +44,7 @@ export function GroupChats({ scrollable = true }: { scrollable?: boolean }) {
                 renderItem={({ item }) => {
 
 
-                    const lastMessage = item.chat_messages?.at(-1);
+                    const lastMessage = item.chat_app_chatmessage?.at(-1);
 
                     return (
                         <TouchableOpacity onPress={() => {

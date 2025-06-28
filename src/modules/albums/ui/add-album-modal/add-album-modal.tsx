@@ -78,7 +78,7 @@ export function AddAlbumModal({ modalVisible, onClose }: Props) {
         token: token,
         body: {
           name: name,
-          topic: [theme],
+          post_app_tag: theme,
         },
       });
 
@@ -102,7 +102,7 @@ export function AddAlbumModal({ modalVisible, onClose }: Props) {
     onClose();
   };
 
-  
+
 
   return (
     <Modal

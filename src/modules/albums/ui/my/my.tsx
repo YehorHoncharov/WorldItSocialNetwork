@@ -173,7 +173,7 @@ export function My(props: IAlbumProps) {
       });
 
       if (response.status === "success" && response.data) {
-        setImages(response.data.images || []);
+        setImages(response.data.images|| []);
         setImagesToDelete([]);
         setChangeImage(false);
         Alert.alert("Успіх", "Зміни успішно збережено");

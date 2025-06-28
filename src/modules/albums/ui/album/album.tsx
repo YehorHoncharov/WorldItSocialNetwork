@@ -260,7 +260,7 @@ export function Album({ scrollOffset = 0, ...props }: IAlbum & { scrollOffset?: 
 								: null}
 						</View>
 						<View style={styles.theme}>
-							<Text style={{ fontSize: 16 }}>{props.topic.post_app_tag.name || "#моїфото"}</Text>
+							<Text style={{ fontSize: 16 }}>{props.post_app_tag.name || "#моїфото"}</Text>
 							<Text style={{ fontSize: 16, color: "#81818D" }}>{props.created_at?.toString().slice(0, 4)} рік</Text>
 						</View>
 						<View style={styles.separator} />

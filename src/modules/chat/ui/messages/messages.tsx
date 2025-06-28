@@ -27,7 +27,7 @@ export function MessagesScreen({ scrollable = true }: { scrollable?: boolean }) 
         const membersIds: number[] = [];
         chats.forEach((chat) => {
             if (chat.is_personal_chat) {
-                chat.members.forEach((member) => {
+                chat.chat_app_chatgroup_members.forEach((member) => {
                     if (member.profile_id !== user.id) {
                         user.chat_group_members?.forEach((chatGroup) => {
                             if (chatGroup.chat_groupId === chat.id){
@@ -65,10 +65,10 @@ export function MessagesScreen({ scrollable = true }: { scrollable?: boolean }) 
                 renderItem={({ item }) => {
                 const chat = chats.find(c =>
                     c.is_personal_chat &&
-                    c.members.some(m => m.profile_id === item.id)
+                    c.chat_app_chatgroup_members.some(m => m.profile_id === item.id)
                 );
 
-                const lastMessage = chat?.chat_messages?.at(-1);
+                const lastMessage = chat?.chat_app_chatmessage?.at(-1);
 
                 return (
                     <TouchableOpacity onPress={() => {
@@ -78,7 +78,8 @@ export function MessagesScreen({ scrollable = true }: { scrollable?: boolean }) 
                         params: {
                             chat_id: chat.id,
                             name: item.auth_user.first_name,
-                            avatar: item.avatar?.at(-1)?.image
+                            avatar: item.avatar?.at(-1)?.image,
+                            username: item.auth_user.username
                         }
                         });
                     }

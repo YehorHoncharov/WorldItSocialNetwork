@@ -22,7 +22,7 @@ import { CreateMessage, MessagePayload } from "../../types/socket";
 import { useUserContext } from "../../../auth/context/user-context";
 
 export function ChatGroup() {
-  const params = useLocalSearchParams<{ name: string; chat_id: string; avatar: string }>();
+  const params = useLocalSearchParams<{ name: string; chat_id: string; avatar: string, username: string }>();
   const { user } = useUserContext();
   const chat = useGetChatById(+params.chat_id);
   const { socket } = useSocketContext();
@@ -37,8 +37,8 @@ export function ChatGroup() {
 
     const chatId = +params.chat_id;
     socket.emit("joinChat", { chatId }, (res) => {
-      if (res.status === "success" && Array.isArray(res.data?.chat_messages)) {
-        setMessages(res.data.chat_messages);
+      if (res.status === "success" && Array.isArray(res.data?.chat_app_chatmessage)) {
+        setMessages(res.data.chat_app_chatmessage);
       }
     });
 
@@ -47,7 +47,7 @@ export function ChatGroup() {
         content: data.content || "",
         sent_at: new Date(),
         author_id: data.author_id,
-        chat_groupId: data.chat_groupId,
+        chat_group_id: data.chat_group_id,
         attached_image: data.attached_image || "",
       };
       setMessages((prev) => [...prev, newMessage]);
@@ -66,7 +66,7 @@ export function ChatGroup() {
     const newMessage: CreateMessage = {
       content: input.trim(),
       author_id: user.id,
-      chat_groupId: +params.chat_id,
+      chat_group_id: +params.chat_id,
       sent_at: new Date(),
       attached_image: "",
     };
@@ -93,7 +93,7 @@ export function ChatGroup() {
             />
             <View style={{}}>
               <Text style={styles.chatName}>{params.name}</Text>
-              <Text style={styles.chatInfo}>👽🤖👾</Text>
+              <Text style={styles.chatInfo}>{params.username}</Text>
             </View>
           </View>
         </View>
@@ -117,6 +117,7 @@ export function ChatGroup() {
         >
           {messages?.map((msg, index) => {
             const isMyMessage = msg.author_id === user?.id;
+            const messageDate = new Date(msg.sent_at); 
             return (
               <View
                 key={index}
@@ -131,7 +132,7 @@ export function ChatGroup() {
                 <View style={isMyMessage ? styles.messageBubbleMy : styles.messageBubble}>
                   <Text style={styles.messageText}>{msg.content}</Text>
                   <Text style={styles.messageTime}>
-                    {new Date(msg.sent_at).toLocaleTimeString([], {
+                    {messageDate.toLocaleTimeString([], {
                       hour: "2-digit",
                       minute: "2-digit",
                     })}
