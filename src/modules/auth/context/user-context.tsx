@@ -23,6 +23,7 @@ interface IUserContext {
   setShowWelcomeModal: (value: boolean) => void;
   showWelcomeModal: boolean;
   logout: () => void;
+  setUser: React.Dispatch<React.SetStateAction<IUser | null>>;
   // refetchLogin: (email: string, password: string) => Promise<IUser | null>;
 }
 
@@ -36,6 +37,7 @@ const initialValue: IUserContext = {
   setShowWelcomeModal: () => { },
   showWelcomeModal: false,
   logout: async () => { },
+  setUser: () => {},
   // refetchLogin: async () => null,
 };
 
@@ -240,6 +242,7 @@ export function UserContextProvider({ children }: IUserContextProviderProps) {
         showWelcomeModal,
         setShowWelcomeModal,
         logout,
+        setUser,
         // refetchLogin,
 
       }}

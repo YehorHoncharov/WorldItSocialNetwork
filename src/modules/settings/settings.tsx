@@ -22,30 +22,22 @@ import {
 	requestMediaLibraryPermissionsAsync,
 } from "expo-image-picker";
 import { API_BASE_URL } from "../../settings";
-import { Avatar } from "../auth/types/user";
-
 
 interface IUserForm {
 	id: number;
 	first_name?: string;
 	username?: string;
 	last_name?: string;
-	date_of_birth?: Date;
+	date_of_birth?: Date | null;
 	email: string;
 	password: string;
 	signature?: string;
-	images?: string;
+	avatar?: string;
 }
 
-
 export function Settings() {
-	const { control, handleSubmit, reset } = useForm<IUserForm>({
-		defaultValues: {
-			date_of_birth: new Date(),
-			images: "",
-		},
-	});
-	const { user } = useUserContext();
+	const { control, handleSubmit, reset, setValue } = useForm<IUserForm>();
+	const { user, setUser } = useUserContext();
 	const [isEditing, setIsEditing] = useState(false);
 	const [isEditing2, setIsEditing2] = useState(false);
 	const router = useRouter();
@@ -55,75 +47,93 @@ export function Settings() {
 	function handleEditToggle() {
 		setIsEditing(!isEditing);
 	}
+	function isValidDate(date: any): date is Date {
+		return date instanceof Date && !isNaN(date.getTime());
+	}
 
 	async function handleSave(data: IUserForm) {
-		const formattedImage = data.images ? [{image: data.images, active: true, shown: true, profile_id: user?.id}]: ""
-
 		try {
 			if (!user) return;
+
+			const formData = new FormData();
+
+			// Додаємо текстові поля
+			formData.append('first_name', data.first_name || '');
+			formData.append('username', data.username || '');
+			formData.append('last_name', data.last_name || '');
+			formData.append('email', data.email || '');
+			formData.append('password', data.password || '');
+
+			if (data.date_of_birth && isValidDate(data.date_of_birth)) {
+				formData.append('date_of_birth', data.date_of_birth.toISOString());
+			} else {
+				formData.append('date_of_birth', '');
+			}
+
+			// Додаємо аватар, якщо він змінився
+			if (typeof data.avatar === 'string' && data.avatar.startsWith('file:')) {
+				const file = {
+					uri: data.avatar,
+					type: 'image/jpeg',
+					name: 'avatar.jpg',
+				};
+				formData.append('avatar', file as any);
+			}
+
 			const response = await fetch(
 				`${API_BASE_URL}/user/${user.id}`,
 				{
 					method: "PUT",
-					headers: { "Content-Type": "application/json" },
-					body: JSON.stringify({
-						first_name: data.first_name,
-						username: data.username,
-						last_name: data.last_name,
-						date_of_birth: data.date_of_birth
-							? new Date(data.date_of_birth)
-							: new Date(),
-						email: data.email,
-						password: data.password,
-						signature: data.signature,
-						image: formattedImage,
-					}),
+					body: formData,
+					headers: {
+						'Accept': 'application/json',
+					},
 				}
 			);
+
 			const result = await response.json();
 
 			if (result.status === "error") {
 				Alert.alert("Помилка", result.message);
 				return;
 			}
+
+			// Оновлюємо контекст користувача
+			if (result.data) {
+				setUser(result.data);
+			}
+
 			setIsEditing(false);
 			setIsEditing2(false);
+			Alert.alert("Успіх", "Дані успішно оновлено");
 		} catch (error) {
 			Alert.alert("Помилка", "Не вдалося зберегти дані");
+			console.error("Update error:", error);
 		}
 	}
+
 	function handleEditToggle2() {
 		setIsEditing2(!isEditing2);
 	}
 
-	function handlePress() {
-		router.navigate("/registration/step-one");
-	}
-
-	const handleSignatureSave = (signature: string) => {
-
-	};
 	useEffect(() => {
-		async function loadData() {
-			if (user) {
-				reset({
-					first_name: user.auth_user.first_name || "",
-					username: user.auth_user.username || "",
-					last_name: user.auth_user.last_name || "",
-					date_of_birth: user.date_of_birth
-						? new Date(user.date_of_birth)
-						: new Date(),
-					email: user.auth_user.email || "",
-					password: user.auth_user.password || "",
-					signature: user.signature || "",
-					images: `${API_BASE_URL}/${user.avatar?.at(-1)?.image}` || "",
-				});
-			}
+		if (user) {
+			reset({
+				first_name: user.auth_user.first_name || "",
+				username: user.auth_user.username || "",
+				last_name: user.auth_user.last_name || "",
+				date_of_birth: user.auth_user.date_of_birth ? new Date(user.auth_user.date_of_birth) : null,
+				email: user.auth_user.email || "",
+				password: user.auth_user.password || "",
+				signature: user.signature || "",
+				avatar: (user.avatar?.length ?? 0) > 0
+					? `${API_BASE_URL}/${user.avatar![0].image}`
+					: "",
+			});
 		}
-		loadData();
 	}, [user, reset]);
 
-	async function onSearch(): Promise<string | null> {
+	async function onSearch() {
 		try {
 			const { status } = await requestMediaLibraryPermissionsAsync();
 			if (status !== "granted") {
@@ -137,48 +147,21 @@ export function Settings() {
 			const result = await launchImageLibraryAsync({
 				mediaTypes: ["images"],
 				quality: 0.8,
-				allowsEditing: false,
-				base64: true,
+				allowsEditing: true,
+				aspect: [1, 1],
+				base64: false,
 			});
 
-			if (
-				result.canceled ||
-				!result.assets ||
-				result.assets.length === 0
-			) {
-				Alert.alert("Скасовано", "Вибір зображення було скасовано");
+			if (result.canceled || !result.assets || result.assets.length === 0) {
 				return null;
 			}
 
 			const asset = result.assets[0];
-			const allowedFormats = ["jpeg", "png", "gif"];
-			const maxSizeInBytes = 5 * 1024 * 1024;
-			const type = asset.mimeType?.split("/")[1]?.toLowerCase() || "";
-
-			if (!asset.base64 || !allowedFormats.includes(type)) {
-				Alert.alert("Помилка", "Непідтримуваний формат зображення");
-				return null;
-			}
-
-			const estimatedSizeInBytes = (asset.base64.length * 3) / 4;
-			if (estimatedSizeInBytes > maxSizeInBytes) {
-				Alert.alert(
-					"Помилка",
-					"Зображення занадто велике (макс. 5 МБ)"
-				);
-				return null;
-			}
-
-			const imageUrl = `data:image/${type};base64,${asset.base64}`;
-
-			const newImage = imageUrl
-
-			return newImage;
+			return asset.uri;
 		} catch (error) {
 			Alert.alert(
 				"Помилка",
-				`Не вдалося вибрати зображення: ${error instanceof Error ? error.message : "Невідома помилка"
-				}`
+				`Не вдалося вибрати зображення: ${error instanceof Error ? error.message : "Невідома помилка"}`
 			);
 			return null;
 		}
@@ -186,28 +169,12 @@ export function Settings() {
 
 	if (!user) {
 		return (
-			<View
-				style={[
-					styles.container,
-					{ justifyContent: "center", alignItems: "center", flex: 1 },
-				]}
-			>
-				<Text
-					style={{
-						fontSize: 18,
-						textAlign: "center",
-						marginBottom: 20,
-					}}
-				>
+			<View style={[styles.container, { justifyContent: "center", alignItems: "center", flex: 1 }]}>
+				<Text style={{ fontSize: 18, textAlign: "center", marginBottom: 20 }}>
 					Ви не авторизовані
 				</Text>
-				<TouchableOpacity
-					style={styles.authButton}
-					onPress={handlePress}
-				>
-					<Text style={styles.authButtonText}>
-						Увійти або зареєструватись
-					</Text>
+				<TouchableOpacity style={styles.authButton} onPress={() => router.navigate("/registration/step-one")}>
+					<Text style={styles.authButtonText}>Увійти або зареєструватись</Text>
 				</TouchableOpacity>
 			</View>
 		);
@@ -220,28 +187,16 @@ export function Settings() {
 			keyboardShouldPersistTaps="handled"
 			overScrollMode="never"
 		>
-			<View style={{ gap: 8, width: "90%", alignItems: "center", justifyContent: "center", }}>
+			<View style={{ gap: 8, width: "90%", alignItems: "center", justifyContent: "center" }}>
+				{/* Перший блок - Картка профілю */}
 				<View style={styles.container}>
 					<View style={styles.userInfoFirst}>
 						<Text style={styles.userInfoText}>Картка профілю</Text>
-						<TouchableOpacity
-							onPress={
-								isEditing
-									? handleSubmit(handleSave)
-									: handleEditToggle
-							}
-						>
+						<TouchableOpacity onPress={isEditing ? handleSubmit(handleSave) : handleEditToggle}>
 							{isEditing ? (
 								<View style={styles.buttonSave}>
 									<PencilIcon width={15} height={15} />
-									<Text
-										style={{
-											color: "#543C52",
-											fontWeight: "500",
-										}}
-									>
-										Зберегти
-									</Text>
+									<Text style={{ color: "#543C52", fontWeight: "500" }}>Зберегти</Text>
 								</View>
 							) : (
 								<Image
@@ -255,7 +210,7 @@ export function Settings() {
 					<View style={{ gap: 24, alignItems: "center" }}>
 						<Controller
 							control={control}
-							name="images"
+							name="avatar"
 							render={({ field }) => (
 								<TouchableOpacity
 									onPress={async () => {
@@ -267,37 +222,23 @@ export function Settings() {
 									}}
 									disabled={!isEditing}
 								>
-
 									<Image
 										source={
 											field.value
 												? { uri: field.value }
 												: require("../../shared/ui/images/avatar.png")
 										}
-										style={{
-											width: 100,
-											height: 100,
-											borderRadius: 48,
-										}}
+										style={{ width: 100, height: 100, borderRadius: 48 }}
 									/>
-
 								</TouchableOpacity>
 							)}
 						/>
 						<View style={{ gap: 10, width: "100%", alignItems: "center", marginBottom: 5 }}>
-
-							{!isEditing ?
-								<Text
-									style={{
-										fontSize: 24,
-										color: "#070A1C",
-										fontWeight: "700",
-
-									}}
-								>
+							{!isEditing && (
+								<Text style={{ fontSize: 24, color: "#070A1C", fontWeight: "700" }}>
 									{user.auth_user.first_name} {user.auth_user.last_name}
 								</Text>
-								: null}
+							)}
 
 							{isEditing ? (
 								<Controller
@@ -307,26 +248,16 @@ export function Settings() {
 										<Input
 											style={{ width: "100%" }}
 											label="Юзернейм"
-											placeholder="Введіть ваш юзер"
+											placeholder="Введіть ваш юзернейм"
 											value={field.value}
-											onChange={field.onChange}
 											onChangeText={field.onChange}
 											editable={isEditing}
 										/>
 									)}
 								/>
 							) : (
-								<TouchableOpacity
-									onPress={() => setIsEditing(true)}
-								>
-									<Text
-										style={{
-											fontSize: 16,
-											color: "#070A1C",
-											fontWeight: "500",
-											alignSelf: "center",
-										}}
-									>
+								<TouchableOpacity onPress={() => setIsEditing(true)}>
+									<Text style={{ fontSize: 16, color: "#070A1C", fontWeight: "500", alignSelf: "center" }}>
 										@{user.auth_user.username}
 									</Text>
 								</TouchableOpacity>
@@ -335,30 +266,14 @@ export function Settings() {
 					</View>
 				</View>
 
-
 				<View style={styles.container}>
 					<View style={styles.userInfoFirst}>
-						<Text style={styles.userInfoText}>
-							Особиста інформація
-						</Text>
-						<TouchableOpacity
-							onPress={
-								isEditing2
-									? handleSubmit(handleSave)
-									: handleEditToggle2
-							}
-						>
+						<Text style={styles.userInfoText}>Особиста інформація</Text>
+						<TouchableOpacity onPress={isEditing2 ? handleSubmit(handleSave) : handleEditToggle2}>
 							{isEditing2 ? (
 								<View style={styles.buttonSave}>
 									<PencilIcon width={15} height={15} />
-									<Text
-										style={{
-											color: "#543C52",
-											fontWeight: "500",
-										}}
-									>
-										Зберегти
-									</Text>
+									<Text style={{ color: "#543C52", fontWeight: "500" }}>Зберегти</Text>
 								</View>
 							) : (
 								<Image
@@ -378,7 +293,6 @@ export function Settings() {
 									label="Ім'я"
 									placeholder="Введіть ваше ім'я"
 									value={field.value}
-									onChange={field.onChange}
 									onChangeText={field.onChange}
 									editable={isEditing2}
 								/>
@@ -393,7 +307,6 @@ export function Settings() {
 									label="Прізвище"
 									placeholder="Введіть ваше прізвище"
 									value={field.value}
-									onChange={field.onChange}
 									onChangeText={field.onChange}
 									editable={isEditing2}
 								/>
@@ -404,47 +317,27 @@ export function Settings() {
 							name="date_of_birth"
 							render={({ field }) => {
 								const [show, setShow] = useState(false);
-								const showDatepicker = () => setShow(true);
 
 								return (
 									<>
-										<Pressable
-											onPress={
-												isEditing2
-													? showDatepicker
-													: undefined
-											}
-										>
+										<Pressable onPress={() => isEditing2 && setShow(true)}>
 											<Input
 												style={{ width: "100%" }}
 												label="Дата народження"
-												value={field.value?.toLocaleDateString()}
+												value={field.value?.toLocaleDateString() || "Не вказано"}
 												editable={false}
 												pointerEvents="none"
 											/>
 										</Pressable>
 										{show && (
 											<DateTimePicker
-												value={
-													field.value || new Date()
-												}
+												value={field.value || new Date()}
 												mode="date"
-												display={
-													Platform.OS === "ios"
-														? "spinner"
-														: "default"
-												}
-												onChange={(
-													event,
-													selectedDate
-												) => {
-													setShow(
-														Platform.OS === "ios"
-													);
+												display={Platform.OS === "ios" ? "spinner" : "default"}
+												onChange={(event, selectedDate) => {
+													setShow(Platform.OS === "ios");
 													if (selectedDate) {
-														field.onChange(
-															selectedDate
-														);
+														field.onChange(selectedDate);
 													}
 												}}
 												maximumDate={new Date()}
@@ -464,7 +357,6 @@ export function Settings() {
 									placeholder="Введіть вашу електронну адресу"
 									keyboardType="email-address"
 									value={field.value}
-									onChange={field.onChange}
 									onChangeText={field.onChange}
 									editable={isEditing2}
 								/>
@@ -478,23 +370,19 @@ export function Settings() {
 									style={{ width: "100%" }}
 									label="Пароль"
 									placeholder="Введіть ваш пароль"
-									secureTextEntry
-									editable={isEditing2}
 									value={field.value}
-									onChange={field.onChange}
 									onChangeText={field.onChange}
+									editable={isEditing2}
 								/>
 							)}
 						/>
 					</View>
 				</View>
 
-
+				{/* Третій блок - Підписи */}
 				<View style={styles.container}>
 					<View style={styles.userInfoFirst}>
-						<Text style={styles.userInfoText}>
-							Варіанти підпису
-						</Text>
+						<Text style={styles.userInfoText}>Варіанти підпису</Text>
 						<Image
 							source={require("../../shared/ui/images/pencil-in-circle.png")}
 							style={styles.pencilImage}
@@ -502,34 +390,15 @@ export function Settings() {
 					</View>
 					<View style={{ gap: 24, padding: 16 }}>
 						<View style={{ gap: 16 }}>
-							<Text
-								style={{
-									fontSize: 16,
-									fontWeight: "500",
-									color: "#543C52",
-								}}
-							>
+							<Text style={{ fontSize: 16, fontWeight: "500", color: "#543C52" }}>
 								Ім'я та прізвище
 							</Text>
-							<Text
-								style={{
-									fontSize: 16,
-									fontWeight: "400",
-									color: "#070A1C",
-								}}
-							>
+							<Text style={{ fontSize: 16, fontWeight: "400", color: "#070A1C" }}>
 								{user.auth_user.first_name} {user.auth_user.last_name}
 							</Text>
 						</View>
 						<View>
-							<Text
-								style={{
-									fontSize: 16,
-									fontWeight: "500",
-									color: "#543C52",
-									marginBottom: 10,
-								}}
-							>
+							<Text style={{ fontSize: 16, fontWeight: "500", color: "#543C52", marginBottom: 10 }}>
 								Мій електронний підпис
 							</Text>
 							<SignaturePad

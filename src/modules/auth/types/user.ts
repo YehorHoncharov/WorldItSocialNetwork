@@ -4,6 +4,7 @@ import { IFriendship } from '../../friends/types/friends.type';
 export interface IUser {
     id: number,
     auth_user: {
+		date_of_birth: any;
         first_name?: string,
         username?: string,
         last_name?: string,
