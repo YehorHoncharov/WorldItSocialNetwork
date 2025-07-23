@@ -35,7 +35,7 @@ export function SocketContextProvider({
 
 	useEffect(() => {
 		if (!token) return
-		const newSocket = io(`ws://192.168.3.13:3000`, { auth: { token } })
+		const newSocket = io(`${API_BASE_URL}`, { auth: { token } })
 
 		newSocket.on("connect", () => {
 			// Alert.alert("Socket connected")
