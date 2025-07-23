@@ -24,7 +24,7 @@ export function SocketContextProvider({
 }: ISocketContextProviderProps) {
 	const [socket, setSocket] = useState<Socket<IServerEvents, IClientEvents> | null>(null)
 	const [token, setToken] = useState<string>()
-	
+
 	useEffect(() => {
 		const getToken = async () => {
 			const tk = await AsyncStorage.getItem("token")
@@ -35,7 +35,7 @@ export function SocketContextProvider({
 
 	useEffect(() => {
 		if (!token) return
-		const newSocket = io(`ws://192.168.3.13:3000`, { auth: { token } })
+		const newSocket = io(`${API_BASE_URL}`, { auth: { token } })
 
 		newSocket.on("connect", () => {
 			// Alert.alert("Socket connected")
