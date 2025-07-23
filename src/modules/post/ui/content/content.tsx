@@ -71,13 +71,13 @@ export function Content(props: IPost) {
 				}
 			>
 				{rowImages.map((imageItem, index) => {
-					const imageUrl = getImageUrl(imageItem.image.filename);
+					const imageUrl = getImageUrl(imageItem.post_app_image.filename);
 					
 					if (!imageUrl) return null;
 
 					return (
 						<View
-							key={`img-${imageItem.image.id || `temp-${index}`}`}
+							key={`img-${imageItem.post_app_image.id || `temp-${index}`}`}
 							style={[
 								rowImages.length === 1 ? styles.imageOne :
 									rowImages.length === 2
@@ -102,11 +102,11 @@ export function Content(props: IPost) {
 		return <ActivityIndicator size="large" />;
 	}
 
-	if (!props.images) {
+	if (!props.post_app_post_images) {
 		return
 	}
 
-	const groupedImages = groupImages(props.images);
+	const groupedImages = groupImages(props.post_app_post_images);
 
 	return (
 		<View style={styles.container}>
@@ -114,22 +114,22 @@ export function Content(props: IPost) {
 				<Text style={{ fontSize: 18 }}>{props.title}</Text>
 		
 				<Text style={styles.text}>{props.content}</Text>
-				{props.tags && props.tags.length > 0 && (
+				{props.post_app_post_tags && props.post_app_post_tags.length > 0 && (
 					<View style={styles.tagsContainer}>
-						{props.tags.map((tagItem, index) => (
+						{props.post_app_post_tags.map((tagItem, index) => (
 							<View
-								key={`tag-${tagItem.tag.tagId || `temp-${index}`}`}
+								key={`tag-${tagItem.post_app_tag.id || `temp-${index}`}`}
 								style={styles.tag}
 							>
 								<Text style={styles.tagText}>
-									{tagItem.tag.name}
+									{tagItem.post_app_tag.name}
 								</Text>
 							</View>
 						))}
 					</View>
 				)}
 			</View>
-			{props.images && props.images.length > 0 ? (
+			{props.post_app_post_images && props.post_app_post_images.length > 0 ? (
 				<FlatList
 					data={groupedImages}
 					renderItem={renderRow}

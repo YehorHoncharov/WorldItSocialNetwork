@@ -132,7 +132,7 @@ export function MyPublicationModal({ modalVisible, changeVisibility }: Props) {
         token: tokenUser,
         body: {
           title: name.trim(),
-          theme: theme.trim(),
+          topic: theme.trim(),
           content: text.trim(),
           links: correctLinks ? correctLinks : undefined,
           tags: sanitizedTags.length > 0 ? sanitizedTags : undefined,
@@ -163,7 +163,7 @@ export function MyPublicationModal({ modalVisible, changeVisibility }: Props) {
         Alert.alert("Успіх", "Публікацію успішно створено");
       }
     } catch (err) {
-      console.error("[refetch] Ошибка в процессе создания поста:", err);
+      console.log("[refetch] Ошибка в процессе создания поста:", err);
       Alert.alert(
         "Помилка",
         `Не вдалося створити публікацію: ${err instanceof Error ? err.message : "Невідома помилка"
@@ -271,7 +271,7 @@ export function MyPublicationModal({ modalVisible, changeVisibility }: Props) {
                   imageUrl,
                   (width, height) => resolve({ width, height }),
                   (error) => {
-                    console.error(
+                    console.log(
                       `[MyPublicationModal] Помилка визначення розмірів: ${error}`
                     );
                     resolve({ width: 150, height: 150 });
@@ -307,7 +307,7 @@ export function MyPublicationModal({ modalVisible, changeVisibility }: Props) {
         Alert.alert("Скасовано", "Вибір зображень було скасовано");
       }
     } catch (error) {
-      console.error("[MyPublicationModal] Помилка вибору зображення:", error);
+      console.log("[MyPublicationModal] Помилка вибору зображення:", error);
       Alert.alert(
         "Помилка",
         `Не вдалося вибрати зображення: ${error instanceof Error ? error.message : "Невідома помилка"
@@ -337,7 +337,7 @@ export function MyPublicationModal({ modalVisible, changeVisibility }: Props) {
           const isValidImage =
             img.url.startsWith("data:image/") || img.url.startsWith("http");
           if (!isValidImage) {
-            console.error(
+            console.log(
               `[ChangePostModal] Некоректний URL зображення: ${img.url}`
             );
             return null;
@@ -349,7 +349,7 @@ export function MyPublicationModal({ modalVisible, changeVisibility }: Props) {
                 style={styles.imageAdded}
                 resizeMode="cover"
                 onError={(e) => {
-                  console.error(
+                  console.log(
                     `[ChangePostModal] Помилка завантаження зображення: ${img.url}`,
                     e.nativeEvent
                   );

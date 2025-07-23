@@ -4,6 +4,7 @@ export interface IAlbumImg {
 		id: number;
 		filename: string;
 		file?: string,
+		uploaded_at?: Date;
 	}
 }
 export interface IAlbumImageShow {
@@ -31,7 +32,7 @@ export interface IAlbumImageDelete {
 }
 
 export interface IAlbumTag {
-	tag: {
+	post_app_tag: {
 		id: number;
 		name: string;
 	}
@@ -46,8 +47,12 @@ export interface IAlbum {
 	id: number;
 	name: string;
 	images?: IAlbumImg[];
-	topic: IAlbumTag[];
-	created_at?: string;
+	shown: boolean,
+	post_app_tag: {
+		id: number;
+		name: string;
+	};
+	created_at?: Date;
 	author_id: number;
 }
 
@@ -82,16 +87,22 @@ export interface Props {
 }
 
 export interface IAlbumEditProps {
-	id: number;
+	id?: number;
 	name: string;
-	topic: IAlbumTag[];
+	post_app_tag: {
+		id?: number
+		name: string;
+	};
 	// year: string;
 	author_id?: number;
 }
 
 export type AlbumUpdateBody = {
 	name?: string,
-	tags?: string[],
+	post_app_tag: {
+		id?: number;
+		name: string;
+	};
 	images?: {
 		image: {
 			id?: number;

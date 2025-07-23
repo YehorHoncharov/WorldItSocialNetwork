@@ -28,10 +28,11 @@ export function MyPublications() {
           <Post
             id={item.id}
             title={item.title}
+            topic={item.topic}
             content={item.content}
-            images={item.images}
+            post_app_post_images={item.post_app_post_images}
             links={item.links}
-            tags={item.tags}
+            post_app_post_tags={item.post_app_post_tags}
             author_id={item.author_id}
             likes={item.likes}
             views={item.views}

@@ -65,7 +65,7 @@ export async function PUT<T>(params: IPutRequestParams): Promise<Result<T>> {
         };
         
     } catch (err) {
-        console.error("Помилка в PUT:", err);
+        console.log("Помилка в PUT:", err);
 
         return {
             status: "error",

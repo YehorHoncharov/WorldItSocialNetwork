@@ -24,12 +24,17 @@ export function FriendsForm(props: FriendsFormProps) {
 
 
     function onPress() {
-        const { date_of_birth, actionButton, deleteId, friendship_from, friendship_to, chat_group_members, chat_messages, administered_groups, ...rest } = props;
+        const { date_of_birth, actionButton, deleteId, friendship_from, friendship_to, chat_group_members, chat_messages, administered_groups, auth_user, avatar, signature} = props;
 
         navigation.navigate({
             pathname: "/friends-profile",
             params: {
-                ...rest,
+                first_name: auth_user.first_name,
+                last_name: auth_user.first_name,
+                username: auth_user.username,
+                image: avatar?.at(-1)?.image,
+                email: auth_user.email,
+                signature: signature,
                 date_of_Birth: date_of_birth ? new Date(date_of_birth).toISOString() : undefined
             },
         });
@@ -82,15 +87,15 @@ export function FriendsForm(props: FriendsFormProps) {
             onPress={onPress}
         >
             <View style={styles.profileContainer}>
-                <Image style={styles.profileImage} source={{ uri: API_BASE_URL + "/" + props.image }} />
+                <Image style={styles.profileImage} source={{ uri: API_BASE_URL + "/" + props.avatar }} />
                 <OfflineIcon style={styles.imageOnline} />
             </View>
 
             <View style={styles.textContainer}>
                 <Text style={styles.nameText}>
-                    {props.name} {props.surname}
+                    {props.auth_user.first_name} {props.auth_user.last_name}
                 </Text>
-                <Text style={styles.usernameText}>@{props.username}</Text>
+                <Text style={styles.usernameText}>@{props.auth_user.last_name}</Text>
             </View>
 
             <View style={styles.buttonsContainer}>

@@ -15,7 +15,7 @@ export function useUsers() {
 			}
 			setUsers(result)
 		} catch (err) {
-			console.error(err);
+			console.log(err);
 		}
 	}
 

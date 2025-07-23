@@ -20,7 +20,13 @@ import { useUserContext } from "../../../auth/context/user-context";
 interface Props {
   modalVisible: boolean;
   album_id: number;
-  initialData: { name: string; topic: string; };
+  initialData: {
+    name: string;
+    post_app_tag: {
+      id: number;
+      name: string;
+    };
+  };
   changeVisibility: () => void;
   onClose: () => void;
   onUpdate: (updatedAlbum: IAlbum) => void;
@@ -35,7 +41,7 @@ export function EditAlbumModal({
   onUpdate,
 }: Props) {
   const [name, setName] = useState(initialData.name);
-  const [topic, setTopic] = useState(initialData.topic);
+  const [topic, setTopic] = useState(initialData.post_app_tag.name);
   const [openTheme, setOpenTheme] = useState(false);
   const { user } = useUserContext()
   const [themeItems, setThemeItems] = useState<IAlbumTheme[]>([
@@ -53,13 +59,13 @@ export function EditAlbumModal({
 
   useEffect(() => {
     setName(initialData.name);
-    setTopic(initialData.topic);
+    setTopic(initialData.post_app_tag.name);
   }, []);
 
 
   const resetForm = () => {
     setName(initialData.name);
-    setTopic(initialData.topic);
+    setTopic(initialData.post_app_tag.name);
 
   };
 
@@ -79,10 +85,13 @@ export function EditAlbumModal({
       const updateData: AlbumUpdateBody = {
         name,
         author_id: user.id,
+        post_app_tag: {
+          name
+        }
       };
 
-      if (topic && topic !== initialData.topic) {
-        updateData.tags = [topic];
+      if (topic && topic !== initialData.post_app_tag.name) {
+        updateData.post_app_tag.name = topic;
       }
 
       const response = await PUT({
@@ -100,19 +109,18 @@ export function EditAlbumModal({
         onUpdate({
           id: album_id,
           name,
-          topic: [{
-            tag: {
-              id: Date.now(),
-              name: "#"+topic
-            }
-          }],
-          author_id: user.id
+          post_app_tag: {
+            id: Date.now(),
+            name: "#" + topic,
+          },
+          author_id: user.id,
+          shown: true
         });
         onClose();
       }
       onClose()
     } catch (err) {
-      console.error(err);
+      console.log(err);
       Alert.alert("Помилка", "Сталася помилка при оновленні альбому");
     }
   };

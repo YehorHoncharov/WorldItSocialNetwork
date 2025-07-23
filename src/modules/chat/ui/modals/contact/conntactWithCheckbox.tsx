@@ -18,11 +18,11 @@ export function ContactWithCheckbox({ userContact, isSelected, onPress }: Contac
     <TouchableOpacity style={styles.container} onPress={onPress}>
       <Image
         source={{
-          uri: `${API_BASE_URL}/${userContact.image}`
+          uri: `${API_BASE_URL}/${userContact.avatar?.at(-1)?.image}`
         }}
         style={styles.avatar}
       />
-      <Text style={styles.name}>{userContact.name || "Anonymous"}</Text>
+      <Text style={styles.name}>{userContact.auth_user.first_name || "Anonymous"}</Text>
       {/* <Checkbox
           style={styles.checkbox}
           value={isChecked}

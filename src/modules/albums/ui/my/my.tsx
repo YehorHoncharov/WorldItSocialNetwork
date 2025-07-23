@@ -173,7 +173,7 @@ export function My(props: IAlbumProps) {
       });
 
       if (response.status === "success" && response.data) {
-        setImages(response.data.images || []);
+        setImages(response.data.images|| []);
         setImagesToDelete([]);
         setChangeImage(false);
         Alert.alert("Успіх", "Зміни успішно збережено");
@@ -181,7 +181,7 @@ export function My(props: IAlbumProps) {
         console.log("Помилка збереження!");
       }
     } catch (err) {
-      console.error("Помилка збереження:", err);
+      console.log("Помилка збереження:", err);
       Alert.alert("Помилка", "Не вдалося зберегти зміни");
     }
   }

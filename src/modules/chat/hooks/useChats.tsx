@@ -17,7 +17,7 @@ export function useChats() {
       return result;
     } catch (error) {
       const err = error instanceof Error ? error.message : "Unknown error";
-      console.error(err);
+      console.log(err);
     }
   }, []);
 

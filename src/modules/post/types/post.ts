@@ -2,18 +2,16 @@ import { IUser } from "../../auth/types";
 
 
 export interface IPostImg {
-  image: {
+  post_app_image: {
     id: number;
     filename: string;
     file?: string,
   }
-  
 }
 
 export interface PostTag {
-  tag: {
-    userPostId: number;
-    tagId: number;
+  post_app_tag: {
+    id: number;
     name: string;
   }
 }
@@ -21,14 +19,14 @@ export interface PostTag {
 export interface IPost {
   id: number;
   title: string;
-  // theme: string | null;
+  topic: string | null;
   content: string;
   links: Link[] | null;
   views: IUser | null;
   likes: IUser | null;
   author_id: number;
-  images: IPostImg[] | null;
-  tags: PostTag[] | null;
+  post_app_post_images: IPostImg[] | null;
+  post_app_post_tags: PostTag[] | null;
 }
 
 export interface Link {

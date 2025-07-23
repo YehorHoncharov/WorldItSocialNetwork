@@ -62,7 +62,7 @@ export function ModalPost({
 
 	async function handleDelete(postId: number) {
 		if (!tokenUser) {
-			console.error("No token found");
+			console.log("No token found");
 			return;
 		}
 		try {
@@ -76,7 +76,7 @@ export function ModalPost({
 			setPosts(posts.filter((post: IPost) => post.id !== postId));
 			onClose();
 		} catch (error: any) {
-			console.error("Помилка видалення:", error.message);
+			console.log("Помилка видалення:", error.message);
 		}
 	}
 
@@ -94,10 +94,11 @@ export function ModalPost({
 					postData={{
 						id: post_id,
 						title: currentPost.title || "",
+						topic: currentPost.topic || "",
 						content: currentPost.content || "",
 						links: currentPost.links || [],
-						images: currentPost.images || [],
-						tags: currentPost.tags || [],
+						post_app_post_images: currentPost.post_app_post_images || [],
+						post_app_post_tags: currentPost.post_app_post_tags || [],
 						author_id: currentPost.author_id || 0,
 						views: currentPost.views || null,
 						likes: currentPost.likes || null,

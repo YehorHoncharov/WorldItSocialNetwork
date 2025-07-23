@@ -149,7 +149,7 @@ export function Album({ scrollOffset = 0, ...props }: IAlbum & { scrollOffset?: 
 								style={styles.imageAdded}
 								resizeMode="cover"
 								onError={(error) => {
-									console.error("Помилка завантаження зображення:", error.nativeEvent);
+									console.log("Помилка завантаження зображення:", error.nativeEvent);
 									Alert.alert("Помилка", "Не вдалося завантажити зображення.");
 								}}
 							/>
@@ -230,7 +230,7 @@ export function Album({ scrollOffset = 0, ...props }: IAlbum & { scrollOffset?: 
 			}
 			Alert.alert("Успіх", "Зміни успішно збережено");
 		} catch (err) {
-			console.error("Помилка збереження:", err);
+			console.log("Помилка збереження:", err);
 		}
 	}
 
@@ -260,8 +260,8 @@ export function Album({ scrollOffset = 0, ...props }: IAlbum & { scrollOffset?: 
 								: null}
 						</View>
 						<View style={styles.theme}>
-							<Text style={{ fontSize: 16 }}>{props.topic.map((topic) => topic.tag.name).join(", ") || "#моїфото"}</Text>
-							<Text style={{ fontSize: 16, color: "#81818D" }}>{props.created_at?.slice(0, 4)} рік</Text>
+							<Text style={{ fontSize: 16 }}>{props.post_app_tag.name || "#моїфото"}</Text>
+							<Text style={{ fontSize: 16, color: "#81818D" }}>{props.created_at?.toString().slice(0, 4)} рік</Text>
 						</View>
 						<View style={styles.separator} />
 					</View>

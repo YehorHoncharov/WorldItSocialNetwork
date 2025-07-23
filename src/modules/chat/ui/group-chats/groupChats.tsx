@@ -9,7 +9,6 @@ import { useRouter } from 'expo-router';
 import { styles } from './group-chats';
 import { Chat } from '../../types/socket';
 
-
 export function GroupChats({ scrollable = true }: { scrollable?: boolean }) {
     const { user } = useUserContext();
     const { chats } = useChats();
@@ -21,7 +20,7 @@ export function GroupChats({ scrollable = true }: { scrollable?: boolean }) {
 
         const userGroupChats = chats.filter(chat =>
             !chat.is_personal_chat &&
-            chat.members.some(member => member.profile_id === user.id)
+            chat.chat_app_chatgroup_members.some(member => member.profile_id === user.id)
         );
 
         setGroupChats(userGroupChats);
@@ -42,28 +41,29 @@ export function GroupChats({ scrollable = true }: { scrollable?: boolean }) {
                 keyExtractor={(item) => `${item.id}`}
                 contentContainerStyle={{ gap: 10, flexGrow: 1 }}
                 renderItem={({ item }) => {
-
-
-                    const lastMessage = item.chat_messages?.at(-1);
+                    const lastMessage = item.chat_app_chatmessage?.at(-1);
+                    const messageDate = lastMessage?.sent_at ? new Date(lastMessage.sent_at) : null;
+                    const lastMessageContent = lastMessage?.content || "";
 
                     return (
                         <TouchableOpacity onPress={() => {
-
                             router.push({
                                 pathname: "/chat",
                                 params: {
                                     chat_id: item.id,
                                     name: item.name,
-                                    avatar: "uploads/user.png"
+                                    avatar: item.avatar || "uploads/group.png"
                                 }
                             });
-
                         }}>
-                            <Friend2 user={{
-                                name: item.name,
-                                image: item.avatar || "uploads/user.png"
-                            }}
-                                lastMessage={lastMessage?.content} />
+                            <Friend2 
+                                messageDate={messageDate} 
+                                user={{
+                                    name: item.name,
+                                    image: item.avatar || "uploads/user.png",
+                                }}
+                                lastMessage={lastMessageContent} 
+                            />
                         </TouchableOpacity>
                     );
                 }}

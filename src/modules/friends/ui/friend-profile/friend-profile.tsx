@@ -38,7 +38,7 @@ export function FriendProfile({ user }: FriendProfileProps) {
 					<View style={styles.profileImageContainer}>
 						<Image
 							style={styles.profileImage}
-							source={{ uri: API_BASE_URL + "/" + user.image }}
+							source={{ uri: API_BASE_URL + "/" + user.avatar }}
 						/>
 						<OfflineIcon style={styles.imageOnline} />
 					</View>
@@ -48,10 +48,10 @@ export function FriendProfile({ user }: FriendProfileProps) {
 						) : (
 							<View>
 								<Text style={styles.name}>
-									{user.name} {user.surname}
+									{user.auth_user.first_name} {user.auth_user.last_name}
 								</Text>
 								<Text style={styles.username}>
-									@{user.username}
+									@{user.auth_user.username}
 								</Text>
 							</View>
 						)}
@@ -99,7 +99,6 @@ export function FriendProfile({ user }: FriendProfileProps) {
 						</View>
 						<Text style={styles.viewAll}>Дивитись всі</Text>
 					</View>
-
 					<FlatList
 						data={userAlbums}
 						scrollEnabled={false}
@@ -112,6 +111,7 @@ export function FriendProfile({ user }: FriendProfileProps) {
 								created_at={item.created_at}
 								author_id={item.author_id}
 								images={item.images}
+								shown={item.shown}
 							/>
 						)}
 						contentContainerStyle={styles.albumsList}
@@ -142,12 +142,13 @@ export function FriendProfile({ user }: FriendProfileProps) {
 								<Post
 									id={item.id}
 									title={item.title}
+									topic={item.topic}
 									content={item.content}
 									author_id={item.author_id}
 									likes={item.likes}
 									views={item.views}
-									tags={item.tags}
-									images={item.images}
+									post_app_post_tags={item.post_app_post_tags}
+									post_app_post_images={item.post_app_post_images}
 									links={item.links}
 								/>
 							)}

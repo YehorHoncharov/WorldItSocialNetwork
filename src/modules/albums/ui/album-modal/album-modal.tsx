@@ -58,7 +58,7 @@ export function ModalAlbum({
 
     async function handleDelete(albumId: number) {
         if (!tokenUser) {
-            console.error("No token found");
+            console.log("No token found");
             return;
         }
         try {
@@ -80,7 +80,7 @@ export function ModalAlbum({
         onClose();
         
     } catch (error: any) {
-        console.error("Помилка видалення:", error.message);
+        console.log("Помилка видалення:", error.message);
     }
      
     }
@@ -94,7 +94,7 @@ export function ModalAlbum({
     const prepareUpdateData = (albumData: IAlbumEditProps): AlbumUpdateBody => {
         return {
             name: albumData.name,
-            tags: albumData.topic ? albumData.topic.map((topic) => topic.tag.name) : undefined,
+            post_app_tag: albumData.post_app_tag,
             images: currentAlbum.images?.map(img => ({
                 image: {
                     id: img.image.id,
@@ -113,7 +113,7 @@ export function ModalAlbum({
                     album_id={albumId}
                     initialData={{
                         name: currentAlbum.name,
-                        topic: currentAlbum.topic?.find?.name,
+                        post_app_tag: currentAlbum.post_app_tag,
                     }}
                     changeVisibility={() => setModalOpened(false)}
                     onClose={() => {
@@ -129,9 +129,9 @@ export function ModalAlbum({
                                     ? {
                                         ...album,
                                         name: updatedAlbum.name,
-                                        topic: updatedAlbum.topic
-                                            ? updatedAlbum.topic
-                                            : album.topic
+                                        topic: updatedAlbum.post_app_tag
+                                            ? updatedAlbum.post_app_tag
+                                            : album.post_app_tag
                                     }
                                     : album
                             )

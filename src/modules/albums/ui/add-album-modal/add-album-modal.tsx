@@ -78,7 +78,7 @@ export function AddAlbumModal({ modalVisible, onClose }: Props) {
         token: token,
         body: {
           name: name,
-          topic: [theme],
+          post_app_tag: theme,
         },
       });
 
@@ -92,7 +92,7 @@ export function AddAlbumModal({ modalVisible, onClose }: Props) {
       resetForm();
       await refetch();
     } catch (err) {
-      console.error("Error creating album:", err);
+      console.log("Error creating album:", err);
       Alert.alert("Помилка", "Сталася помилка при створенні альбому");
     }
   };
@@ -102,7 +102,7 @@ export function AddAlbumModal({ modalVisible, onClose }: Props) {
     onClose();
   };
 
-  
+
 
   return (
     <Modal

@@ -19,11 +19,12 @@ export function useAlbums() {
         return
       }
 
-      setAlbums(result);
+
+      setAlbums(result.data);
       return result
     } catch (error) {
       const err = error instanceof Error ? error.message : "Unknown error";
-      console.error("Error fetching albums:", err);
+      console.log("Error fetching albums:", err);
       setError(err);
     } finally {
       setIsLoading(false);
