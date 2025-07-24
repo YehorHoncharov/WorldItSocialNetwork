@@ -30,6 +30,7 @@ export default function Post(props: IPost) {
 					author_id={author_id}
 					views={views}
 					tags={tags}
+					theme={props.theme}
 				/>
 				<Content
 					id={id}
@@ -41,6 +42,7 @@ export default function Post(props: IPost) {
 					views={views}
 					tags={tags}
 					images={images}
+					theme={props.theme}
 				/>
 			</View>
 

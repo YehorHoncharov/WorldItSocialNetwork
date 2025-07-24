@@ -3,8 +3,7 @@ import { StyleSheet } from "react-native";
 export const styles = StyleSheet.create({
     footer: {
         height: 72, 
-        // paddingBottom: 35, 
-        // marginTop: 15,
+        paddingBottom: 35, 
         flexDirection: 'row',
         justifyContent: 'space-around',
         alignItems: 'center',

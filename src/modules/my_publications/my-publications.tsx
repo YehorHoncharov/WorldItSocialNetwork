@@ -6,59 +6,70 @@ import { FlatList, View, Text, StyleSheet } from "react-native";
 import Post from "../post/ui/main-page/main.page";
 
 export function MyPublications() {
-  const { posts } = usePosts();
-  const { user } = useUserContext();
-  const [userPosts, setUserPosts] = useState<IPost[]>([])
+    const { posts, refresh } = usePosts();
+    const { user } = useUserContext();
+    const [userPosts, setUserPosts] = useState<IPost[]>([])
 
-  useEffect(() => {
-      if (!user) return;
-      const myPosts = posts.filter((post) => post.author_id === user.id);
-      setUserPosts(myPosts);
-  }, [posts, user]);
-  
-  return (
-    <FlatList
-      overScrollMode="never"
-      style={{ gap: 20 }}
-      data={userPosts}
-      keyExtractor={(item) => `${item.id}`}
-      contentContainerStyle={styles.listContainer}
-      renderItem={({ item }) => (
-        <View style={styles.postContainer}>
-          <Post
-            id={item.id}
-            title={item.title}
-            content={item.content}
-            images={item.images}
-            links={item.links}
-            tags={item.tags}
-            author_id={item.author_id}
-            likes={item.likes}
-            views={item.views}
-          />
-        </View>
-      )}
-    
-      ListEmptyComponent={
-        <View style={styles.emptyContainer}>
-          <Text>Немає постів для відображення</Text>
-        </View>
-      }
-    />
-  );
+    useEffect(() => {
+        if (!user) return;
+        const myPosts = posts.filter((post) => post.author_id === user.id);
+        setUserPosts(myPosts);
+    }, [posts, user]);
+
+    useEffect(() => {
+        const interval = setInterval(() => {
+            refresh();
+        }, 3000); // кожні 3 секунди
+
+        return () => clearInterval(interval);
+    }, []);
+
+    return (
+        <FlatList
+            overScrollMode="never"
+            style={{ gap: 20 }}
+            data={userPosts}
+            keyExtractor={(item) => `${item.id}`}
+            contentContainerStyle={styles.listContainer}
+            renderItem={({ item }) => (
+                <View style={styles.postContainer}>
+                    <Post
+                        id={item.id}
+                        title={item.title}
+                        content={item.content}
+                        images={item.images}
+                        links={item.links}
+                        tags={item.tags}
+                        author_id={item.author_id}
+                        likes={item.likes}
+                        views={item.views}
+                        theme={item.theme}
+                    />
+                </View>
+            )}
+
+            ListEmptyComponent={
+                <View style={styles.emptyContainer}>
+                    <Text>Немає постів для відображення</Text>
+                </View>
+            }
+        />
+    );
 }
 
 const styles = StyleSheet.create({
-  listContainer: {
-    paddingBottom: 20,
-  },
-  postContainer: {
-    backgroundColor: "#FAF8FF",
-    borderRadius: 8,
-    overflow: "hidden",
-  },
-  emptyContainer: {
-    padding: 20,
-    alignItems: "center",
-  },
+    listContainer: {
+        paddingVertical: 10,
+    },
+    postContainer: {
+        width: "100%",
+        maxWidth: 800,
+        backgroundColor: "#FAF8FF",
+        borderRadius: 8,
+        overflow: "hidden",
+    },
+    emptyContainer: {
+        padding: 20,
+        alignItems: "center",
+    },
 });

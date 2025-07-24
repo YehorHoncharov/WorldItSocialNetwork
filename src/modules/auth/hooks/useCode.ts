@@ -4,7 +4,7 @@ import { Response } from "../context/types";
 export async function sendCode(email: string) {
 	try {
 		const response = await fetch(
-			`${API_BASE_URL}user/sendCode`,
+			`${API_BASE_URL}/user/sendCode`,
 			{
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
@@ -18,6 +18,6 @@ export async function sendCode(email: string) {
 			return;
 		}
 	} catch (error) {
-		console.error("Login error:", error);
+		console.log("Login error:", error);
 	}
 }

@@ -5,7 +5,7 @@ import { SocketContextProvider } from "../modules/chat/context/socketContext";
 
 export default function Providers({ children }: { children: ReactNode }) {
     return (
-        <SafeAreaProvider>
+        <SafeAreaProvider style={{ flex: 1, backgroundColor: "#FAF8FF" }}>
             <UserContextProvider>
                 <SocketContextProvider>
                     {children}

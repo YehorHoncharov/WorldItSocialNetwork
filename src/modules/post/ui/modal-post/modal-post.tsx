@@ -5,6 +5,8 @@ import {
 	Modal,
 	Image,
 	Dimensions,
+	Alert,
+	ActivityIndicator,
 } from "react-native";
 import Pencil from "../../../../shared/ui/icons/pencil";
 import Dots from "../../../../shared/ui/icons/dots";
@@ -36,7 +38,7 @@ export function ModalPost({
 }: ModalPostProps) {
 	const [modalOpened, setModalOpened] = useState<boolean>(false);
 	const [tokenUser, setTokenUser] = useState<string | null>(null);
-	const { posts, setPosts } = usePosts();
+	const { posts, setPosts, refresh, isLoading } = usePosts();
 
 	const getToken = async (): Promise<string | null> => {
 		return await AsyncStorage.getItem("token");
@@ -44,6 +46,14 @@ export function ModalPost({
 
 	useEffect(() => {
 		getToken().then(setTokenUser);
+	}, []);
+
+	useEffect(() => {
+		const interval = setInterval(() => {
+			refresh();
+		}, 3000); // кожні 3 секунди
+
+		return () => clearInterval(interval);
 	}, []);
 
 	const modalWidth = 343;
@@ -75,6 +85,7 @@ export function ModalPost({
 			});
 			setPosts(posts.filter((post: IPost) => post.id !== postId));
 			onClose();
+			Alert.alert("Успіх", "Публікацію успішно видалено");
 		} catch (error: any) {
 			console.error("Помилка видалення:", error.message);
 		}
@@ -86,6 +97,8 @@ export function ModalPost({
 		return null;
 	}
 
+	{ isLoading && (<ActivityIndicator />) }
+
 	return (
 		<>
 			{modalOpened && (
@@ -94,6 +107,7 @@ export function ModalPost({
 					postData={{
 						id: post_id,
 						title: currentPost.title || "",
+						theme: currentPost.theme || "",
 						content: currentPost.content || "",
 						links: currentPost.links || [],
 						images: currentPost.images || [],
@@ -145,16 +159,21 @@ export function ModalPost({
 						<TouchableOpacity
 							style={styles.modalOption}
 							onPress={() => handleDelete(post_id)}
-						>
-							<Image
-								source={require("../../../../shared/ui/images/trash.png")}
-								style={{ width: 20, height: 24 }}
-							/>
-							<Text
-								style={[styles.optionText, styles.deleteText]}
-							>
-								Видалити публікацію
-							</Text>
+						>{isLoading ? (
+							<ActivityIndicator color="#fff" />
+						) : (
+							<>
+								<Image
+									source={require("../../../../shared/ui/images/trash.png")}
+									style={{ width: 20, height: 24 }}
+								/>
+								<Text
+									style={[styles.optionText, styles.deleteText]}
+								>
+									Видалити публікацію
+								</Text>
+							</>
+						)}
 						</TouchableOpacity>
 					</View>
 				</TouchableOpacity>

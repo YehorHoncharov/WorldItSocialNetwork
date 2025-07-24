@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from "react";
 import {
-  Modal,
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  ScrollView,
-  Alert,
+    Modal,
+    View,
+    Text,
+    StyleSheet,
+    TouchableOpacity,
+    ScrollView,
+    Alert,
 } from "react-native";
 import DropDownPicker from "react-native-dropdown-picker";
 import { Input } from "../../../../shared/ui/input";
@@ -18,177 +18,174 @@ import { PUT } from "../../../../shared/api/put";
 import { useUserContext } from "../../../auth/context/user-context";
 
 interface Props {
-  modalVisible: boolean;
-  album_id: number;
-  initialData: { name: string; topic: string; };
-  changeVisibility: () => void;
-  onClose: () => void;
-  onUpdate: (updatedAlbum: IAlbum) => void;
+    modalVisible: boolean;
+    album_id: number;
+    initialData: { name: string; topic: string; };
+    changeVisibility: () => void;
+    onClose: () => void;
+    onUpdate: (updatedAlbum: IAlbum) => void;
 }
 
 export function EditAlbumModal({
-  modalVisible,
-  album_id,
-  initialData,
-  changeVisibility,
-  onClose,
-  onUpdate,
+    modalVisible,
+    album_id,
+    initialData,
+    changeVisibility,
+    onClose,
+    onUpdate,
 }: Props) {
-  const [name, setName] = useState(initialData.name);
-  const [topic, setTopic] = useState(initialData.topic);
-  const [openTheme, setOpenTheme] = useState(false);
-  const { user } = useUserContext()
-  const [themeItems, setThemeItems] = useState<IAlbumTheme[]>([
-    { label: "Відпочинок", value: "#відпочинок" },
-    { label: "Натхнення", value: "#натхнення" },
-    { label: "Життя", value: "#життя" },
-    { label: "Природа", value: "#природа" },
-    { label: "Спокій", value: "#спокій" },
-    { label: "Читання", value: "#читання" },
-    { label: "Гармонія", value: "#гармонія" },
-    { label: "Музика", value: "#музика" },
-    { label: "Фільми", value: "#фільми" },
-    { label: "Подорожі", value: "#подорожі" },
-  ]);
+    const [name, setName] = useState(initialData.name);
+    const [topic, setTopic] = useState(initialData.topic);
+    const [openTheme, setOpenTheme] = useState(false);
+    const { user } = useUserContext()
+    const [themeItems, setThemeItems] = useState<IAlbumTheme[]>([
+        { label: "Відпочинок", value: "#відпочинок" },
+        { label: "Натхнення", value: "#натхнення" },
+        { label: "Життя", value: "#життя" },
+        { label: "Природа", value: "#природа" },
+        { label: "Спокій", value: "#спокій" },
+        { label: "Читання", value: "#читання" },
+        { label: "Гармонія", value: "#гармонія" },
+        { label: "Музика", value: "#музика" },
+        { label: "Фільми", value: "#фільми" },
+        { label: "Подорожі", value: "#подорожі" },
+    ]);
 
-  useEffect(() => {
-    setName(initialData.name);
-    setTopic(initialData.topic);
-  }, []);
+    useEffect(() => {
+        setName(initialData.name);
+        setTopic(initialData.topic);
+    }, []);
 
 
-  const resetForm = () => {
-    setName(initialData.name);
-    setTopic(initialData.topic);
+    const resetForm = () => {
+        setName(initialData.name);
+        setTopic(initialData.topic);
 
-  };
+    };
 
-  const handleSubmit = async () => {
-    if (!name) {
-      Alert.alert("Помилка", "Будь ласка, введіть назву альбому");
-      return;
-    }
+    const handleSubmit = async () => {
+        if (!name) {
+            Alert.alert("Помилка", "Будь ласка, введіть назву альбому");
+            return;
+        }
 
-    try {
-      const token = await AsyncStorage.getItem("token");
-      if (!token || !user) {
-        Alert.alert("Помилка", "Користувач не авторизований");
-        return;
-      }
-
-      const updateData: AlbumUpdateBody = {
-        name,
-        author_id: user.id,
-      };
-
-      if (topic && topic !== initialData.topic) {
-        updateData.tags = [topic];
-      }
-
-      const response = await PUT({
-        endpoint: `${API_BASE_URL}/albums/${album_id}`,
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        token: token,
-        body: updateData,
-      });
-
-      if (response.status === "success") {
-        Alert.alert("Успіх", "Альбом успішно оновлено!");
-        onUpdate({
-          id: album_id,
-          name,
-          topic: [{
-            tag: {
-              id: Date.now(),
-              name: "#"+topic
+        try {
+            const token = await AsyncStorage.getItem("token");
+            if (!token || !user) {
+                Alert.alert("Помилка", "Користувач не авторизований");
+                return;
             }
-          }],
-          author_id: user.id
-        });
-        onClose();
-      }
-      onClose()
-    } catch (err) {
-      console.error(err);
-      Alert.alert("Помилка", "Сталася помилка при оновленні альбому");
-    }
-  };
 
+            const updateData: AlbumUpdateBody = {
+                name,
+                author_id: user.id,
+            };
 
-  return (
-    <Modal
-      animationType="fade"
-      transparent={true}
-      visible={modalVisible}
-      onRequestClose={() => {
-        resetForm();
-        onClose();
-      }}
-    >
-      <View style={styles.centeredView}>
-        <View style={styles.modalView}>
-          <View style={styles.header}>
-            <Text style={styles.modalTitle}>Редагувати альбом</Text>
-          </View>
+            if (topic && topic !== initialData.topic) {
+                updateData.tags = [topic];
+            }
 
-          <ScrollView style={styles.scrollArea} overScrollMode="never">
-            <View style={styles.form}>
-              <Input
-                width={320}
-                label="Назва альбому"
-                placeholder="назва альбому"
-                value={name}
-                onChangeText={setName}
-              />
+            const response = await PUT({
+                endpoint: `${API_BASE_URL}/albums/${album_id}`,
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`,
+                },
+                token: token,
+                body: updateData,
+            });
 
-              <View style={{ width: "100%", zIndex: 2000, marginTop: 10 }}>
-                <DropDownPicker
-                  flatListProps={{ nestedScrollEnabled: true }}
-                  open={openTheme}
-                  value={topic}
-                  items={themeItems}
-                  setOpen={setOpenTheme}
-                  setValue={setTopic}
-                  setItems={setThemeItems}
-                  placeholder="Оберіть тему"
-                  searchable={true}
-                  searchPlaceholder="Пошук теми..."
-                  listMode="MODAL"
-                  scrollViewProps={{
-                    nestedScrollEnabled: true,
-                  }}
-                  addCustomItem={true}
-                  maxHeight={200}
-                  zIndex={2000}
-                  dropDownContainerStyle={{
-                    maxHeight: 250,
-                    borderColor: "#543C52",
-                    zIndex: 2000,
-                  }}
-                  onChangeSearchText={(text) => {
-                    const sanitizedText = text.trim();
-                    if (
-                      sanitizedText &&
-                      !themeItems.some((item) => item.value === sanitizedText) &&
-                      sanitizedText.length <= 50
-                    ) {
-                      setThemeItems((prev) => [
-                        ...prev,
-                        {
-                          label: sanitizedText,
-                          value: sanitizedText,
-                        },
-                      ]);
+            Alert.alert("Успіх", "Альбом успішно оновлено!");
+            onUpdate({
+                id: album_id,
+                name,
+                topic: [{
+                    tag: {
+                        id: Date.now(),
+                        name: "#" + topic
                     }
-                  }}
-                />
-              </View>
+                }],
+                author_id: user.id
+            });
+            onClose();
+        } catch (err) {
+            console.error(err);
+            Alert.alert("Помилка", "Сталася помилка при оновленні альбому");
+        }
+    };
 
-              {/* <View style={{ width: "100%", zIndex: 1000, marginTop: 10 }}> */}
-              {/* <DropDownPicker
+
+    return (
+        <Modal
+            animationType="fade"
+            transparent={true}
+            visible={modalVisible}
+            onRequestClose={() => {
+                resetForm();
+                onClose();
+            }}
+        >
+            <View style={styles.centeredView}>
+                <View style={styles.modalView}>
+                    <View style={styles.header}>
+                        <Text style={styles.modalTitle}>Редагувати альбом</Text>
+                    </View>
+
+                    <ScrollView style={styles.scrollArea} overScrollMode="never">
+                        <View style={styles.form}>
+                            <Input
+                                width={320}
+                                label="Назва альбому"
+                                placeholder="назва альбому"
+                                value={name}
+                                onChangeText={setName}
+                            />
+
+                            <View style={{ width: "100%", zIndex: 2000, marginTop: 10 }}>
+                                <DropDownPicker
+                                    flatListProps={{ nestedScrollEnabled: true }}
+                                    open={openTheme}
+                                    value={topic}
+                                    items={themeItems}
+                                    setOpen={setOpenTheme}
+                                    setValue={setTopic}
+                                    setItems={setThemeItems}
+                                    placeholder="Оберіть тему"
+                                    searchable={true}
+                                    searchPlaceholder="Пошук теми..."
+                                    listMode="MODAL"
+                                    scrollViewProps={{
+                                        nestedScrollEnabled: true,
+                                    }}
+                                    addCustomItem={true}
+                                    maxHeight={200}
+                                    zIndex={2000}
+                                    dropDownContainerStyle={{
+                                        maxHeight: 250,
+                                        borderColor: "#543C52",
+                                        zIndex: 2000,
+                                    }}
+                                    onChangeSearchText={(text) => {
+                                        const sanitizedText = text.trim();
+                                        if (
+                                            sanitizedText &&
+                                            !themeItems.some((item) => item.value === sanitizedText) &&
+                                            sanitizedText.length <= 50
+                                        ) {
+                                            setThemeItems((prev) => [
+                                                ...prev,
+                                                {
+                                                    label: sanitizedText,
+                                                    value: sanitizedText,
+                                                },
+                                            ]);
+                                        }
+                                    }}
+                                />
+                            </View>
+
+                            {/* <View style={{ width: "100%", zIndex: 1000, marginTop: 10 }}> */}
+                            {/* <DropDownPicker
                   open={openYear}
                   value={year}
                   items={yearItems}
@@ -227,32 +224,32 @@ export function EditAlbumModal({
                     }
                   }}
                 /> */}
-              {/* </View> */}
-            </View>
+                            {/* </View> */}
+                        </View>
 
-            <View style={styles.actions}>
-              <View style={styles.iconRow}>
-                <TouchableOpacity
-                  style={styles.cancelButton}
-                  onPress={() => {
-                    resetForm();
-                    onClose();
-                  }}
-                >
-                  <Text style={styles.submitTextCancel}>Скасувати</Text>
-                </TouchableOpacity>
+                        <View style={styles.actions}>
+                            <View style={styles.iconRow}>
+                                <TouchableOpacity
+                                    style={styles.cancelButton}
+                                    onPress={() => {
+                                        resetForm();
+                                        onClose();
+                                    }}
+                                >
+                                    <Text style={styles.submitTextCancel}>Скасувати</Text>
+                                </TouchableOpacity>
 
-                <TouchableOpacity
-                  style={styles.saveButton}
-                  onPress={handleSubmit}
-                >
-                  <Text style={styles.submitText}>Зберегти</Text>
-                </TouchableOpacity>
-              </View>
+                                <TouchableOpacity
+                                    style={styles.saveButton}
+                                    onPress={handleSubmit}
+                                >
+                                    <Text style={styles.submitText}>Зберегти</Text>
+                                </TouchableOpacity>
+                            </View>
+                        </View>
+                    </ScrollView>
+                </View>
             </View>
-          </ScrollView>
-        </View>
-      </View>
-    </Modal>
-  );
+        </Modal>
+    );
 }

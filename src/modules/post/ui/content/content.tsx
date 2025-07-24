@@ -15,7 +15,7 @@ import { API_BASE_URL } from "../../../../settings";
 export function Content(props: IPost) {
 
 	const [isLoading, setIsLoading] = useState(true);
-	
+
 	useEffect(() => {
 		checkServerAvailability();
 	}, []);
@@ -44,7 +44,7 @@ export function Content(props: IPost) {
 
 		return fullUrl;
 	};
-	
+
 
 	const groupImages = (images: IPostImg[]) => {
 		const grouped = [];
@@ -72,7 +72,7 @@ export function Content(props: IPost) {
 			>
 				{rowImages.map((imageItem, index) => {
 					const imageUrl = getImageUrl(imageItem.image.filename);
-					
+
 					if (!imageUrl) return null;
 
 					return (
@@ -112,7 +112,7 @@ export function Content(props: IPost) {
 		<View style={styles.container}>
 			<View style={styles.textContainer}>
 				<Text style={{ fontSize: 18 }}>{props.title}</Text>
-		
+				<Text style={styles.text}>{props.theme}</Text>
 				<Text style={styles.text}>{props.content}</Text>
 				{props.tags && props.tags.length > 0 && (
 					<View style={styles.tagsContainer}>
