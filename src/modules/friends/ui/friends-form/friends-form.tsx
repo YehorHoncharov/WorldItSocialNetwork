@@ -21,8 +21,6 @@ export function FriendsForm(props: FriendsFormProps) {
     const { user } = useUserContext();
     const { refreshUser } = useUserContext();
 
-
-
     function onPress() {
         const { date_of_birth, actionButton, deleteId, friendship_from, friendship_to, chat_group_members, chat_messages, administered_groups, ...rest } = props;
 

@@ -8,6 +8,11 @@ export const styles = StyleSheet.create({
 		padding: 16,
 		gap: 10,
 	},
+	containerBack: {
+		width: "100%",
+		flexDirection: "row",
+		alignItems: "flex-start",
+	},
 	profileContainer: {
 		backgroundColor: "white",
 		borderRadius: 10,

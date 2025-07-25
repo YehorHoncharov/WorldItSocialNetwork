@@ -21,7 +21,7 @@ export function RecomendFriends({
     scrollable?: boolean;
     limit?: number;
 }) {
-    const { users } = useUsers();
+    const { users, refresh } = useUsers();
     const { user } = useUserContext();
 
     const [correctUsers, setCorrectUsers] = useState<IUser[]>([]);
@@ -47,6 +47,14 @@ export function RecomendFriends({
     useEffect(() => {
         updateRecommendations();
     }, [users]);
+
+    useEffect(() => {
+        const interval = setInterval(() => {
+            refresh();
+        }, 3000);
+
+        return () => clearInterval(interval);
+    }, [])
 
     async function handleRequest(userTo: IUser) {
         try {

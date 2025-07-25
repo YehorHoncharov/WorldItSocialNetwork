@@ -7,10 +7,9 @@ import { useEffect, useState } from "react";
 import { IUser } from "../../../auth/types";
 
 export function AllFriends({ scrollable = true, limit = undefined }: { scrollable?: boolean; limit?: number }) {
-    const { users } = useUsers();
+    const { users, refresh } = useUsers();
     const { user } = useUserContext();
     const [displayedUsers, setDisplayedUsers] = useState<IUser[]>([]);
-   
 
     function updateFriendList() {
         if (!user) return;
@@ -34,6 +33,14 @@ export function AllFriends({ scrollable = true, limit = undefined }: { scrollabl
     useEffect(() => {
         updateFriendList();
     }, [users, user]);
+
+    useEffect(() => {
+        const interval = setInterval(() => {
+            refresh();
+        }, 3000);
+
+        return () => clearInterval(interval);
+    }, [])
 
 
     const content = (

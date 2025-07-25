@@ -12,6 +12,8 @@ import { IAlbum } from "../../../albums/types/albums.types";
 import { usePosts } from "../../../post/hooks/use-get-post";
 import Post from "../../../post/ui/main-page/main.page";
 import { IPost } from "../../../post/types/post";
+import BackArrowIcon from "../../../../shared/ui/icons/arrowBack";
+import { useRouter } from "expo-router";
 
 interface FriendProfileProps {
 	user: IUser
@@ -22,6 +24,7 @@ export function FriendProfile({ user }: FriendProfileProps) {
 	const { posts } = usePosts();
 	const [userAlbums, setUserAlbums] = useState<IAlbum[]>([]);
 	const [userPosts, setUserPosts] = useState<IPost[]>([]);
+	const router = useRouter();
 
 	useEffect(() => {
 		if (!user) return;
@@ -31,10 +34,19 @@ export function FriendProfile({ user }: FriendProfileProps) {
 		setUserPosts(myPosts);
 	}, [albums, user]);
 
+	function onBack() {
+		router.back();
+	}
+
 	return (
 		<ScrollView style={styles.scrollView} overScrollMode="never">
 			<View style={styles.container}>
 				<View style={styles.profileContainer}>
+					<View style={styles.containerBack}>
+						<TouchableOpacity onPress={onBack}>
+							<BackArrowIcon style={{ width: 20, height: 20 }} />
+						</TouchableOpacity>
+					</View>
 					<View style={styles.profileImageContainer}>
 						<Image
 							style={styles.profileImage}
@@ -141,6 +153,7 @@ export function FriendProfile({ user }: FriendProfileProps) {
 
 								<Post
 									id={item.id}
+									theme={item.theme}
 									title={item.title}
 									content={item.content}
 									author_id={item.author_id}
