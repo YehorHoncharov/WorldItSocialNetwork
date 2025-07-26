@@ -60,7 +60,7 @@ export const styles = StyleSheet.create({
 		// marginTop: 10,
 	},
 	confirmButton: {
-		width: 111,
+		width: "60%",
 		height: 40,
 		borderRadius: 20,
 		backgroundColor: "#543C52",

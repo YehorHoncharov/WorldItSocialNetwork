@@ -17,17 +17,17 @@ import { API_BASE_URL } from "../../../../settings";
 export function RecomendFriends({
     scrollable = true,
     limit = undefined,
+    onShowAll,
 }: {
     scrollable?: boolean;
     limit?: number;
+    onShowAll?: () => void;
 }) {
     const { users, refresh } = useUsers();
     const { user } = useUserContext();
 
     const [correctUsers, setCorrectUsers] = useState<IUser[]>([]);
     const displayedUsers = limit ? correctUsers.slice(0, limit) : correctUsers;
-    const { refreshUser } = useUserContext();
-
 
     function updateRecommendations() {
         if (!user) return;
@@ -83,7 +83,6 @@ export function RecomendFriends({
                 Alert.alert("Помилка", result.message);
                 return;
             }
-            await refreshUser();
             updateRecommendations();
 
             Alert.alert("Успіх", "Запит відправлено");
@@ -95,7 +94,7 @@ export function RecomendFriends({
         <View style={styles.container}>
             <View style={styles.buttonContainer}>
                 <Text style={[styles.text, { color: "#070A1C" }]}>Рекомендації</Text>
-                <TouchableOpacity>
+                <TouchableOpacity onPress={onShowAll}>
                     <Text style={[styles.text, { color: "#543C52" }]}>Дивитись всі</Text>
                 </TouchableOpacity>
             </View>

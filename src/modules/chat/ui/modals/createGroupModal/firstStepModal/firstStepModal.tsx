@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from "react";
 import {
-  Modal,
-  View,
-  Text,
-  TouchableOpacity,
-  ScrollView,
-  TextInput,
-  Alert,
+    Modal,
+    View,
+    Text,
+    TouchableOpacity,
+    ScrollView,
+    TextInput,
+    Alert,
 } from "react-native";
 import { IUser } from "../../../../../auth/types";
 import { useUserContext } from "../../../../../auth/context/user-context";
@@ -22,288 +22,288 @@ import { launchImageLibraryAsync, requestMediaLibraryPermissionsAsync } from "ex
 import { Chat } from "../../../../types/socket";
 
 interface Props {
-  modalVisible: boolean;
-  onClose: () => void;
+    modalVisible: boolean;
+    onClose: () => void;
 }
 
 export function AddFriendModal({ modalVisible, onClose }: Props) {
-  const { user: currentUser } = useUserContext();
-  const { users } = useUsers();
-  const [step, setStep] = useState<1 | 2>(1);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [selectedFriends, setSelectedFriends] = useState<number[]>([]);
-  const [groupName, setGroupName] = useState("");
-  const [friends, setFriends] = useState<IUser[]>([]);
-  const router = useRouter();
+    const { user: currentUser } = useUserContext();
+    const { users } = useUsers();
+    const [step, setStep] = useState<1 | 2>(1);
+    const [searchTerm, setSearchTerm] = useState("");
+    const [selectedFriends, setSelectedFriends] = useState<number[]>([]);
+    const [groupName, setGroupName] = useState("");
+    const [friends, setFriends] = useState<IUser[]>([]);
+    const router = useRouter();
 
-  useEffect(() => {
-    if (!currentUser) return;
+    useEffect(() => {
+        if (!currentUser) return;
 
-    const myFriends = users.filter((userF) =>
-      currentUser.friendship_to?.some(
-        (f) => f.accepted === true && f.profile1_id === userF.id
-      )
-    );
-
-    const friendsToAdd = users.filter((userF) =>
-      currentUser.friendship_from?.some(
-        (f) => f.accepted === true && f.profile2_id === userF.id
-      )
-    );
-
-    const allFriends = [...myFriends, ...friendsToAdd];
-    setFriends(allFriends);
-  }, [users, currentUser]);
-
-  const filteredFriends = friends.filter((friend) =>
-    friend.name?.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
-  const handleToggleFriend = (id: number) => {
-    setSelectedFriends((prev) =>
-      prev.includes(id) ? prev.filter((fid) => fid !== id) : [...prev, id]
-    );
-  };
-
-  const handleContinue = () => {
-    if (selectedFriends.length === 0) {
-      alert("Будь ласка, оберіть хоча б одного друга");
-      return;
-    }
-    setStep(2);
-  };
-
-  const handleCreateGroup = async () => {
-    if (!groupName.trim()) {
-      Alert.alert("Помилка", "Будь ласка, введіть назву групи");
-      return;
-    }
-
-    if (!currentUser) {
-      Alert.alert("Помилка", "Користувач не авторизований");
-      return;
-    }
-    const selectedFriendObjects = friends.filter(friend =>
-      selectedFriends.includes(friend.id)
-    );
-
-    const members = [currentUser, ...selectedFriendObjects];
-
-    try {
-      const token = await AsyncStorage.getItem("token");
-      if (!token) {
-        Alert.alert("Помилка", "Користувач не авторизований");
-        return;
-      }
-
-      const response = await POST<Chat>({
-        endpoint: `${API_BASE_URL}/chats/create`,
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        token,
-        body: {
-          name: groupName,
-          is_personal_chat: false,
-          admin_id: currentUser.id,
-          members: members,
-          avatar: "uploads/user.png"
-        },
-      });
-
-      if (response.status === "success") {
-        const createdChat = response.data;
-        Alert.alert("Успіх", "Група успішно створена!");
-        handleCancel();
-        router.push({
-          pathname: "/chat",
-          params: {
-            chat_id: createdChat.id,
-            name: groupName,
-            avatar: "uploads/user.png",
-          
-          },
-        });
-      }
-    } catch (err) {
-      console.error("Error creating chat/group:", err);
-      Alert.alert("Помилка", "Сталася помилка при створенні групи");
-    }
-  };
-
-  async function onSearch(): Promise<string | null> {
-    try {
-      const { status } = await requestMediaLibraryPermissionsAsync();
-      if (status !== "granted") {
-        Alert.alert(
-          "Дозвіл не надано",
-          "Для додавання зображення необхідно надати доступ до галереї"
+        const myFriends = users.filter((userF) =>
+            currentUser.friendship_to?.some(
+                (f) => f.accepted === true && f.profile1_id === userF.id
+            )
         );
-        return null;
-      }
 
-      const result = await launchImageLibraryAsync({
-        mediaTypes: ["images"],
-        quality: 0.8,
-        allowsEditing: false,
-        base64: true,
-      });
-
-      if (
-        result.canceled ||
-        !result.assets ||
-        result.assets.length === 0
-      ) {
-        Alert.alert("Скасовано", "Вибір зображення було скасовано");
-        return null;
-      }
-
-      const asset = result.assets[0];
-      const allowedFormats = ["jpeg", "png", "gif"];
-      const maxSizeInBytes = 5 * 1024 * 1024;
-      const type = asset.mimeType?.split("/")[1]?.toLowerCase() || "";
-
-      if (!asset.base64 || !allowedFormats.includes(type)) {
-        Alert.alert("Помилка", "Непідтримуваний формат зображення");
-        return null;
-      }
-
-      const estimatedSizeInBytes = (asset.base64.length * 3) / 4;
-      if (estimatedSizeInBytes > maxSizeInBytes) {
-        Alert.alert(
-          "Помилка",
-          "Зображення занадто велике (макс. 5 МБ)"
+        const friendsToAdd = users.filter((userF) =>
+            currentUser.friendship_from?.some(
+                (f) => f.accepted === true && f.profile2_id === userF.id
+            )
         );
-        return null;
-      }
 
-      const imageUrl = `data:image/${type};base64,${asset.base64}`;
+        const allFriends = [...myFriends, ...friendsToAdd];
+        setFriends(allFriends);
+    }, [users, currentUser]);
 
-      const newImage = imageUrl
+    const filteredFriends = friends.filter((friend) =>
+        friend.name?.toLowerCase().includes(searchTerm.toLowerCase())
+    );
 
-      return newImage;
-    } catch (error) {
-      Alert.alert(
-        "Помилка",
-        `Не вдалося вибрати зображення: ${error instanceof Error ? error.message : "Невідома помилка"
-        }`
-      );
-      return null;
+    const handleToggleFriend = (id: number) => {
+        setSelectedFriends((prev) =>
+            prev.includes(id) ? prev.filter((fid) => fid !== id) : [...prev, id]
+        );
+    };
+
+    const handleContinue = () => {
+        if (selectedFriends.length === 0) {
+            Alert.alert("Помилка", "Будь ласка, оберіть хоча б одного друга");
+            return;
+        }
+        setStep(2);
+    };
+
+    const handleCreateGroup = async () => {
+        if (!groupName.trim()) {
+            Alert.alert("Помилка", "Будь ласка, введіть назву групи");
+            return;
+        }
+
+        if (!currentUser) {
+            Alert.alert("Помилка", "Користувач не авторизований");
+            return;
+        }
+        const selectedFriendObjects = friends.filter(friend =>
+            selectedFriends.includes(friend.id)
+        );
+
+        const members = [currentUser, ...selectedFriendObjects];
+
+        try {
+            const token = await AsyncStorage.getItem("token");
+            if (!token) {
+                Alert.alert("Помилка", "Користувач не авторизований");
+                return;
+            }
+
+            const response = await POST<Chat>({
+                endpoint: `${API_BASE_URL}/chats/create`,
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`,
+                },
+                token,
+                body: {
+                    name: groupName,
+                    is_personal_chat: false,
+                    admin_id: currentUser.id,
+                    members: members,
+                    avatar: "uploads/user.png"
+                },
+            });
+
+            if (response.status === "success") {
+                const createdChat = response.data;
+                Alert.alert("Успіх", "Група успішно створена!");
+                handleCancel();
+                router.push({
+                    pathname: "/chat",
+                    params: {
+                        chat_id: createdChat.id,
+                        name: groupName,
+                        avatar: "uploads/user.png",
+
+                    },
+                });
+            }
+        } catch (err) {
+            console.error("Error creating chat/group:", err);
+            Alert.alert("Помилка", "Сталася помилка при створенні групи");
+        }
+    };
+
+    async function onSearch(): Promise<string | null> {
+        try {
+            const { status } = await requestMediaLibraryPermissionsAsync();
+            if (status !== "granted") {
+                Alert.alert(
+                    "Дозвіл не надано",
+                    "Для додавання зображення необхідно надати доступ до галереї"
+                );
+                return null;
+            }
+
+            const result = await launchImageLibraryAsync({
+                mediaTypes: ["images"],
+                quality: 0.8,
+                allowsEditing: false,
+                base64: true,
+            });
+
+            if (
+                result.canceled ||
+                !result.assets ||
+                result.assets.length === 0
+            ) {
+                Alert.alert("Скасовано", "Вибір зображення було скасовано");
+                return null;
+            }
+
+            const asset = result.assets[0];
+            const allowedFormats = ["jpeg", "png", "gif"];
+            const maxSizeInBytes = 5 * 1024 * 1024;
+            const type = asset.mimeType?.split("/")[1]?.toLowerCase() || "";
+
+            if (!asset.base64 || !allowedFormats.includes(type)) {
+                Alert.alert("Помилка", "Непідтримуваний формат зображення");
+                return null;
+            }
+
+            const estimatedSizeInBytes = (asset.base64.length * 3) / 4;
+            if (estimatedSizeInBytes > maxSizeInBytes) {
+                Alert.alert(
+                    "Помилка",
+                    "Зображення занадто велике (макс. 5 МБ)"
+                );
+                return null;
+            }
+
+            const imageUrl = `data:image/${type};base64,${asset.base64}`;
+
+            const newImage = imageUrl
+
+            return newImage;
+        } catch (error) {
+            Alert.alert(
+                "Помилка",
+                `Не вдалося вибрати зображення: ${error instanceof Error ? error.message : "Невідома помилка"
+                }`
+            );
+            return null;
+        }
     }
-  }
 
-  const handleCancel = () => {
-    setStep(1);
-    setSelectedFriends([]);
-    setGroupName("");
-    setSearchTerm("");
-    onClose();
-  };
+    const handleCancel = () => {
+        setStep(1);
+        setSelectedFriends([]);
+        setGroupName("");
+        setSearchTerm("");
+        onClose();
+    };
 
-  return (
-    <Modal animationType="fade" transparent={true} visible={modalVisible} onRequestClose={handleCancel}>
-      <View style={styles.centeredView}>
-        <View style={styles.modalView}>
-          {step === 1 ? (
-            <>
-              <View style={styles.header}>
-                <Text style={styles.modalTitle}>Нова група</Text>
-                <TouchableOpacity onPress={handleCancel} style={styles.closeButton}>
-                  <Text style={styles.closeText}>×</Text>
-                </TouchableOpacity>
-              </View>
+    return (
+        <Modal animationType="fade" transparent={true} visible={modalVisible} onRequestClose={handleCancel}>
+            <View style={styles.centeredView}>
+                <View style={styles.modalView}>
+                    {step === 1 ? (
+                        <>
+                            <View style={styles.header}>
+                                <Text style={styles.modalTitle}>Нова група</Text>
+                                <TouchableOpacity onPress={handleCancel} style={styles.closeButton}>
+                                    <Text style={styles.closeText}>×</Text>
+                                </TouchableOpacity>
+                            </View>
 
-              <View style={styles.searchInput}>
-                <SearchIcon style={{ width: 17, height: 17 }} />
-                <TextInput
-                  placeholder="Пошук..."
-                  value={searchTerm}
-                  onChangeText={setSearchTerm}
-                  style={{ flex: 1, marginLeft: 8 }}
-                />
-              </View>
+                            <View style={styles.searchInput}>
+                                <SearchIcon style={{ width: 17, height: 17 }} />
+                                <TextInput
+                                    placeholder="Пошук..."
+                                    value={searchTerm}
+                                    onChangeText={setSearchTerm}
+                                    style={{ flex: 1, marginLeft: 8 }}
+                                />
+                            </View>
 
-              <Text style={styles.friendCount}>
-                Вибрано: {selectedFriends.length}
-              </Text>
+                            <Text style={styles.friendCount}>
+                                Вибрано: {selectedFriends.length}
+                            </Text>
 
-              <ScrollView style={styles.scrollArea} overScrollMode="never">
-                <View style={styles.form}>
-                  {filteredFriends.map((friend) => (
-                    <TouchableOpacity
-                      key={friend.id}
-                      style={styles.friendItem}
-                      onPress={() => handleToggleFriend(friend.id)}
-                    >
-                      <ContactWithCheckbox
-                        userContact={friend}
-                        isSelected={selectedFriends.includes(friend.id)}
-                      />
-                      <View style={styles.checkbox}>
-                        {selectedFriends.includes(friend.id) && (
-                          <Text style={styles.checkmark}>✓</Text>
-                        )}
-                      </View>
-                    </TouchableOpacity>
-                  ))}
+                            <ScrollView style={styles.scrollArea} overScrollMode="never">
+                                <View style={styles.form}>
+                                    {filteredFriends.map((friend) => (
+                                        <TouchableOpacity
+                                            key={friend.id}
+                                            style={styles.friendItem}
+                                            onPress={() => handleToggleFriend(friend.id)}
+                                        >
+                                            <ContactWithCheckbox
+                                                userContact={friend}
+                                                isSelected={selectedFriends.includes(friend.id)}
+                                            />
+                                            <View style={styles.checkbox}>
+                                                {selectedFriends.includes(friend.id) && (
+                                                    <Text style={styles.checkmark}>✓</Text>
+                                                )}
+                                            </View>
+                                        </TouchableOpacity>
+                                    ))}
+                                </View>
+                            </ScrollView>
+
+                            <View style={styles.iconRow}>
+                                <TouchableOpacity
+                                    style={styles.cancelButton}
+                                    onPress={handleCancel}
+                                >
+                                    <Text style={styles.submitTextCancel}>Скасувати</Text>
+                                </TouchableOpacity>
+                                <TouchableOpacity
+                                    style={styles.saveButton}
+                                    onPress={handleContinue}
+                                >
+                                    <Text style={styles.submitText}>Далі</Text>
+                                </TouchableOpacity>
+                            </View>
+                        </>
+                    ) : (
+                        <>
+                            <View style={styles.header}>
+                                <Text style={styles.modalTitle}>Назва групи</Text>
+                                <TouchableOpacity onPress={handleCancel} style={styles.closeButton}>
+                                    <Text style={styles.closeText}>×</Text>
+                                </TouchableOpacity>
+                            </View>
+
+                            <ScrollView style={styles.scrollArea} overScrollMode="never">
+                                <View style={styles.form}>
+                                    <TextInput
+                                        style={styles.input}
+                                        placeholder="Введіть назву групи"
+                                        value={groupName}
+                                        onChangeText={setGroupName}
+                                    />
+                                </View>
+                            </ScrollView>
+
+                            <View style={styles.iconRow}>
+                                <TouchableOpacity
+                                    style={styles.cancelButton}
+                                    onPress={handleCancel}
+                                >
+                                    <Text style={styles.submitTextCancel}>Скасувати</Text>
+                                </TouchableOpacity>
+
+                                <TouchableOpacity
+                                    style={styles.saveButton}
+                                    onPress={handleCreateGroup}
+                                >
+                                    <Text style={styles.submitText}>Створити</Text>
+                                </TouchableOpacity>
+                            </View>
+                        </>
+                    )}
                 </View>
-              </ScrollView>
-
-              <View style={styles.iconRow}>
-                <TouchableOpacity
-                  style={styles.cancelButton}
-                  onPress={handleCancel}
-                >
-                  <Text style={styles.submitTextCancel}>Скасувати</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={styles.saveButton}
-                  onPress={handleContinue}
-                >
-                  <Text style={styles.submitText}>Далі</Text>
-                </TouchableOpacity>
-              </View>
-            </>
-          ) : (
-            <>
-              <View style={styles.header}>
-                <Text style={styles.modalTitle}>Назва групи</Text>
-                <TouchableOpacity onPress={handleCancel} style={styles.closeButton}>
-                  <Text style={styles.closeText}>×</Text>
-                </TouchableOpacity>
-              </View>
-
-              <ScrollView style={styles.scrollArea} overScrollMode="never">
-                <View style={styles.form}>
-                  <TextInput
-                    style={styles.input}
-                    placeholder="Введіть назву групи"
-                    value={groupName}
-                    onChangeText={setGroupName}
-                  />
-                </View>
-              </ScrollView>
-
-              <View style={styles.iconRow}>
-                <TouchableOpacity
-                  style={styles.cancelButton}
-                  onPress={handleCancel}
-                >
-                  <Text style={styles.submitTextCancel}>Скасувати</Text>
-                </TouchableOpacity>
-
-                <TouchableOpacity
-                  style={styles.saveButton}
-                  onPress={handleCreateGroup}
-                >
-                  <Text style={styles.submitText}>Створити</Text>
-                </TouchableOpacity>
-              </View>
-            </>
-          )}
-        </View>
-      </View>
-    </Modal>
-  );
+            </View>
+        </Modal>
+    );
 }

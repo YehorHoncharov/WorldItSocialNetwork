@@ -58,7 +58,6 @@ export function UserContextProvider({ children }: IUserContextProviderProps) {
             const response = await fetch(`${API_BASE_URL}/user/me`, {
                 headers: {
                     Authorization: `Bearer ${token}`,
-                    // "Cache-Control": "no-cache",
                 },
             });
             const result: Response<IUser> = await response.json();
@@ -75,6 +74,20 @@ export function UserContextProvider({ children }: IUserContextProviderProps) {
             return null;
         }
     }
+
+    // useEffect(() => {
+    //     async function refreshUser() {
+    //         const token = await AsyncStorage.getItem("token");
+    //         if (token) {
+    //             const interval = setInterval(() => {
+    //                 getData(token);
+    //             }, 3000);
+
+    //             return () => clearInterval(interval);
+    //         }
+    //     }
+    //     refreshUser();
+    // }, [])
 
     async function login(email: string, password: string) {
         try {
@@ -182,30 +195,6 @@ export function UserContextProvider({ children }: IUserContextProviderProps) {
         }
     }
 
-    // async function refetchLogin(email: string, password: string): Promise<IUser | null> {
-    //   try {
-    //     await AsyncStorage.multiRemove(["token", "user"]);
-    //     const response = await fetch(`${API_BASE_URL}/user/log`, {
-    //       method: "POST",
-    //       headers: {
-    //         "Content-Type": "application/json",
-    //         // "Cache-Control": "no-cache",
-    //       },
-    //       body: JSON.stringify({ email, password }),
-    //     });
-    //     const result: Response<string> = await response.json();
-    //     if (result.status === "error") {
-    //       throw new Error(result.message);
-    //     }
-    //     await AsyncStorage.setItem("token", result.data);
-    //     return await getData(result.data);
-    //   } catch (error) {
-    //     console.error("[refetchLogin] Error:", error);
-    //     throw error;
-    //   }
-    // }
-
-
     async function updateUser(updatedUser: IUser) {
         try {
             setUser(updatedUser);
@@ -236,8 +225,11 @@ export function UserContextProvider({ children }: IUserContextProviderProps) {
         async function checkToken() {
             const token = await AsyncStorage.getItem("token");
             if (token) {
-                await getData(token);
+                const interval = setInterval(() => {
+                    getData(token);
+                }, 500);
 
+                return () => clearInterval(interval);
             } else {
                 router.push({
                     pathname: "/registration/step-one"

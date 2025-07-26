@@ -6,7 +6,7 @@ import { useUserContext } from "../../../auth/context/user-context";
 import { useEffect, useState } from "react";
 import { IUser } from "../../../auth/types";
 
-export function AllFriends({ scrollable = true, limit = undefined }: { scrollable?: boolean; limit?: number }) {
+export function AllFriends({ scrollable = true, limit = undefined, onShowAll }: { scrollable?: boolean; limit?: number; onShowAll?: () => void; }) {
     const { users, refresh } = useUsers();
     const { user } = useUserContext();
     const [displayedUsers, setDisplayedUsers] = useState<IUser[]>([]);
@@ -47,7 +47,7 @@ export function AllFriends({ scrollable = true, limit = undefined }: { scrollabl
         <View style={styles.container}>
             <View style={styles.buttonContainer}>
                 <Text style={[styles.text, { color: "#070A1C" }]}>Всі друзі</Text>
-                <TouchableOpacity>
+                <TouchableOpacity onPress={onShowAll}>
                     <Text style={[styles.text, { color: "#543C52" }]}>Дивитись всі</Text>
                 </TouchableOpacity>
             </View>

@@ -15,7 +15,7 @@ export interface IUser {
     friendship_to?: IFriendship[],
     chat_group_members?: {
         chat_groupId: number,
-        profile_id: 7
+        profile_id: number
     }[],
     chat_messages?: Chat[], 
     administered_groups?: Chat[]

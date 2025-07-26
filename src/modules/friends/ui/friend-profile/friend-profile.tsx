@@ -14,6 +14,8 @@ import Post from "../../../post/ui/main-page/main.page";
 import { IPost } from "../../../post/types/post";
 import BackArrowIcon from "../../../../shared/ui/icons/arrowBack";
 import { useRouter } from "expo-router";
+import { useFriends } from "../../hooks/useFriends";
+import { IFriendship } from "../../types/friends.type";
 
 interface FriendProfileProps {
 	user: IUser
@@ -22,21 +24,24 @@ interface FriendProfileProps {
 export function FriendProfile({ user }: FriendProfileProps) {
 	const { albums } = useAlbums();
 	const { posts } = usePosts();
-	const [userAlbums, setUserAlbums] = useState<IAlbum[]>([]);
-	const [userPosts, setUserPosts] = useState<IPost[]>([]);
+	const { friends } = useFriends();
 	const router = useRouter();
+	const [myAlbums, setMyAlbums] = useState<IAlbum[]>([]);
+	const [myPosts, setMyPosts] = useState<IPost[]>([]);
+	const [myFriends, setMyFriends] = useState<IFriendship[]>([]);
 
 	useEffect(() => {
 		if (!user) return;
-		const myAlbums = albums.filter((album) => album.author_id === user.id);
-		const myPosts = posts.filter((post) => post.author_id === user.id);
-		setUserAlbums(myAlbums);
-		setUserPosts(myPosts);
-	}, [albums, user]);
+		setMyAlbums(albums.filter((album) => album.author_id === user.id));
+		setMyPosts(posts.filter((post) => post.author_id === user.id));
+		setMyFriends(friends.filter((friend) => friend.profile1_id === user.id || friend.profile2_id === user.id));
+	}, [albums, user, posts, friends]);
 
 	function onBack() {
 		router.back();
 	}
+
+	// console.log("myFriends", user.friendship_from)
 
 	return (
 		<ScrollView style={styles.scrollView} overScrollMode="never">
@@ -72,31 +77,31 @@ export function FriendProfile({ user }: FriendProfileProps) {
 						<View
 							style={[styles.statItem, styles.statItemWithBorder]}
 						>
-							<Text style={styles.statNumber}>3</Text>
-							<Text style={styles.statLabel}>Дописи</Text>
+							<Text style={styles.statNumber}>{myAlbums.length}</Text>
+							<Text style={styles.statLabel}>Альбоми</Text>
 						</View>
 						<View
 							style={[styles.statItem, styles.statItemWithBorder]}
 						>
-							<Text style={styles.statNumber}>12.1к</Text>
-							<Text style={styles.statLabel}>Читачів</Text>
+							<Text style={styles.statNumber}>{myPosts.length}</Text>
+							<Text style={styles.statLabel}>Пости</Text>
 						</View>
 						<View style={styles.statItem}>
-							<Text style={styles.statNumber}>222</Text>
+							<Text style={styles.statNumber}>{myFriends.length}</Text>
 							<Text style={styles.statLabel}>Друзі</Text>
 						</View>
 					</View>
-					<View style={styles.buttonContainer}>
-						<Button
-							label="Підтвердити"
-							style={[styles.confirmButton]}
-						>
-							<Text style={styles.buttonText}>Підтвердити</Text>
-						</Button>
-						<TouchableOpacity style={styles.deleteButton}>
+					{myFriends.length > 0 ?
+						<View style={styles.buttonContainer}>
+							<Button
+								label="Написати"
+								style={[styles.confirmButton]}
+							>
+							</Button>
+							{/* <TouchableOpacity style={styles.deleteButton}>
 							<Text style={styles.buttonText}>Видалити</Text>
-						</TouchableOpacity>
-					</View>
+						</TouchableOpacity> */}
+						</View> : null}
 				</View>
 				<View style={styles.albumsContainer}>
 					<View style={styles.albumsSection}>
@@ -113,7 +118,7 @@ export function FriendProfile({ user }: FriendProfileProps) {
 					</View>
 
 					<FlatList
-						data={userAlbums}
+						data={myAlbums}
 						scrollEnabled={false}
 						keyExtractor={(item) => item.id.toString()}
 						renderItem={({ item }) => (
@@ -130,7 +135,7 @@ export function FriendProfile({ user }: FriendProfileProps) {
 					/>
 
 				</View>
-				{userPosts.length > 0 ?
+				{myPosts.length > 0 ?
 					<View style={styles.albumsContainer}>
 						<View style={styles.albumsSection}>
 							<View style={styles.albumsHeader}>
@@ -146,7 +151,7 @@ export function FriendProfile({ user }: FriendProfileProps) {
 						</View>
 
 						<FlatList
-							data={userPosts}
+							data={myPosts}
 							scrollEnabled={false}
 							keyExtractor={(item) => item.id.toString()}
 							renderItem={({ item }) => (

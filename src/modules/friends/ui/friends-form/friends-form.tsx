@@ -13,13 +13,13 @@ type FriendsFormProps = IUser & {
         label: string;
         onPress?: () => void;
     };
-    deleteId: number
+    deleteId: number;
 };
 
 export function FriendsForm(props: FriendsFormProps) {
+
     const navigation = useRouter();
     const { user } = useUserContext();
-    const { refreshUser } = useUserContext();
 
     function onPress() {
         const { date_of_birth, actionButton, deleteId, friendship_from, friendship_to, chat_group_members, chat_messages, administered_groups, ...rest } = props;
@@ -64,10 +64,9 @@ export function FriendsForm(props: FriendsFormProps) {
                 Alert.alert("Помилка", result.message);
                 return;
             }
-            await refreshUser()
 
-
-            Alert.alert("Успіх", "Запит прийнято");
+            Alert.alert("Успіх", "Запит відхилено");
+            // checkRequest();
         } catch (error: any) {
             Alert.alert("Помилка", "Не вдалося підтвердити запит");
             console.log(error.message)

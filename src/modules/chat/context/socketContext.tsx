@@ -24,7 +24,7 @@ export function SocketContextProvider({
 }: ISocketContextProviderProps) {
 	const [socket, setSocket] = useState<Socket<IServerEvents, IClientEvents> | null>(null)
 	const [token, setToken] = useState<string>()
-	
+
 	useEffect(() => {
 		const getToken = async () => {
 			const tk = await AsyncStorage.getItem("token")
@@ -44,6 +44,10 @@ export function SocketContextProvider({
 		newSocket.on("disconnect", () => {
 			// Alert.alert("Socket disconnected")
 		})
+
+		newSocket.on("friendRequestDeclined", (data) => {
+			Alert.alert("Запит відхилено", data.message);
+		});
 
 		setSocket(newSocket)
 

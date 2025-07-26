@@ -14,20 +14,22 @@ import { FriendsForm } from "../friends-form/friends-form";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useFriends } from "../../hooks/useFriends";
 import { API_BASE_URL } from "../../../../settings";
+import { useRouter } from "expo-router";
 
 export function RequestsFriends({
     scrollable = true,
     limit = undefined,
+    onShowAll,
 }: {
     scrollable?: boolean;
+    onShowAll?: () => void;
     limit?: number;
 }) {
     const { users, refresh } = useUsers();
     const { user } = useUserContext();
     const [displayedUsers, setDisplayedUsers] = useState<IUser[]>();
-    const { friends } = useFriends();
-    const { refreshUser } = useUserContext();
-
+    const { refresh: refreshFriends } = useFriends();
+    const router = useRouter()
 
     function getFriendRequests() {
         if (!user || !user.friendship_to) return;
@@ -45,12 +47,13 @@ export function RequestsFriends({
         getFriendRequests();
     }, [user, users]);
 
-    useEffect(() =>{
-		const interval = setInterval(() => {
-			refresh();
-		}, 3000);
+    useEffect(() => {
+        const interval = setInterval(() => {
+            refresh();
+            refreshFriends();
+        }, 3000);
 
-		return () => clearInterval(interval);
+        return () => clearInterval(interval);
     }, [])
 
     async function handleAccept(clickedUserId: number) {
@@ -83,7 +86,6 @@ export function RequestsFriends({
                 return;
             }
 
-            await refreshUser()
             getFriendRequests();
 
             Alert.alert("Успіх", "Запит прийнято");
@@ -116,7 +118,7 @@ export function RequestsFriends({
         <View style={styles.container}>
             <View style={styles.buttonContainer}>
                 <Text style={[styles.text, { color: "#070A1C" }]}>Запити</Text>
-                <TouchableOpacity>
+                <TouchableOpacity onPress={onShowAll}>
                     <Text style={[styles.text, { color: "#543C52" }]}>Дивитись всі</Text>
                 </TouchableOpacity>
             </View>

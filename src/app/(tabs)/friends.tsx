@@ -8,60 +8,65 @@ import { AllFriends } from "../../modules/friends/ui/all/all";
 const screenWidth = Dimensions.get("window").width;
 
 export default function Friends() {
-  const [activeTab, setActiveTab] = useState('main');
-  const translateX = useRef(new Animated.Value(0)).current;
 
-  const handleTabPress = (tab: string) => {
-    if (tab === 'main') {
-      setActiveTab('main');
-      return;
-    }
+    const [activeTab, setActiveTab] = useState('main');
+    const translateX = useRef(new Animated.Value(0)).current;
 
-    let toValue = 0;
-    switch (tab) {
-      case 'requests': toValue = 0; break;
-      case 'recommendations': toValue = -screenWidth; break;
-      case 'all': toValue = -screenWidth * 2; break;
-    }
+    const handleTabPress = (tab: string) => {
+        if (tab === 'main') {
+            setActiveTab('main');
+            return;
+        }
 
-    Animated.timing(translateX, {
-      toValue,
-      duration: 300,
-      useNativeDriver: true,
-    }).start();
+        let toValue = 0;
+        switch (tab) {
+            case 'requests': toValue = 0; break;
+            case 'recommendations': toValue = -screenWidth; break;
+            case 'all': toValue = -screenWidth * 2; break;
+        }
 
-    setActiveTab(tab);
-  };
+        Animated.timing(translateX, {
+            toValue,
+            duration: 300,
+            useNativeDriver: true,
+        }).start();
 
-  return (
-    <View style={{ flex: 1, backgroundColor: "#ffffff" }}>
-      <FriendsHeader activeTab={activeTab} onTabPress={handleTabPress} />
+        setActiveTab(tab);
+    };
 
-      {activeTab === 'main' ? (
-        <ScrollView contentContainerStyle={{alignItems:"center", gap: 10}} overScrollMode="never">
-          <RequestsFriends limit={3} scrollable={true} />
-          <RecomendFriends limit={2} scrollable={true} />
-          <AllFriends limit={2} scrollable={true} />
-        </ScrollView>
-      ) : (
-        <View style={{ flex: 1, overflow: 'hidden' }}>
-          <Animated.View style={{
-            flexDirection: 'row',
-            width: screenWidth * 3,
-            transform: [{ translateX }],
-          }}>
-            <ScrollView style={{ width: screenWidth }} overScrollMode="never">
-              <RequestsFriends />
-            </ScrollView>
-            <ScrollView style={{ width: screenWidth }} overScrollMode="never">
-              <RecomendFriends />
-            </ScrollView>
-            <ScrollView style={{ width: screenWidth }} overScrollMode="never">
-              <AllFriends />
-            </ScrollView>
-          </Animated.View>
+    const handleShowAllPress = (tab: string) => {
+        handleTabPress(tab);
+    };
+
+    return (
+        <View style={{ flex: 1, backgroundColor: "#ffffff" }}>
+            <FriendsHeader activeTab={activeTab} onTabPress={handleTabPress} />
+
+            {activeTab === 'main' ? (
+                <ScrollView contentContainerStyle={{ alignItems: "center", gap: 10 }} overScrollMode="never">
+                    <RequestsFriends limit={2} scrollable={true} onShowAll={() => handleShowAllPress('requests')} />
+                    <RecomendFriends limit={2} scrollable={true} onShowAll={() => handleShowAllPress('recommendations')} />
+                    <AllFriends limit={2} scrollable={true} onShowAll={() => handleShowAllPress('all')} />
+                </ScrollView>
+            ) : (
+                <View style={{ flex: 1, overflow: 'hidden' }}>
+                    <Animated.View style={{
+                        flexDirection: 'row',
+                        width: screenWidth * 3,
+                        transform: [{ translateX }],
+                    }}>
+                        <ScrollView style={{ width: screenWidth }} overScrollMode="never">
+                            <RequestsFriends />
+                        </ScrollView>
+                        <ScrollView style={{ width: screenWidth }} overScrollMode="never">
+                            <RecomendFriends />
+                        </ScrollView>
+                        <ScrollView style={{ width: screenWidth }} overScrollMode="never">
+                            <AllFriends />
+                        </ScrollView>
+                    </Animated.View>
+                </View>
+            )}
         </View>
-      )}
-    </View>
-  );
+    );
 }
