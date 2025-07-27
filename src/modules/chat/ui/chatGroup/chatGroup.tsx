@@ -31,18 +31,26 @@ export function ChatGroup() {
     const [input, setInput] = useState("");
     const scrollViewRef = useRef<ScrollView>(null);
     const router = useRouter();
+    const [isMounted, setIsMounted] = useState(false);
 
     useEffect(() => {
-        if (!socket) return;
+        setIsMounted(true);
+        return () => setIsMounted(false);
+    }, []);
+
+    useEffect(() => {
+        if (!socket || !isMounted) return;
 
         const chatId = +params.chat_id;
         socket.emit("joinChat", { chatId }, (res) => {
+            if (!isMounted) return;
             if (res.status === "success" && Array.isArray(res.data?.chat_messages)) {
                 setMessages(res.data.chat_messages);
             }
         });
 
-        socket.on("newMessage", (data: CreateMessage) => {
+        const handleNewMessage = (data: CreateMessage) => {
+            if (!isMounted) return;
             const newMessage: MessagePayload = {
                 content: data.content || "",
                 sent_at: new Date(),
@@ -52,13 +60,16 @@ export function ChatGroup() {
             };
             setMessages((prev) => [...prev, newMessage]);
             scrollViewRef.current?.scrollToEnd({ animated: true });
-        });
+        };
+
+        socket.on("newMessage", handleNewMessage);
 
         return () => {
-            socket.off("newMessage");
+            socket.off("newMessage", handleNewMessage);
             socket.emit("leaveChat", { chatId });
         };
-    }, [socket, params.chat_id]);
+    }, [socket, params.chat_id, isMounted]);
+
 
     const sendMessage = () => {
         if (!socket || !input.trim() || !user) return;
@@ -76,7 +87,9 @@ export function ChatGroup() {
     };
 
     function onBack() {
-        router.back();
+        router.navigate({
+            pathname: "/chats",
+        });
     }
 
     return (

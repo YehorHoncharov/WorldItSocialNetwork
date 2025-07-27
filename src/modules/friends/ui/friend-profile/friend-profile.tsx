@@ -16,6 +16,7 @@ import BackArrowIcon from "../../../../shared/ui/icons/arrowBack";
 import { useRouter } from "expo-router";
 import { useFriends } from "../../hooks/useFriends";
 import { IFriendship } from "../../types/friends.type";
+import { useChats } from "../../../chat/hooks/useChats";
 
 interface FriendProfileProps {
 	user: IUser
@@ -25,6 +26,8 @@ export function FriendProfile({ user }: FriendProfileProps) {
 	const { albums } = useAlbums();
 	const { posts } = usePosts();
 	const { friends } = useFriends();
+	const { chats } = useChats();
+	const { user: currentUser } = useUserContext();
 	const router = useRouter();
 	const [myAlbums, setMyAlbums] = useState<IAlbum[]>([]);
 	const [myPosts, setMyPosts] = useState<IPost[]>([]);
@@ -34,14 +37,35 @@ export function FriendProfile({ user }: FriendProfileProps) {
 		if (!user) return;
 		setMyAlbums(albums.filter((album) => album.author_id === user.id));
 		setMyPosts(posts.filter((post) => post.author_id === user.id));
-		setMyFriends(friends.filter((friend) => friend.profile1_id === user.id || friend.profile2_id === user.id));
+		setMyFriends(friends.filter((friend) => (friend.profile1_id === user.id || friend.profile2_id === user.id) && friend.accepted));
 	}, [albums, user, posts, friends]);
 
 	function onBack() {
 		router.back();
 	}
 
-	// console.log("myFriends", user.friendship_from)
+	function onWrite() {
+
+		const existingChat = chats.find((chat) => {
+			if (!currentUser || !user) return false;
+			const memberIds = chat.members.map((m) => m.profile_id);
+			return (
+				memberIds.includes(currentUser.id) &&
+				memberIds.includes(user.id) &&
+				chat.members.length === 2
+			);
+		});
+		if (existingChat) {
+			return router.replace({
+				pathname: "/chat",
+				params: {
+					chat_id: existingChat.id,
+					name: user.name,
+					avatar: user.image,
+				},
+			});
+		}
+	}
 
 	return (
 		<ScrollView style={styles.scrollView} overScrollMode="never">
@@ -94,6 +118,7 @@ export function FriendProfile({ user }: FriendProfileProps) {
 					{myFriends.length > 0 ?
 						<View style={styles.buttonContainer}>
 							<Button
+								onPress={onWrite}
 								label="Написати"
 								style={[styles.confirmButton]}
 							>
@@ -114,7 +139,7 @@ export function FriendProfile({ user }: FriendProfileProps) {
 							</View>
 							<Text style={styles.albumsLabel}>Альбоми</Text>
 						</View>
-						<Text style={styles.viewAll}>Дивитись всі</Text>
+						{/* <Text style={styles.viewAll}>Дивитись всі</Text> */}
 					</View>
 
 					<FlatList
@@ -147,7 +172,7 @@ export function FriendProfile({ user }: FriendProfileProps) {
 								</View>
 								<Text style={styles.albumsLabel}>Пости</Text>
 							</View>
-							<Text style={styles.viewAll}>Дивитись всі</Text>
+							{/* <Text style={styles.viewAll}>Дивитись всі</Text> */}
 						</View>
 
 						<FlatList

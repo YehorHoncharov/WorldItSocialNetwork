@@ -17,6 +17,8 @@ export default function FriendsProfile() {
         password: typeof params.password === "string" ? params.password : "",
         signature: typeof params.signature === "string" ? params.signature : undefined,
         image: typeof params.image === "string" ? params.image : undefined,
+        friendship_from: typeof params.friendshipFrom === "string" ? JSON.parse(params.friendshipFrom) : [],
+        friendship_to: typeof params.friendshipTo === "string" ? JSON.parse(params.friendshipTo) : [],
     };
     return (
         <Providers>

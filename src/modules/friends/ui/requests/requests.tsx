@@ -106,6 +106,7 @@ export function RequestsFriends({
                             onPress: () => handleAccept(item.id),
                         }}
                         deleteId={item.id}
+                        withoutDelete={true}
                     />
                 ))
             ) : (

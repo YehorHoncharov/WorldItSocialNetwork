@@ -7,25 +7,25 @@ import { Search } from '../search/search';
 
 export function ContactsScreen({ scrollable = true }: { scrollable?: boolean }) {
 
-  const { socket } = useSocketContext();
+    const { socket } = useSocketContext();
 
-  useEffect(() => {
-    if (!socket) return;
-    socket.on("chatUpdate", (data) => { });
-    return () => {
-      socket.off("chatUpdate")
-    }
-  }, [socket]);
+    useEffect(() => {
+        if (!socket) return;
+        socket.on("chatUpdate", (data) => { });
+        return () => {
+            socket.off("chatUpdate")
+        }
+    }, [socket]);
 
-  const content = (
-    <View style={styles.container}>
-      <View style={styles.header}>
-        <PeopleIcon style={{ borderColor: '#81818D', width: 20, height: 20 }} />
-        <Text style={styles.title}>Контакти</Text>
-      </View>
-      <Search />
-    </View>
-  )
+    const content = (
+        <View style={styles.container}>
+            <View style={styles.header}>
+                <PeopleIcon style={{ borderColor: '#81818D', width: 20, height: 20 }} />
+                <Text style={styles.title}>Контакти</Text>
+            </View>
+            <Search />
+        </View>
+    )
 
-  return scrollable ? <ScrollView overScrollMode="never">{content}</ScrollView> : content;
+    return scrollable ? <ScrollView overScrollMode="never">{content}</ScrollView> : content;
 }

@@ -63,6 +63,7 @@ export function AllFriends({ scrollable = true, limit = undefined, onShowAll }: 
                                 onPress: undefined,
                             }}
                             deleteId={item.id}
+                            withoutDelete={true}
                         />
                     ))
                 ) : (

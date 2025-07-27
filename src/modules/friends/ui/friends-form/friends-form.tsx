@@ -13,6 +13,7 @@ type FriendsFormProps = IUser & {
         label: string;
         onPress?: () => void;
     };
+    withoutDelete?: boolean;
     deleteId: number;
 };
 
@@ -28,7 +29,8 @@ export function FriendsForm(props: FriendsFormProps) {
             pathname: "/friends-profile",
             params: {
                 ...rest,
-                date_of_Birth: date_of_birth ? new Date(date_of_birth).toISOString() : undefined
+                date_of_Birth: date_of_birth ? new Date(date_of_birth).toISOString() : undefined,
+                withoutDelete: props.withoutDelete ? 1 : 0,
             },
         });
     }
@@ -66,7 +68,6 @@ export function FriendsForm(props: FriendsFormProps) {
             }
 
             Alert.alert("Успіх", "Запит відхилено");
-            // checkRequest();
         } catch (error: any) {
             Alert.alert("Помилка", "Не вдалося підтвердити запит");
             console.log(error.message)
@@ -96,9 +97,11 @@ export function FriendsForm(props: FriendsFormProps) {
                     label={props.actionButton.label}
                     onPress={props.actionButton.onPress ? props.actionButton.onPress : onPress}
                 />
-                <TouchableOpacity style={styles.deleteButton} onPress={() => handleDelete(props.deleteId)}>
-                    <Text style={styles.buttonDeleteText}>Видалити</Text>
-                </TouchableOpacity>
+                { props.withoutDelete ?
+                    <TouchableOpacity style={styles.deleteButton} onPress={() => handleDelete(props.deleteId)}>
+                        <Text style={styles.buttonDeleteText}>Видалити</Text>
+                    </TouchableOpacity> : null
+                }
             </View>
         </TouchableOpacity>
     );

@@ -225,6 +225,7 @@ export function Album({ scrollOffset = 0, ...props }: IAlbum & { scrollOffset?: 
 			});
 
 			if (response.status === "success" && response.data) {
+				console.log( imagesToDelete)
 				setImagesToDelete([]);
 				Alert.alert("Успіх", "Зміни успішно збережено");
 			}

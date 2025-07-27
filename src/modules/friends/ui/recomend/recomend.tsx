@@ -133,6 +133,7 @@ export function RecomendFriends({
                                     onPress: () => handleRequest(item),
                                 }}
                                 deleteId={item.id}
+                                withoutDelete={false}
                             />
                         ))
                     ) : (

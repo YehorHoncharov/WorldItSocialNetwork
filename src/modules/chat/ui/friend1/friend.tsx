@@ -10,91 +10,54 @@ import { useUserContext } from "../../../auth/context/user-context";
 import { useChats } from "../../hooks/useChats";
 import { Chat } from "../../types/socket";
 
-export function Friend1({ userContact }: { userContact: IUser }) {
-  const router = useRouter();
-  const { user } = useUserContext();
-  const [token, setToken] = useState<string>("");
-  const { chats } = useChats()
-  const [correctChat, setCorrectChat] = useState<Chat[]>()
+export function Friend1({userContact, withoutDelete}: {userContact: IUser, withoutDelete: boolean}) {
+    const router = useRouter();
+    const { user } = useUserContext();
+    const [token, setToken] = useState<string>("");
+    const { chats } = useChats()
+    const [correctChat, setCorrectChat] = useState<Chat[]>()
 
-  useEffect(() => {
-    async function getToken() {
-      const token = await AsyncStorage.getItem("token");
-      if (!token) return;
-      setToken(token);
-    }
-    getToken();
-  }, [token]);
+    useEffect(() => {
+        async function getToken() {
+            const token = await AsyncStorage.getItem("token");
+            if (!token) return;
+            setToken(token);
+        }
+        getToken();
+    }, [token]);
 
-  async function onPress() {
-    if (!user) return;
+    async function onPress() {
+        if (!user) return;
 
-    const existingChat = chats.find((chat) => {
-      const memberIds = chat.members.map((m) => m.profile_id);
-      return (
-        memberIds.includes(user.id) &&
-        memberIds.includes(userContact.id) &&
-        chat.members.length === 2 
-      );
-    });
+        const { date_of_birth, friendship_from, friendship_to, chat_group_members, chat_messages, administered_groups, ...rest } = userContact;
 
-    if (existingChat) {
-      router.push({
-        pathname: "/chat",
-        params: {
-          chat_id: existingChat.id,
-          name: userContact.name,
-          avatar: userContact.image,
-       
-        },
-      });
-    } else {
-      const response = await POST<Chat>({
-        endpoint: `${API_BASE_URL}/chats/create`,
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        token: token,
-        body: {
-          name: userContact.name,
-          is_personal_chat: true,
-          avatar: userContact.image || "uploads/user.png",
-          members: [user, userContact],
-        },
-      });
-
-      if (response.status === "success" && response.data) {
-        const createdChat = response.data;
-        router.push({
-          pathname: "/chat",
-          params: {
-            chat_id: createdChat.id,
-            name: userContact.name,
-            avatar: userContact.image,
-          
-          },
+        router.navigate({
+            pathname: "/friends-profile",
+            params: {
+                ...rest,
+                date_of_Birth: date_of_birth ? new Date(date_of_birth).toISOString() : undefined,
+                withoutDelete: withoutDelete ? 1 : 0,
+            },
         });
-      }
-    }
-  }
 
-  return (
-    <TouchableOpacity onPress={onPress}>
-      <View style={styles.container}>
-        <Image
-          source={{
-            uri:
-              API_BASE_URL + "/" + userContact?.image ||
-              "../../../../shared/ui/images/user.png",
-          }}
-          style={styles.avatar}
-        />
-        <View style={{flexDirection: "row", gap: 4}}>
-          <Text style={styles.name}>{userContact?.name || "Anonymous"}</Text>
-          <Text style={styles.name}>{userContact?.surname || "Anonymous"}</Text>
-        </View>
-      </View>
-    </TouchableOpacity>
-  );
+    }
+
+    return (
+        <TouchableOpacity onPress={onPress}>
+            <View style={styles.container}>
+                <Image
+                    source={{
+                        uri:
+                            API_BASE_URL + "/" + userContact?.image ||
+                            "../../../../shared/ui/images/user.png",
+                    }}
+                    style={styles.avatar}
+                />
+                <View style={{ flexDirection: "row", gap: 4 }}>
+                    <Text style={styles.name}>{userContact?.name || "Anonymous"}</Text>
+                    <Text style={styles.name}>{userContact?.surname || "Anonymous"}</Text>
+                </View>
+            </View>
+        </TouchableOpacity>
+    );
 }

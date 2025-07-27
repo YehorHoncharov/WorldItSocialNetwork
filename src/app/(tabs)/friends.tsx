@@ -39,7 +39,7 @@ export default function Friends() {
     };
 
     return (
-        <View style={{ flex: 1, backgroundColor: "#ffffff" }}>
+        <View style={{ flex: 1, backgroundColor: "#FAF8FF" }}>
             <FriendsHeader activeTab={activeTab} onTabPress={handleTabPress} />
 
             {activeTab === 'main' ? (
