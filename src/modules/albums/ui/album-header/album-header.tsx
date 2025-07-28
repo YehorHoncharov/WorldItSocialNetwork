@@ -27,12 +27,9 @@ export function AlbumHeader() {
     const [activeTab, setActiveTab] = useState("personal");
     const translateX = useRef(new Animated.Value(0)).current;
     const { user } = useUserContext();
-    const { albums, refetch } = useAlbums();
+    const { albums, refetch, error } = useAlbums();
     const [userAlbums, setUserAlbums] = useState<IAlbum[]>([]);
     const [isLoading, setIsLoading] = useState<boolean>(false);
-    const [error, setError] = useState<boolean>(false);
-    const [refreshing, setRefreshing] = useState(false);
-    const router = useRouter();
 
     useEffect(() => {
         const interval = setInterval(() => {
@@ -42,12 +39,14 @@ export function AlbumHeader() {
         return () => clearInterval(interval);
     }, [])
 
+    const correctAlbums = albums.filter((album) => album.author_id === user?.id);
+
     const filteredAlbums = useMemo(() => {
         if (!user) return [];
         return albums.filter(
             (album) => album.author_id.toString() === user.id.toString()
         );
-    }, [albums, user])
+    }, [albums, user]);
 
     useEffect(() => {
         setUserAlbums(filteredAlbums);
@@ -148,7 +147,7 @@ export function AlbumHeader() {
                                     backgroundColor: "#E9E5EE",
                                 }}
                             >
-                                <My albums={albums} />
+                                <My albums={correctAlbums} />
                             </View>
                             {userAlbums.length > 1 ? (
                                 userAlbums.slice(1).map((item) => (

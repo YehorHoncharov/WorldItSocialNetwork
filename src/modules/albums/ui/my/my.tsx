@@ -9,6 +9,7 @@ import {
 import { styles } from "./my.style";
 import {
     launchImageLibraryAsync,
+    MediaTypeOptions,
     requestMediaLibraryPermissionsAsync,
 } from "expo-image-picker";
 import { useEffect, useState } from "react";
@@ -29,9 +30,7 @@ export function My(props: IAlbumProps) {
     const [changeImage, setChangeImage] = useState<boolean>(false);
     const { albums } = props;
 
-    const correctAlbums = albums.filter((album) => album.author_id === user?.id);
-
-    const minAlbum: IAlbum | null = correctAlbums.reduce(
+    const minAlbum: IAlbum | null = albums.reduce(
         (min: IAlbum | null, album: IAlbum) => {
             if (!min || album.id < min.id) {
                 return album;
@@ -47,11 +46,10 @@ export function My(props: IAlbumProps) {
     };
 
     useEffect(() => {
-        getToken().then(setTokenUser);
-        if (minAlbum?.images && Array.isArray(minAlbum.images)) {
+        if (minAlbum?.images && !changeImage) {
             setImages(minAlbum.images);
         }
-    }, [user]);
+    }, [minAlbum?.id]);
 
     async function onSearch() {
         try {
@@ -65,7 +63,7 @@ export function My(props: IAlbumProps) {
             }
 
             const result = await launchImageLibraryAsync({
-                mediaTypes: ["images"],
+                mediaTypes: MediaTypeOptions.Images,
                 allowsMultipleSelection: true,
                 quality: 0.8,
                 allowsEditing: false,
@@ -173,7 +171,7 @@ export function My(props: IAlbumProps) {
             });
 
             console.log("Response from PUT:", response.data);
-            
+
             Alert.alert("Успіх", "Зміни успішно збережено");
             setImages(response.data?.images || []);
             setImagesToDelete([]);

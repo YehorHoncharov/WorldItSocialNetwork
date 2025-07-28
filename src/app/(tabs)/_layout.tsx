@@ -108,8 +108,8 @@ export default function TabsLayout() {
 								style={styles.chats}
 								source={
 									isChatsActive
-										? require("../../shared/ui/images/chats.png")// тут дрлжен быть chats-with-line.png
-										: require("../../shared/ui/images/chats.png")
+										? require("../../shared/ui/images/correctChats.png")
+										: require("../../shared/ui/images/correctChats.png")
 								}
 							/>
 						),

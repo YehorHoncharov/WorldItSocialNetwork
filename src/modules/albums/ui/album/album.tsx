@@ -2,9 +2,9 @@ import { ScrollView, View, Text, TouchableOpacity, Image, Alert } from "react-na
 import { styles } from "./album.style";
 import Dots from "../../../../shared/ui/icons/dots";
 import { useEffect, useState, useRef } from "react";
-import { launchImageLibraryAsync, requestMediaLibraryPermissionsAsync } from "expo-image-picker";
+import { launchImageLibraryAsync, MediaTypeOptions, requestMediaLibraryPermissionsAsync } from "expo-image-picker";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { IAlbum, IAlbumImageDelete, IAlbumImageShow, IAlbumImg, IPutResponse } from "../../types/albums.types";
+import { IAlbum, IAlbumImageShow, IPutResponse } from "../../types/albums.types";
 import { PUT } from "../../../../shared/api/put";
 import { API_BASE_URL } from "../../../../settings";
 import { ModalAlbum } from "../album-modal/album-modal";
@@ -26,6 +26,7 @@ export function Album({ scrollOffset = 0, ...props }: IAlbum & { scrollOffset?: 
 	});
 	const [tokenUser, setTokenUser] = useState<string>("");
 	const { user } = useUserContext()
+	const [isChange, setIsChange] = useState<boolean>(false);
 
 	const getToken = async (): Promise<string> => {
 		const token = await AsyncStorage.getItem("tokenStorage");
@@ -70,7 +71,7 @@ export function Album({ scrollOffset = 0, ...props }: IAlbum & { scrollOffset?: 
 			}
 
 			const result = await launchImageLibraryAsync({
-				mediaTypes: ["images"],
+				mediaTypes: MediaTypeOptions.Images,
 				allowsMultipleSelection: true,
 				quality: 0.8,
 				allowsEditing: false,
@@ -122,7 +123,7 @@ export function Album({ scrollOffset = 0, ...props }: IAlbum & { scrollOffset?: 
 					Alert.alert("Увага", "Максимальна кількість зображень - 10");
 					return;
 				}
-
+				setIsChange(true);
 				setImages((prev) => [...prev, ...newImages]);
 			} else if (result.canceled) {
 				Alert.alert("Скасовано", "Вибір зображень було скасовано");
@@ -163,7 +164,7 @@ export function Album({ scrollOffset = 0, ...props }: IAlbum & { scrollOffset?: 
 										style={{ width: 22, height: 22 }}
 									/>
 								</TouchableOpacity>
-							: null }
+								: null}
 						</View>
 					);
 				})}
@@ -200,40 +201,45 @@ export function Album({ scrollOffset = 0, ...props }: IAlbum & { scrollOffset?: 
 			delete updatedDimensions[id];
 			return updatedDimensions;
 		});
+		setIsChange(true);
 	}
+
+
 
 	async function handleSubmit() {
+        try {
+            const formattedImages: IAlbumImageShow[] = [
+                ...images,
+                ...imagesToDelete.map((id) => ({ image: { id: id, filename: "" } }))
+            ];
 
-		try {
-			const formattedImages: IAlbumImageShow[] = [
-				...images,
-				...imagesToDelete.map((id) => ({ image: { id: id, filename: "" } }))
-			]
+            const response: IPutResponse = await PUT({
+                endpoint: `${API_BASE_URL}/albums/${props.id}`,
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${tokenUser}`,
+                },
+                token: tokenUser,
+                body: {
+                    images:
+                        formattedImages.length > 0 || formattedImages.length > 0
+                            ? formattedImages
+                            : undefined,
+                },
+            });
 
-			const response: IPutResponse = await PUT({
-				endpoint: `${API_BASE_URL}/albums/${props.id}`,
-				headers: {
-					"Content-Type": "application/json",
-				},
-				token: tokenUser,
-				body: {
-					images:
-						formattedImages.length > 0 || formattedImages.length > 0
-							? formattedImages
-							: undefined,
-				},
-			});
+            console.log("Response from PUT:", response.data);
 
-			if (response.status === "success" && response.data) {
-				console.log( imagesToDelete)
-				setImagesToDelete([]);
-				Alert.alert("Успіх", "Зміни успішно збережено");
-			}
-			Alert.alert("Успіх", "Зміни успішно збережено");
-		} catch (err) {
-			console.error("Помилка збереження:", err);
-		}
-	}
+            Alert.alert("Успіх", "Зміни успішно збережено");
+            setImages(response.data?.images || []);
+            setImagesToDelete([]);
+            setIsChange(false);
+        } catch (err) {
+            console.error("Помилка збереження:", err);
+            Alert.alert("Помилка", "Не вдалося зберегти зміни");
+        }
+    }
+
 
 	return (
 		<View style={styles.container} onLayout={handleContainerLayout}>
@@ -272,7 +278,7 @@ export function Album({ scrollOffset = 0, ...props }: IAlbum & { scrollOffset?: 
 							{images ? renderImages() : null}
 						</View>
 					</View>
-					{user?.id === props.author_id ?
+					{user?.id === props.author_id && isChange ?
 						<TouchableOpacity onPress={handleSubmit} style={styles.submitBtn}>
 							<Text style={styles.submitText}>Зберегти</Text>
 						</TouchableOpacity>

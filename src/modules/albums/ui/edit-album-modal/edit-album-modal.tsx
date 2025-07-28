@@ -16,6 +16,7 @@ import { styles } from "./edit-album-modal.style";
 import { AlbumUpdateBody, IAlbum, IAlbumTag, IAlbumTheme, } from "../../types/albums.types";
 import { PUT } from "../../../../shared/api/put";
 import { useUserContext } from "../../../auth/context/user-context";
+import { useAlbums } from "../../hooks/useAlbums";
 
 interface Props {
     modalVisible: boolean;
@@ -96,6 +97,7 @@ export function EditAlbumModal({
             });
 
             Alert.alert("Успіх", "Альбом успішно оновлено!");
+
             onUpdate({
                 id: album_id,
                 name,

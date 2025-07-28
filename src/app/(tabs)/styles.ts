@@ -27,5 +27,12 @@ export const styles = StyleSheet.create({
         width: 47,
         height: 54,
         // paddingRight: 20,
+        // borderTopWidth: 2,
+        // borderTopColor: '#543C52',
     },
+    font:{
+        fontFamily: "Space Grotesk",
+        fontWeight: "500",
+        fontStyle: "normal"
+    }
 });
