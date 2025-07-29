@@ -62,11 +62,13 @@ export function FriendProfile({ user }: FriendProfileProps) {
 					chat_id: existingChat.id,
 					name: user.name,
 					avatar: user.image,
+					username: user.username,
+					lastAtMessage: user.chat_messages?.at(-1)?.chat_messages.at(-1)?.sent_at.toString() || new Date().toISOString(),
 				},
 			});
 		}
 	}
-
+	
 	return (
 		<ScrollView style={styles.scrollView} overScrollMode="never">
 			<View style={styles.container}>

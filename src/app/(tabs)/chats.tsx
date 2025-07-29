@@ -3,9 +3,7 @@ import { ContactsScreen } from "../../modules/chat/ui/contacts/contacts";
 import { useRef, useState } from "react";
 import { ChatHeader } from "../../modules/chat/ui/chat-header/chat-header";
 import { MessagesScreen } from "../../modules/chat/ui/messages/messages";
-import { GroupChats } from "../../modules/chat/ui/group-chats/groupChats";
-
-
+import { GroupChats } from "../../modules/chat/ui/group-chats/group-chats";
 
 const screenWidth = Dimensions.get("window").width;
 

@@ -6,12 +6,11 @@ import {
     TextInput,
     TouchableOpacity,
     ScrollView,
-    KeyboardAvoidingView,
     Platform,
 } from "react-native";
 import SendArrow from "../../../../shared/ui/icons/send-arrow";
 import BackArrowIcon from "../../../../shared/ui/icons/arrowBack";
-import { styles } from "./chatGroup.styles";
+import { styles } from "./privatChat.style";
 import Dots from "../../../../shared/ui/icons/dots";
 import CheckMarkIcon from "../../../../shared/ui/icons/checkMark";
 import { useLocalSearchParams, useRouter } from "expo-router";
@@ -19,12 +18,12 @@ import { useGetChatById } from "../../hooks/useGetChatById";
 import { API_BASE_URL } from "../../../../settings";
 import { useSocketContext } from "../../context/socketContext";
 import { CreateMessage, MessagePayload } from "../../types/socket";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { useUserContext } from "../../../auth/context/user-context";
 
-export function ChatGroup() {
-    const params = useLocalSearchParams<{ name: string; chat_id: string; avatar: string }>();
+export function PrivatChat() {
+    const params = useLocalSearchParams<{ name: string; chat_id: string; avatar: string, username: string, lastAtMessage: string }>();
     const { user } = useUserContext();
-    const chat = useGetChatById(+params.chat_id);
     const { socket } = useSocketContext();
 
     const [messages, setMessages] = useState<MessagePayload[]>([]);
@@ -70,7 +69,6 @@ export function ChatGroup() {
         };
     }, [socket, params.chat_id, isMounted]);
 
-
     const sendMessage = () => {
         if (!socket || !input.trim() || !user) return;
 
@@ -86,10 +84,42 @@ export function ChatGroup() {
         setInput("");
     };
 
+    useEffect(() => {
+        if (messages.length > 0) {
+            setTimeout(() => {
+                scrollViewRef.current?.scrollToEnd({ animated: false });
+            }, 0);
+        }
+    }, [messages]);
+
+    function formatDate(date: Date) {
+        const today = new Date();
+        const yesterday = new Date(today);
+        yesterday.setDate(today.getDate() - 1);
+
+        const isToday = date.toDateString() === today.toDateString();
+        const isYesterday = date.toDateString() === yesterday.toDateString();
+
+        if (isToday) return "Сьогодні";
+        if (isYesterday) return "Вчора";
+        return date.toLocaleDateString("uk-UA", {
+            day: "numeric",
+            month: "long",
+            year: "numeric",
+        });
+    }
+
     function onBack() {
         router.navigate({
             pathname: "/chats",
         });
+    }
+
+    function shouldShowDate(currentMessage: MessagePayload, prevMessage?: MessagePayload) {
+        if (!prevMessage) return true;
+        const currentDate = new Date(currentMessage.sent_at).toDateString();
+        const prevDate = new Date(prevMessage.sent_at).toDateString();
+        return currentDate !== prevDate;
     }
 
     return (
@@ -99,14 +129,14 @@ export function ChatGroup() {
                     <TouchableOpacity onPress={onBack}>
                         <BackArrowIcon style={{ width: 20, height: 20 }} />
                     </TouchableOpacity>
-                    <View style={{ flexDirection: "row", justifyContent: "center" }}>
+                    <View style={{ flexDirection: "row", justifyContent: "center", gap: 15, alignItems: "center" }}>
                         <Image
                             source={{ uri: API_BASE_URL + "/" + params.avatar }}
                             style={styles.avatar}
                         />
                         <View style={{}}>
                             <Text style={styles.chatName}>{params.name}</Text>
-                            <Text style={styles.chatInfo}>👽🤖👾</Text>
+                            <Text style={styles.chatInfo}>@{params.username.toLowerCase()}</Text>
                         </View>
                     </View>
                 </View>
@@ -115,24 +145,33 @@ export function ChatGroup() {
                 </TouchableOpacity>
             </View>
 
-            <Text style={styles.chatDate}>25 травня 2025</Text>
-
-            <KeyboardAvoidingView
-                behavior={Platform.OS === "ios" ? "padding" : "height"}
-                style={{ flex: 1 }}
-                keyboardVerticalOffset={Platform.OS === "ios" ? 50 : 20}
+            <KeyboardAwareScrollView
+                innerRef={(ref) => {
+                    scrollViewRef.current = ref;
+                }}
+                enableOnAndroid={true}
+                extraScrollHeight={Platform.OS === 'ios' ? 80 : 0}
+                keyboardShouldPersistTaps="handled"
+                contentContainerStyle={styles.messages}
+                enableAutomaticScroll={false}
+                extraHeight={20}
             >
-                <ScrollView
-                    ref={scrollViewRef}
-                    overScrollMode="never"
-                    contentContainerStyle={styles.messages}
-                    keyboardShouldPersistTaps="handled"
-                >
-                    {messages?.map((msg, index) => {
-                        const isMyMessage = msg.author_id === user?.id;
-                        return (
+                {messages?.map((msg, index) => {
+                    const isMyMessage = msg.author_id === user?.id;
+                    const showDate = shouldShowDate(msg, messages[index - 1]);
+
+                    return (
+                        <View key={index}>
+                            {showDate && (
+                                <View style={{ alignItems: "center", marginVertical: 10 }}>
+                                    <View style={styles.dateContainer}>
+                                        <Text style={styles.chatDate}>
+                                            {formatDate(new Date(msg.sent_at))}
+                                        </Text>
+                                    </View>
+                                </View>
+                            )}
                             <View
-                                key={index}
                                 style={[styles.message, isMyMessage ? { justifyContent: "flex-end" } : {}]}
                             >
                                 {!isMyMessage && (
@@ -143,20 +182,22 @@ export function ChatGroup() {
                                 )}
                                 <View style={isMyMessage ? styles.messageBubbleMy : styles.messageBubble}>
                                     <Text style={styles.messageText}>{msg.content}</Text>
-                                    <Text style={styles.messageTime}>
-                                        {new Date(msg.sent_at).toLocaleTimeString([], {
-                                            hour: "2-digit",
-                                            minute: "2-digit",
-                                        })}
+                                    <View style={styles.messageBox}>
+                                        <Text style={styles.messageTime}>
+                                            {new Date(msg.sent_at).toLocaleTimeString([], {
+                                                hour: "2-digit",
+                                                minute: "2-digit",
+                                            })}
+                                        </Text>
                                         <CheckMarkIcon style={{ width: 10, height: 9 }} />
-                                    </Text>
+                                    </View>
                                 </View>
                             </View>
-                        );
-                    })}
-                </ScrollView>
+                        </View>
+                    );
+                })}
 
-                <View style={styles.inputContainer}>
+                <View style={[styles.inputContainer]}>
                     <TextInput
                         style={styles.input}
                         placeholder="Повідомлення"
@@ -173,7 +214,7 @@ export function ChatGroup() {
                         <SendArrow style={{ width: 20, height: 20 }} />
                     </TouchableOpacity>
                 </View>
-            </KeyboardAvoidingView>
+            </KeyboardAwareScrollView>
         </View>
     );
 }

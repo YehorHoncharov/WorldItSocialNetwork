@@ -1,12 +1,10 @@
 import { useEffect, useState } from 'react';
 import { View, Text, FlatList, ScrollView, Image, TouchableOpacity } from 'react-native';
-import { useUsers } from '../../../friends/hooks/useUsers';
 import { Friend2 } from '../friend2/friend';
-import { IUser } from '../../../auth/types';
 import { useUserContext } from '../../../auth/context/user-context';
 import { useChats } from '../../hooks/useChats';
 import { useRouter } from 'expo-router';
-import { styles } from './group-chats';
+import { styles } from './group-chats.style';
 import { Chat } from '../../types/socket';
 
 
@@ -50,11 +48,12 @@ export function GroupChats({ scrollable = true }: { scrollable?: boolean }) {
                         <TouchableOpacity onPress={() => {
 
                             router.push({
-                                pathname: "/chat",
+                                pathname: "/chatGroup",
                                 params: {
                                     chat_id: item.id,
                                     name: item.name,
-                                    avatar: "uploads/user.png"
+                                    avatar: "uploads/user.png",
+                                    lastAtMessage: lastMessage?.sent_at.toString()
                                 }
                             });
 

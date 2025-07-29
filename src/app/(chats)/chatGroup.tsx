@@ -1,14 +1,13 @@
 import { View } from "react-native";
 import Providers from "../providers";
-import { PrivatChat } from "../../modules/chat/ui/privateChat/privateChat";
+import { Group } from "../../modules/chat/ui/group/group";
 
-
-export default function ChatApp() {
+export default function ChatsApp() {
 
     return (
         <Providers>
             <View style={{ backgroundColor: "#ffffff", flexGrow: 1 }}>
-                <PrivatChat></PrivatChat>
+                <Group />
             </View>
         </Providers>
     );
