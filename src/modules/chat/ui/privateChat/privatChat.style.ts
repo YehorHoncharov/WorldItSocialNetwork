@@ -33,7 +33,7 @@ export const styles = StyleSheet.create({
 		textAlign: "center",
 		fontSize: 14,
 	},
-	dateContainer:{
+	dateContainer: {
 		backgroundColor: "#E9E5EE",
 		alignItems: "center",
 		justifyContent: "center",
@@ -116,5 +116,37 @@ export const styles = StyleSheet.create({
 		borderRadius: 20,
 		alignItems: "center",
 		justifyContent: "center",
+	},
+	messageImage: {
+		width: 200,
+		height: 200,
+		borderRadius: 10,
+		marginBottom: 8,
+	},
+	selectedImageContainer: {
+		position: 'relative',
+		marginHorizontal: 15,
+		marginBottom: 10,
+	},
+	selectedImage: {
+		width: 150,
+		height: 150,
+		borderRadius: 10,
+	},
+	removeImageButton: {
+		position: 'absolute',
+		top: -10,
+		right: -10,
+		backgroundColor: 'red',
+		width: 30,
+		height: 30,
+		borderRadius: 15,
+		justifyContent: 'center',
+		alignItems: 'center',
+	},
+	removeImageText: {
+		color: 'white',
+		fontSize: 20,
+		fontWeight: 'bold',
 	},
 });

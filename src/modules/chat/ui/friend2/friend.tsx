@@ -33,9 +33,10 @@ export function Friend2(props: IFriendProps) {
                         {props.timeMessage ? new Date(props.timeMessage).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ''}
                     </Text>
                 </View>
-                {props.lastMessage && props.lastMessage.length >= 76 ? (
-                    <Text style={{ fontSize: 14, fontWeight: 400 }}>{props.lastMessage.slice(0, 76)}..</Text>
-                ) : <Text style={{ fontSize: 14, fontWeight: 400 }}>{props.lastMessage}</Text>}
+                {!props.lastMessage ? <Text>Немає повідомлень</Text> :
+                    props.lastMessage.length >= 76 ? (
+                        <Text style={{ fontSize: 14, fontWeight: 400 }}>{props.lastMessage.slice(0, 76)}..</Text>
+                    ) : <Text style={{ fontSize: 14, fontWeight: 400 }}>{props.lastMessage}</Text>}
             </View>
         </View>
     );
