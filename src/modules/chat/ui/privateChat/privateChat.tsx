@@ -8,6 +8,8 @@ import {
     ScrollView,
     Platform,
     Alert,
+    Modal,
+    Dimensions,
 } from "react-native";
 import SendArrow from "../../../../shared/ui/icons/send-arrow";
 import BackArrowIcon from "../../../../shared/ui/icons/arrowBack";
@@ -22,8 +24,7 @@ import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view
 import { useUserContext } from "../../../auth/context/user-context";
 import { ChatModalDelete } from "../modals/modal/chatModalDelete";
 import { IAlbumImageShow } from "../../../albums/types/albums.types";
-import * as ImagePicker from 'expo-image-picker';
-import * as FileSystem from 'expo-file-system';
+import { launchImageLibraryAsync, MediaType, requestMediaLibraryPermissionsAsync } from "expo-image-picker";
 
 export function PrivatChat() {
     const params = useLocalSearchParams<{ name: string; chat_id: string; avatar: string, username: string, lastAtMessage: string }>();
@@ -37,10 +38,10 @@ export function PrivatChat() {
     const dotsRef = useRef<ElementRef<typeof TouchableOpacity>>(null);
     const router = useRouter();
     const [isMounted, setIsMounted] = useState(false);
-    const [scrollOffset, setScrollOffset] = useState(0)
-    const [images, setImages] = useState<IAlbumImageShow[]>([]);
-    const [selectedImage, setSelectedImage] = useState<string | null>(null);
+    const [scrollOffset, setScrollOffset] = useState(0);
+    const [selectedImages, setSelectedImages] = useState<string[]>([]);
     const [isUploading, setIsUploading] = useState(false);
+    const [fullScreenImage, setFullScreenImage] = useState<string | null>(null);
 
     useEffect(() => {
         setIsMounted(true);
@@ -79,21 +80,6 @@ export function PrivatChat() {
         };
     }, [socket, params.chat_id, isMounted]);
 
-    // const sendMessage = () => {
-    //     if (!socket || !input.trim() || !user) return;
-
-    //     const newMessage: CreateMessage = {
-    //         content: input.trim(),
-    //         author_id: user.id,
-    //         chat_groupId: +params.chat_id,
-    //         sent_at: new Date(),
-    //         attached_image: "",
-    //     };
-
-    //     socket.emit("sendMessage", newMessage as MessagePayload);
-    //     setInput("");
-    // };
-
     const measureDots = () => {
         if (dotsRef.current) {
             dotsRef.current.measureInWindow((x, y, width, height) => {
@@ -106,14 +92,7 @@ export function PrivatChat() {
         if (modalVisible) {
             measureDots();
         }
-    }, [modalVisible]);
-
-    useEffect(() => {
-        if (modalVisible) {
-            measureDots();
-        }
-    }, [scrollOffset, modalVisible]);
-
+    }, [modalVisible, scrollOffset]);
 
     useEffect(() => {
         if (messages.length > 0) {
@@ -154,28 +133,26 @@ export function PrivatChat() {
     }
 
     const sendMessage = async () => {
-        if ((!input.trim() && !selectedImage) || !user || !socket) return;
+        if ((!input.trim() && selectedImages.length === 0) || !user || !socket) return;
 
         try {
-            let imageUrl = "";
+            setIsUploading(true);
+            const imageUrls: string[] = [];
 
-            if (selectedImage) {
-                setIsUploading(true);
-                imageUrl = await uploadImage(selectedImage);
-                setIsUploading(false);
-            }
-
+            // Note: Assuming backend handles single image for now
+            // If backend supports multiple images, modify to send array
             const newMessage: CreateMessage = {
                 content: input.trim(),
                 author_id: user.id,
                 chat_groupId: +params.chat_id,
                 sent_at: new Date(),
-                attached_image: imageUrl,
+                attached_image: selectedImages[0] || "",
             };
 
             socket.emit("sendMessage", newMessage as MessagePayload);
             setInput("");
-            setSelectedImage(null);
+            setSelectedImages([]);
+            setIsUploading(false);
         } catch (error) {
             setIsUploading(false);
             Alert.alert("Помилка", "Не вдалося відправити повідомлення");
@@ -185,26 +162,30 @@ export function PrivatChat() {
 
     const pickImage = async () => {
         try {
-            const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+            const { status } = await requestMediaLibraryPermissionsAsync();
             if (status !== 'granted') {
                 Alert.alert("Дозвіл не надано", "Потрібен доступ до галереї");
                 return;
             }
 
-            const result = await ImagePicker.launchImageLibraryAsync({
-                mediaTypes: ImagePicker.MediaTypeOptions.Images,
+            const result = await launchImageLibraryAsync({
+                mediaTypes: "images",
                 allowsMultipleSelection: true,
-                allowsEditing: true,
-                aspect: [4, 3],
                 quality: 0.7,
                 base64: true,
             });
 
-            if (!result.canceled && result.assets && result.assets.length > 0) {
-                const selected = result.assets[0];
-                if (selected.base64) {
-                    setSelectedImage(`data:image/jpeg;base64,${selected.base64}`);
+            if (!result.canceled && result.assets?.length > 0) {
+                const newImages = result.assets
+                    .filter(asset => asset.base64)
+                    .map(asset => `data:image/jpeg;base64,${asset.base64!}`);
+
+                if (selectedImages.length + newImages.length > 5) {
+                    Alert.alert("Ліміт зображень", "Можна вибрати не більше 5 зображень.");
+                    return;
                 }
+
+                setSelectedImages(prev => [...prev, ...newImages]);
             }
         } catch (error) {
             console.error("Помилка вибору зображення:", error);
@@ -212,8 +193,12 @@ export function PrivatChat() {
         }
     };
 
-    const removeImage = () => {
-        setSelectedImage(null);
+    const removeImage = (index: number) => {
+        setSelectedImages(prev => prev.filter((_, i) => i !== index));
+    };
+
+    const showFullScreenImage = (uri: string) => {
+        setFullScreenImage(uri);
     };
 
     return (
@@ -250,89 +235,161 @@ export function PrivatChat() {
                 enableAutomaticScroll={false}
                 extraHeight={20}
             >
-                {messages.length == 0 ? <Text style={{ textAlign: "center", paddingTop: 10, color: "#543C52" }}>Немає повідомлень!</Text> : messages.map((msg, index) => {
-                    const isMyMessage = msg.author_id === user?.id;
-                    const showDate = shouldShowDate(msg, messages[index - 1]);
+                {messages.length === 0 ? (
+                    <Text style={{ textAlign: "center", paddingTop: 10, color: "#543C52" }}>
+                        Немає повідомлень!
+                    </Text>
+                ) : (
+                    messages.map((msg, index) => {
+                        const isMyMessage = msg.author_id === user?.id;
+                        const showDate = shouldShowDate(msg, messages[index - 1]);
 
-                    return (
-                        <View key={index}>
-                            {showDate && (
-                                <View style={{ alignItems: "center", marginVertical: 10 }}>
-                                    <View style={styles.dateContainer}>
-                                        <Text style={styles.chatDate}>
-                                            {formatDate(new Date(msg.sent_at))}
-                                        </Text>
+                        return (
+                            <View key={index}>
+                                {showDate && (
+                                    <View style={{ alignItems: "center", marginVertical: 10 }}>
+                                        <View style={styles.dateContainer}>
+                                            <Text style={styles.chatDate}>
+                                                {formatDate(new Date(msg.sent_at))}
+                                            </Text>
+                                        </View>
                                     </View>
-                                </View>
-                            )}
-                            <View
-                                style={[styles.message, isMyMessage ? { justifyContent: "flex-end" } : {}]}
-                            >
-                                {!isMyMessage && (
-                                    <Image
-                                        source={{ uri: API_BASE_URL + "/" + params.avatar }}
-                                        style={{ width: 40, height: 40, borderRadius: 12345 }}
-                                    />
                                 )}
-                                <View style={isMyMessage ? styles.messageBubbleMy : styles.messageBubble}>
-                                    {msg.attached_image && (
+                                <View
+                                    style={[styles.message, isMyMessage ? { justifyContent: "flex-end" } : {}]}
+                                >
+                                    {!isMyMessage && (
                                         <Image
-                                            source={{ uri: msg.attached_image }}
-                                            style={styles.messageImage}
-                                            resizeMode="cover"
+                                            source={{ uri: API_BASE_URL + "/" + params.avatar }}
+                                            style={{ width: 40, height: 40, borderRadius: 12345 }}
                                         />
                                     )}
-                                    <Text style={styles.messageText}>{msg.content}</Text>
-                                    <View style={styles.messageBox}>
-                                        <Text style={styles.messageTime}>
-                                            {new Date(msg.sent_at).toLocaleTimeString([], {
-                                                hour: "2-digit",
-                                                minute: "2-digit",
-                                            })}
-                                        </Text>
-                                        <CheckMarkIcon style={{ width: 10, height: 9 }} />
+                                    <View style={isMyMessage ? styles.messageBubbleMy : styles.messageBubble}>
+                                        {msg.attached_image && (
+                                            <TouchableOpacity onPress={() => showFullScreenImage(msg.attached_image)}>
+                                                <Image
+                                                    source={{ uri: msg.attached_image }}
+                                                    style={[styles.messageImage, { width: 150, height: 150, borderRadius: 8 }]}
+                                                    resizeMode="cover"
+                                                />
+                                            </TouchableOpacity>
+                                        )}
+                                        <Text style={styles.messageText}>{msg.content}</Text>
+                                        <View style={styles.messageBox}>
+                                            <Text style={styles.messageTime}>
+                                                {new Date(msg.sent_at).toLocaleTimeString([], {
+                                                    hour: "2-digit",
+                                                    minute: "2-digit",
+                                                })}
+                                            </Text>
+                                            <CheckMarkIcon style={{ width: 10, height: 9 }} />
+                                        </View>
                                     </View>
                                 </View>
                             </View>
-                        </View>
-                    );
-                })}
-
+                        );
+                    })
+                )}
             </KeyboardAwareScrollView>
 
-            {selectedImage && (
-                <View style={styles.selectedImageContainer}>
-                    <Image
-                        source={{ uri: selectedImage }}
-                        style={styles.selectedImage}
-                        resizeMode="cover"
-                    />
-                    <TouchableOpacity
-                        style={styles.removeImageButton}
-                        onPress={removeImage}
-                    >
-                        <Text style={styles.removeImageText}>×</Text>
-                    </TouchableOpacity>
-                </View>
+            {selectedImages.length > 0 && (
+                <ScrollView
+                    horizontal
+                    style={styles.selectedImagesContainer}
+                    showsHorizontalScrollIndicator={false}
+                >
+                    {selectedImages.map((img, index) => (
+                        <View key={index} style={styles.previewImageWrapper}>
+                            <Image
+                                source={{ uri: img }}
+                                style={styles.selectedImage}
+                                resizeMode="cover"
+                            />
+                            <TouchableOpacity
+                                style={[styles.removeImageButton, {
+                                    position: 'absolute',
+                                    top: -5,
+                                    right: -5,
+                                    backgroundColor: '#9c0a0aff',
+                                    borderRadius: 12,
+                                    width: 24,
+                                    height: 24,
+                                    justifyContent: 'center',
+                                    alignItems: 'center'
+                                }]}
+                                onPress={() => removeImage(index)}
+                            >
+                                <Text style={[styles.removeImageText, { color: '#fff', fontSize: 16 }]}>×</Text>
+                            </TouchableOpacity>
+                        </View>
+                    ))}
+                </ScrollView>
             )}
 
-            <View style={[styles.inputContainer]}>
+            <View style={[styles.inputContainer, { paddingBottom: 10 }]}>
                 <TextInput
-                    style={styles.input}
+                    style={[styles.input, { flex: 1, borderRadius: 20, paddingHorizontal: 15 }]}
                     placeholder="Повідомлення"
                     value={input}
                     onChangeText={setInput}
                 />
-                <TouchableOpacity style={styles.attachBtn} onPress={pickImage}>
+                <TouchableOpacity
+                    style={[styles.attachBtn, { padding: 10 }]}
+                    onPress={pickImage}
+                    disabled={isUploading}
+                >
                     <Image
                         source={require("../../../../shared/ui/images/pictures-modal.png")}
                         style={{ width: 40, height: 40 }}
                     />
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.sendBtn} onPress={sendMessage}>
+                <TouchableOpacity
+                    style={[styles.sendBtn, {
+                        backgroundColor: isUploading ? '#ccc' : '#543C52',
+                        borderRadius: 20,
+                        padding: 10
+                    }]}
+                    onPress={sendMessage}
+                    disabled={isUploading}
+                >
                     <SendArrow style={{ width: 20, height: 20 }} />
                 </TouchableOpacity>
             </View>
+
+            <Modal
+                visible={!!fullScreenImage}
+                transparent={true}
+                animationType="fade"
+                onRequestClose={() => setFullScreenImage(null)}
+            >
+                <View style={{
+                    flex: 1,
+                    backgroundColor: 'rgba(0,0,0,0.9)',
+                    justifyContent: 'center',
+                    alignItems: 'center'
+                }}>
+                    <TouchableOpacity
+                        style={{
+                            position: 'absolute',
+                            top: 40,
+                            right: 20,
+                            zIndex: 1000
+                        }}
+                        onPress={() => setFullScreenImage(null)}
+                    >
+                        <Text style={{ color: '#fff', fontSize: 24 }}>×</Text>
+                    </TouchableOpacity>
+                    <Image
+                        source={{ uri: fullScreenImage || '' }}
+                        style={{
+                            width: Dimensions.get('window').width,
+                            height: Dimensions.get('window').height * 0.8,
+                            resizeMode: 'contain'
+                        }}
+                    />
+                </View>
+            </Modal>
+
             <ChatModalDelete
                 visible={modalVisible}
                 onClose={() => setModalVisible(false)}
@@ -344,34 +401,3 @@ export function PrivatChat() {
         </View>
     );
 }
-export const uploadImage = async (base64Image: string): Promise<string> => {
-    try {
-        const fileUri = FileSystem.cacheDirectory + `upload_${Date.now()}.jpg`;
-        await FileSystem.writeAsStringAsync(fileUri, base64Image.replace(/^data:image\/\w+;base64,/, ""), { encoding: FileSystem.EncodingType.Base64 });
-
-        const formData = new FormData();
-        formData.append('file', {
-            uri: fileUri,
-            name: 'photo.jpg',
-            type: 'image/jpeg',
-        } as any);
-
-        const response = await fetch(`${API_BASE_URL}/upload`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'multipart/form-data',
-            },
-            body: formData,
-        });
-
-        const result = await response.json();
-        if (result.url) {
-            return result.url;
-        }
-        throw new Error('Не вдалося завантажити зображення');
-    } catch (error) {
-        console.error('Помилка завантаження:', error);
-        throw error;
-    }
-};
-
