@@ -55,7 +55,7 @@ export function UserContextProvider({ children }: IUserContextProviderProps) {
 
     async function getData(token: string): Promise<IUser | null> {
         try {
-            const response = await fetch(`${API_BASE_URL}/user/me`, {
+            const response = await fetch(`${API_BASE_URL}/users/me`, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },
@@ -91,7 +91,7 @@ export function UserContextProvider({ children }: IUserContextProviderProps) {
 
     async function login(email: string, password: string) {
         try {
-            const response = await fetch(`${API_BASE_URL}/user/log`, {
+            const response = await fetch(`${API_BASE_URL}/users/log`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -120,7 +120,7 @@ export function UserContextProvider({ children }: IUserContextProviderProps) {
         username: string,
     ) {
         try {
-            const response = await fetch(`${API_BASE_URL}/user/reg`, {
+            const response = await fetch(`${API_BASE_URL}/users/reg`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -174,7 +174,7 @@ export function UserContextProvider({ children }: IUserContextProviderProps) {
         try {
             const token = await AsyncStorage.getItem("token");
             if (token) {
-                const response = await fetch(`${API_BASE_URL}/user/logout`, {
+                const response = await fetch(`${API_BASE_URL}/users/logout`, {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
