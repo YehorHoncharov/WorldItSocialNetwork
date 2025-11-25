@@ -1,10 +1,6 @@
 import { router } from "expo-router";
-import {
-	SafeAreaView,
-	ScrollView,
-} from "react-native";
-import { RegFormThree } from "../../../modules/auth/ui/reg-form-three";
-
+import { SafeAreaView, ScrollView } from "react-native";
+import { RegFormThree } from "../../../src/modules/auth/ui/reg-form-three";
 
 export default function RegThree() {
 	function onPress() {
@@ -14,7 +10,7 @@ export default function RegThree() {
 	return (
 		<SafeAreaView style={{ flex: 1, backgroundColor: "#ffffff" }}>
 			<ScrollView
-			overScrollMode="never"
+				overScrollMode="never"
 				contentContainerStyle={{
 					flex: 1,
 				}}

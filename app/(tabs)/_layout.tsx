@@ -1,7 +1,7 @@
 import { Tabs } from "expo-router";
 import { Image } from "react-native";
 import { useState } from "react";
-import { Header } from "../../shared/ui/header";
+import { Header } from "../../src/shared/ui/header";
 import { styles } from "./styles";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -12,7 +12,10 @@ export default function TabsLayout() {
 	const [isChatsActive, setIsChatsActive] = useState(false);
 
 	return (
-		<SafeAreaView style={{ flex: 1, backgroundColor: "#ffffff" }} edges={["top"]}>
+		<SafeAreaView
+			style={{ flex: 1, backgroundColor: "#ffffff" }}
+			edges={["top"]}
+		>
 			<Tabs
 				screenOptions={{
 					tabBarStyle: styles.footer,
@@ -36,8 +39,8 @@ export default function TabsLayout() {
 								style={styles.home}
 								source={
 									isHomeActive
-										? require("../../shared/ui/images/home.png")
-										: require("../../shared/ui/images/home-without-line.png")
+										? require("../../src/shared/ui/images/home.png")
+										: require("../../src/shared/ui/images/home-without-line.png")
 								}
 							/>
 						),
@@ -60,8 +63,8 @@ export default function TabsLayout() {
 								style={styles.myposts}
 								source={
 									isMyPostsActive
-										? require("../../shared/ui/images/my-posts-with-line.png")
-										: require("../../shared/ui/images/my-posts.png")
+										? require("../../src/shared/ui/images/my-posts-with-line.png")
+										: require("../../src/shared/ui/images/my-posts.png")
 								}
 							/>
 						),
@@ -84,8 +87,8 @@ export default function TabsLayout() {
 								style={styles.friends}
 								source={
 									isFriendsActive
-										? require("../../shared/ui/images/friends-with-line.png")
-										: require("../../shared/ui/images/friends.png")
+										? require("../../src/shared/ui/images/friends-with-line.png")
+										: require("../../src/shared/ui/images/friends.png")
 								}
 							/>
 						),
@@ -108,15 +111,15 @@ export default function TabsLayout() {
 								style={styles.chats}
 								source={
 									isChatsActive
-										? require("../../shared/ui/images/correctChats.png")
-										: require("../../shared/ui/images/correctChats.png")
+										? require("../../src/shared/ui/images/correctChats.png")
+										: require("../../src/shared/ui/images/correctChats.png")
 								}
 							/>
 						),
 						header: () => <Header actionType={3} />,
 					}}
 				/>
-				{ }
+				{}
 				<Tabs.Screen
 					name="settings"
 					listeners={{
@@ -129,7 +132,7 @@ export default function TabsLayout() {
 					}}
 					options={{
 						header: () => <Header actionType={2} />,
-						href: null
+						href: null,
 					}}
 				/>
 			</Tabs>

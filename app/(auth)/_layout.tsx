@@ -1,8 +1,7 @@
 import { Stack } from "expo-router";
 import { Platform } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Header } from "../../shared/ui/header";
-
+import { Header } from "../../src/shared/ui/header";
 
 export default function AuthLayout() {
 	return (
@@ -14,7 +13,8 @@ export default function AuthLayout() {
 			<Stack
 				screenOptions={{
 					headerShown: false,
-					statusBarStyle: Platform.OS === "android" ? "dark" : undefined,
+					statusBarStyle:
+						Platform.OS === "android" ? "dark" : undefined,
 				}}
 			/>
 		</SafeAreaView>

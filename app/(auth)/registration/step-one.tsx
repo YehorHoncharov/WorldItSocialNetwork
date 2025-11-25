@@ -1,5 +1,5 @@
-import { RegFormOne } from "../../../modules/auth/ui/reg-form-one";
-import { LoginFormOne } from "../../../modules/auth/ui/login-form-one";
+import { RegFormOne } from "../../../src/modules/auth/ui/reg-form-one";
+import { LoginFormOne } from "../../../src/modules/auth/ui/login-form-one";
 import {
 	Animated,
 	Dimensions,
@@ -33,7 +33,6 @@ export default function Register() {
 	};
 
 	return (
-		
 		<KeyboardAwareScrollView
 			contentContainerStyle={styles.scroll}
 			keyboardShouldPersistTaps="handled"
@@ -43,7 +42,6 @@ export default function Register() {
 			overScrollMode="never"
 			extraScrollHeight={0}
 		>
-			
 			<View style={styles.card}>
 				<View style={styles.tabContainer}>
 					<TouchableOpacity
