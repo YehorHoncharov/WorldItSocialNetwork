@@ -24,8 +24,5 @@ jobs:
             - name: Run tests
               run: npm test
 
-            - name: Build project
-              run: npm run build
-
-            - name: Run expo build
-              run: expo build:web
+            - name: Build Expo web
+              run: npx expo build:web
