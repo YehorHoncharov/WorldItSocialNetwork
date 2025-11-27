@@ -1,7 +1,7 @@
 {
     "expo": {
         "name": "WorldItSocialNetwork",
-        "scheme": "worldIt",
+        "scheme": "worlditsocialnetwork",
         "slug": "WorldItSocialNetwork",
         "version": "1.0.0",
         "orientation": "portrait",
@@ -25,6 +25,13 @@
             "package": "com.serjik.WorldItSocialNetwork"
         },
         "web": {
+            "build": {
+                "babel": {
+                    "include": []
+                },
+                "output": "web-build",
+                "publicPath": "./"
+            },
             "bundler": "metro",
             "favicon": "./assets/favicon.png"
         },
