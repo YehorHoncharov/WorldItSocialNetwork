@@ -13,7 +13,7 @@ export function Author({ scrollOffset = 0, ...props }: IPost & { scrollOffset?: 
     const [dotsPosition, setDotsPosition] = useState({ x: 150, y: 78 });
     const containerRef = useRef<View>(null);
     const dotsRef = useRef<ElementRef<typeof TouchableOpacity>>(null);
-    const { user } = useUserByID(props.author_id)
+    const { user } = useUserByID(props.author_id);
     const { user: currentUser } = useUserContext();
     const [containerSize, setContainerSize] = useState({
         width: 400,
@@ -22,7 +22,7 @@ export function Author({ scrollOffset = 0, ...props }: IPost & { scrollOffset?: 
 
     const measureDots = () => {
         if (dotsRef.current) {
-            dotsRef.current.measureInWindow((x, y, width, height) => {
+            dotsRef.current.measureInWindow((x, y) => {
                 setDotsPosition({ x, y });
             });
         }
@@ -46,11 +46,7 @@ export function Author({ scrollOffset = 0, ...props }: IPost & { scrollOffset?: 
     };
 
     return (
-        <View
-            style={styles.container}
-            ref={containerRef}
-            onLayout={handleContainerLayout}
-        >
+        <View style={styles.container} ref={containerRef} onLayout={handleContainerLayout}>
             <View style={styles.main}>
                 <View style={styles.contant}>
                     <View style={{ position: "relative" }}>
@@ -69,7 +65,9 @@ export function Author({ scrollOffset = 0, ...props }: IPost & { scrollOffset?: 
                             source={require("../../../../shared/ui/images/avatar-indicator.png")}
                         />
                     </View>
-                    <Text>{user?.name} {user?.surname}</Text>
+                    <Text>
+                        {user?.name} {user?.surname}
+                    </Text>
                 </View>
 
                 <Image
@@ -77,7 +75,7 @@ export function Author({ scrollOffset = 0, ...props }: IPost & { scrollOffset?: 
                     source={require("../../../../shared/ui/images/signature.png")}
                 />
             </View>
-            {currentUser?.id === props.author_id ?
+            {currentUser?.id === props.author_id ? (
                 <View>
                     <TouchableOpacity
                         ref={dotsRef}
@@ -87,7 +85,7 @@ export function Author({ scrollOffset = 0, ...props }: IPost & { scrollOffset?: 
                         <Dots style={{ height: 20, width: 20 }} />
                     </TouchableOpacity>
                 </View>
-                : null}
+            ) : null}
             <ModalPost
                 visible={modalVisible}
                 onClose={() => setModalVisible(false)}

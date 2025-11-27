@@ -1,14 +1,14 @@
-import { StyleSheet } from "react-native"
+import { StyleSheet } from "react-native";
 
 export const styles = StyleSheet.create({
     // reg: {
-	// 	fontWeight: 700,
-	// 	fontSize: 24,
+    // 	fontWeight: 700,
+    // 	fontSize: 24,
     //     color: '#070A1C',
-	// },
+    // },
     // log: {
     //     fontWeight: 700,
-	// 	fontSize: 24,
+    // 	fontSize: 24,
     //     color: '#070A1C',
     // },
     // reg2: {
@@ -30,23 +30,23 @@ export const styles = StyleSheet.create({
     //     flexDirection: 'row',
     //     gap: 24,
     // },
-      activeText: {
-    fontWeight: '700',
-    fontSize: 24,
-    color: '#070A1C',
-  },
-  inactiveText: {
-    fontWeight: '500',
-    fontSize: 24,
-    color: "#81818D"
-  },
-  underline: {
-    height: 2,
-    backgroundColor: '#543C52',
-    marginTop: 4,
-  },
-  header: {
-    flexDirection: 'row',
-    gap: 24,
-  },
-})
+    activeText: {
+        fontWeight: "700",
+        fontSize: 24,
+        color: "#070A1C",
+    },
+    inactiveText: {
+        fontWeight: "500",
+        fontSize: 24,
+        color: "#81818D",
+    },
+    underline: {
+        height: 2,
+        backgroundColor: "#543C52",
+        marginTop: 4,
+    },
+    header: {
+        flexDirection: "row",
+        gap: 24,
+    },
+});

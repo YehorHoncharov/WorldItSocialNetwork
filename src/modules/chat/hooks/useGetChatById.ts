@@ -13,13 +13,13 @@ export function useGetChatById(id: number) {
                 if (result.status === "error") {
                     return;
                 }
-                setChat(result)
+                setChat(result);
             } catch (err) {
-                console.error(err);}
-            
+                console.error(err);
             }
+        };
         getChat();
-    }, [])
+    }, []);
 
     return { chat };
 }

@@ -28,14 +28,14 @@ interface IUserContext {
 
 const initialValue: IUserContext = {
     user: null,
-    login: async () => { },
-    register: async () => { },
+    login: async () => {},
+    register: async () => {},
     isAuthenticated: () => false,
-    updateUser: async () => { },
-    refreshUser: async () => { },
-    setShowWelcomeModal: () => { },
+    updateUser: async () => {},
+    refreshUser: async () => {},
+    setShowWelcomeModal: () => {},
     showWelcomeModal: false,
-    logout: async () => { },
+    logout: async () => {},
 };
 
 const userContext = createContext<IUserContext>(initialValue);
@@ -51,7 +51,7 @@ interface IUserContextProviderProps {
 export function UserContextProvider({ children }: IUserContextProviderProps) {
     const [user, setUser] = useState<IUser | null>(null);
     const [showWelcomeModal, setShowWelcomeModal] = useState(false);
-    const router = useRouter()
+    const router = useRouter();
 
     async function getData(token: string): Promise<IUser | null> {
         try {
@@ -69,8 +69,8 @@ export function UserContextProvider({ children }: IUserContextProviderProps) {
             return result.data;
         } catch (error) {
             router.push({
-                pathname: "/registration/step-one"
-            })
+                pathname: "/registration/step-one",
+            });
             return null;
         }
     }
@@ -106,10 +106,9 @@ export function UserContextProvider({ children }: IUserContextProviderProps) {
             await AsyncStorage.setItem("token", result.data);
             await getData(result.data);
         } catch (error) {
-            // console.error("[login] Error:", error);
+            console.error("[login] Error:", error);
         }
     }
-
 
     async function register(
         email: string,
@@ -146,14 +145,16 @@ export function UserContextProvider({ children }: IUserContextProviderProps) {
                     body: {
                         name: "Мої фото",
                         images: {
-                            create: [{
-                                image: {
-                                    create: {
-                                        filename: "uploads/user.png",
-                                        file: "uploads/user.png"
-                                    }
-                                }
-                            }]
+                            create: [
+                                {
+                                    image: {
+                                        create: {
+                                            filename: "uploads/user.png",
+                                            file: "uploads/user.png",
+                                        },
+                                    },
+                                },
+                            ],
                         },
                     },
                 });
@@ -232,8 +233,8 @@ export function UserContextProvider({ children }: IUserContextProviderProps) {
                 return () => clearInterval(interval);
             } else {
                 router.push({
-                    pathname: "/registration/step-one"
-                })
+                    pathname: "/registration/step-one",
+                });
             }
         }
         checkToken();
@@ -251,7 +252,6 @@ export function UserContextProvider({ children }: IUserContextProviderProps) {
                 showWelcomeModal,
                 setShowWelcomeModal,
                 logout,
-
             }}
         >
             {children}

@@ -1,26 +1,24 @@
-import { StyleSheet } from "react-native"
-import { COLORS } from '../colors'
+import { StyleSheet } from "react-native";
+import { COLORS } from "../colors";
 
 export const styles = StyleSheet.create({
     inputContainer: {
         padding: 16,
-        
     },
     label: {
         fontSize: 16,
         color: "#070A1C",
         marginBottom: 10,
-        paddingLeft:5,
-        fontWeight: '500',
+        paddingLeft: 5,
+        fontWeight: "500",
     },
     inputWrapper: {
-        position: 'relative',
-        flexDirection: 'row',
-        alignItems: 'center',
-        
+        position: "relative",
+        flexDirection: "row",
+        alignItems: "center",
     },
     rightIcon: {
-        position: 'absolute',
+        position: "absolute",
         right: 25,
         zIndex: 2,
     },
@@ -39,18 +37,18 @@ export const styles = StyleSheet.create({
         borderColor: "#CDCED2",
     },
     inputWithRightIcon: {
-        paddingRight: 60, 
+        paddingRight: 60,
     },
     errorText: {
         color: COLORS.red100,
         fontSize: 12,
         flexShrink: 1,
-        fontWeight: '500',
+        fontWeight: "500",
         paddingLeft: 20,
-        marginTop: 5
+        marginTop: 5,
     },
-    errorBlock:{
+    errorBlock: {
         gap: 2,
-        flexDirection:"row",
-    }
+        flexDirection: "row",
+    },
 });

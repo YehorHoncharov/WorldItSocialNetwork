@@ -18,12 +18,21 @@ type FriendsFormProps = IUser & {
 };
 
 export function FriendsForm(props: FriendsFormProps) {
-
     const navigation = useRouter();
     const { user } = useUserContext();
 
     function onPress() {
-        const { date_of_birth, actionButton, deleteId, friendship_from, friendship_to, chat_group_members, chat_messages, administered_groups, ...rest } = props;
+        const {
+            date_of_birth,
+            actionButton,
+            deleteId,
+            friendship_from,
+            friendship_to,
+            chat_group_members,
+            chat_messages,
+            administered_groups,
+            ...rest
+        } = props;
 
         navigation.navigate({
             pathname: "/friends-profile",
@@ -44,21 +53,17 @@ export function FriendsForm(props: FriendsFormProps) {
                 return;
             }
 
-            const response = await fetch(
-                `${API_BASE_URL}/friendship/deleteFriendship`,
-                {
-                    method: "DELETE",
-                    headers: {
-                        "Content-Type": "application/json",
-                        Authorization: `Bearer ${token}`,
-                    },
-                    body: JSON.stringify({
-                        //profile1 - кому, profile2 - ми
-                        id: clickedUserId
-
-                    })
-                }
-            );
+            const response = await fetch(`${API_BASE_URL}/friendship/deleteFriendship`, {
+                method: "DELETE",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`,
+                },
+                body: JSON.stringify({
+                    //profile1 - кому, profile2 - ми
+                    id: clickedUserId,
+                }),
+            });
 
             const result = await response.json();
 
@@ -70,17 +75,17 @@ export function FriendsForm(props: FriendsFormProps) {
             Alert.alert("Успіх", "Запит відхилено");
         } catch (error: any) {
             Alert.alert("Помилка", "Не вдалося підтвердити запит");
-            console.log(error.message)
+            console.log(error.message);
         }
     }
 
     return (
-        <TouchableOpacity
-            style={[styles.container, { flexShrink: 0 }]}
-            onPress={onPress}
-        >
+        <TouchableOpacity style={[styles.container, { flexShrink: 0 }]} onPress={onPress}>
             <View style={styles.profileContainer}>
-                <Image style={styles.profileImage} source={{ uri: API_BASE_URL + "/" + props.image }} />
+                <Image
+                    style={styles.profileImage}
+                    source={{ uri: API_BASE_URL + "/" + props.image }}
+                />
                 <OfflineIcon style={styles.imageOnline} />
             </View>
 
@@ -97,11 +102,14 @@ export function FriendsForm(props: FriendsFormProps) {
                     label={props.actionButton.label}
                     onPress={props.actionButton.onPress ? props.actionButton.onPress : onPress}
                 />
-                { props.withoutDelete ?
-                    <TouchableOpacity style={styles.deleteButton} onPress={() => handleDelete(props.deleteId)}>
+                {props.withoutDelete ? (
+                    <TouchableOpacity
+                        style={styles.deleteButton}
+                        onPress={() => handleDelete(props.deleteId)}
+                    >
                         <Text style={styles.buttonDeleteText}>Видалити</Text>
-                    </TouchableOpacity> : null
-                }
+                    </TouchableOpacity>
+                ) : null}
             </View>
         </TouchableOpacity>
     );

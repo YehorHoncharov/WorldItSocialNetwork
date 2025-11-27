@@ -1,10 +1,4 @@
-import {
-    ScrollView,
-    View,
-    Text,
-    TouchableOpacity,
-    Alert,
-} from "react-native";
+import { ScrollView, View, Text, TouchableOpacity, Alert } from "react-native";
 import { FriendsForm } from "../friends-form/friends-form";
 import { useUserContext } from "../../../auth/context/user-context";
 import { styles } from "./recomend.style";
@@ -33,13 +27,11 @@ export function RecomendFriends({
         if (!user) return;
 
         const friendIds = [
-            ...(user.friendship_to?.map((f) => f.profile1_id) || []),
-            ...(user.friendship_from?.map((f) => f.profile2_id) || []),
+            ...(user.friendship_to?.map(f => f.profile1_id) || []),
+            ...(user.friendship_from?.map(f => f.profile2_id) || []),
         ];
 
-        const filtered = users.filter(
-            (u) => u.id !== user.id && !friendIds.includes(u.id)
-        );
+        const filtered = users.filter(u => u.id !== user.id && !friendIds.includes(u.id));
 
         setCorrectUsers(filtered);
     }
@@ -54,7 +46,7 @@ export function RecomendFriends({
         }, 3000);
 
         return () => clearInterval(interval);
-    }, [])
+    }, []);
 
     async function handleRequest(userTo: IUser) {
         try {
@@ -106,7 +98,7 @@ export function RecomendFriends({
                     nestedScrollEnabled
                 >
                     {displayedUsers.length > 0 ? (
-                        displayedUsers.map((item) => (
+                        displayedUsers.map(item => (
                             <FriendsForm
                                 key={item.id}
                                 {...item}
@@ -124,7 +116,7 @@ export function RecomendFriends({
             ) : (
                 <View style={{ gap: 10 }}>
                     {displayedUsers.length > 0 ? (
-                        displayedUsers.map((item) => (
+                        displayedUsers.map(item => (
                             <FriendsForm
                                 key={item.id}
                                 {...item}

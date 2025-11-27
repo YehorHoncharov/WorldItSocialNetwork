@@ -19,7 +19,7 @@ export const styles = StyleSheet.create({
     },
     worldItLogo: {
         width: 23,
-        height: 19
+        height: 19,
     },
     plus: {
         width: 41,
@@ -62,11 +62,11 @@ export const styles = StyleSheet.create({
         color: "#543C52",
         width: 6,
         height: 17,
-        marginBottom: 5
+        marginBottom: 5,
     },
     t: {
         color: "#543C52",
         width: 14,
         height: 16,
-    }
-})
+    },
+});

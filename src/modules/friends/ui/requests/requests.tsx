@@ -2,19 +2,12 @@ import { useEffect, useState } from "react";
 import { useUsers } from "../../hooks/useUsers";
 import { useUserContext } from "../../../auth/context/user-context";
 import { IUser } from "../../../auth/types";
-import {
-    TouchableOpacity,
-    View,
-    Text,
-    ScrollView,
-    Alert,
-} from "react-native";
+import { TouchableOpacity, View, Text, ScrollView, Alert } from "react-native";
 import { styles } from "./requests.style";
 import { FriendsForm } from "../friends-form/friends-form";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useFriends } from "../../hooks/useFriends";
 import { API_BASE_URL } from "../../../../settings";
-import { useRouter } from "expo-router";
 
 export function RequestsFriends({
     scrollable = true,
@@ -29,15 +22,12 @@ export function RequestsFriends({
     const { user } = useUserContext();
     const [displayedUsers, setDisplayedUsers] = useState<IUser[]>();
     const { refresh: refreshFriends } = useFriends();
-    const router = useRouter()
 
     function getFriendRequests() {
         if (!user || !user.friendship_to) return;
 
-        const myFriends = users.filter((userF) =>
-            user.friendship_to?.some(
-                (f) => f.accepted === false && f.profile1_id === userF.id
-            )
+        const myFriends = users.filter(userF =>
+            user.friendship_to?.some(f => f.accepted === false && f.profile1_id === userF.id),
         );
 
         setDisplayedUsers(limit ? myFriends.slice(0, limit) : myFriends);
@@ -54,7 +44,7 @@ export function RequestsFriends({
         }, 3000);
 
         return () => clearInterval(interval);
-    }, [])
+    }, []);
 
     async function handleAccept(clickedUserId: number) {
         try {
@@ -65,19 +55,16 @@ export function RequestsFriends({
                 return;
             }
 
-            const response = await fetch(
-                `${API_BASE_URL}/friendship/acceptFriendship`,
-                {
-                    method: "PUT",
-                    headers: {
-                        "Content-Type": "application/json",
-                        Authorization: `Bearer ${token}`,
-                    },
-                    body: JSON.stringify({
-                        id: clickedUserId,
-                    }),
-                }
-            );
+            const response = await fetch(`${API_BASE_URL}/friendship/acceptFriendship`, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`,
+                },
+                body: JSON.stringify({
+                    id: clickedUserId,
+                }),
+            });
 
             const result = await response.json();
 
@@ -97,7 +84,7 @@ export function RequestsFriends({
     const list = (
         <View style={{ gap: 10 }}>
             {displayedUsers && displayedUsers.length > 0 ? (
-                displayedUsers.map((item) => (
+                displayedUsers.map(item => (
                     <FriendsForm
                         key={item.id}
                         {...item}

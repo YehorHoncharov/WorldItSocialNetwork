@@ -1,3 +1,3 @@
 export interface IRegCode {
-	code: string;
+    code: string;
 }

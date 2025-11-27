@@ -11,10 +11,7 @@ import {
     Alert,
     ActivityIndicator,
 } from "react-native";
-import {
-    launchImageLibraryAsync,
-    requestMediaLibraryPermissionsAsync,
-} from "expo-image-picker";
+import { launchImageLibraryAsync, requestMediaLibraryPermissionsAsync } from "expo-image-picker";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import DropDownPicker from "react-native-dropdown-picker";
 import { usePosts } from "../../hooks/use-get-post";
@@ -33,7 +30,7 @@ interface TagItem {
 
 interface UpdateData {
     title: string;
-    theme: string; 
+    theme: string;
     content: string;
     links?: string;
     tags?: string[];
@@ -46,11 +43,7 @@ interface Props {
     postData: IPost | null;
 }
 
-export function ChangePostModal({
-    modalVisible,
-    changeVisibility,
-    postData,
-}: Props) {
+export function ChangePostModal({ modalVisible, changeVisibility, postData }: Props) {
     const [name, setName] = useState("");
     const [theme, settheme] = useState("");
     const [text, setText] = useState("");
@@ -92,32 +85,32 @@ export function ChangePostModal({
                 setLinks(
                     Array.isArray(postData.links)
                         ? postData.links.map((l: any) =>
-                            typeof l === "string"
-                                ? l
-                                : typeof l === "object" && l !== null && "url" in l
+                              typeof l === "string"
+                                  ? l
+                                  : typeof l === "object" && l !== null && "url" in l
                                     ? l.url
-                                    : ""
-                        )
+                                    : "",
+                          )
                         : postData.links
-                            ? [postData.links]
-                            : [""]
+                          ? [postData.links]
+                          : [""],
                 );
 
                 const tagsFromPost = Array.from(
                     new Set(
                         postData.tags
-                            ?.map((tag) => tag.tag.name)
-                            .filter((tag): tag is string => tag !== null) || []
-                    )
+                            ?.map(tag => tag.tag.name)
+                            .filter((tag): tag is string => tag !== null) || [],
+                    ),
                 );
 
                 setValue(tagsFromPost);
                 setImages(postData.images || []);
 
                 const additionalTags = tagsFromPost
-                    .filter((tag) => !items.some((item) => item.value === tag))
-                    .map((tag) => ({ label: tag, value: tag }));
-                setItems((prev) => [...prev, ...additionalTags]);
+                    .filter(tag => !items.some(item => item.value === tag))
+                    .map(tag => ({ label: tag, value: tag }));
+                setItems(prev => [...prev, ...additionalTags]);
             }
         };
 
@@ -132,9 +125,7 @@ export function ChangePostModal({
             return;
         }
 
-        const invalidLinks = links.filter(
-            (link) => link.trim() !== "" && !isValidUrl(link.trim())
-        );
+        const invalidLinks = links.filter(link => link.trim() !== "" && !isValidUrl(link.trim()));
         if (invalidLinks.length > 0) {
             Alert.alert("Помилка", "Будь ласка, введіть коректні посилання");
             return;
@@ -146,8 +137,8 @@ export function ChangePostModal({
         }
 
         const sanitizedTags = value
-            .map((tag) => tag.trim())
-            .filter((tag) => tag.length > 0 && tag.length <= 50);
+            .map(tag => tag.trim())
+            .filter(tag => tag.length > 0 && tag.length <= 50);
 
         if (sanitizedTags.length !== value.length) {
             Alert.alert("Помилка", "Теги повинні бути не довшими за 50 символів");
@@ -155,7 +146,7 @@ export function ChangePostModal({
         }
 
         const formattedLinks = links
-            .filter((link) => link.trim() !== "")
+            .filter(link => link.trim() !== "")
             .filter(isValidUrl)
             .join(",");
 
@@ -169,17 +160,15 @@ export function ChangePostModal({
 
         const existingImages = postData.images || [];
 
-        const remainingImages = images.filter((img) =>
-            existingImages.some((ei) => ei.image.id === img.image.id)
+        const remainingImages = images.filter(img =>
+            existingImages.some(ei => ei.image.id === img.image.id),
         );
 
         const newImages = images
-            .filter((img) => img.image.filename.startsWith("data:image"))
-            .map((img) => {
+            .filter(img => img.image.filename.startsWith("data:image"))
+            .map(img => {
                 try {
-                    const matches = img.image.filename.match(
-                        /^data:image\/(\w+);base64,(.+)$/
-                    );
+                    const matches = img.image.filename.match(/^data:image\/(\w+);base64,(.+)$/);
                     if (!matches || !["jpeg", "png", "gif"].includes(matches[1].toLowerCase())) {
                         return null;
                     }
@@ -199,8 +188,8 @@ export function ChangePostModal({
             .filter((img): img is { url: string } => img !== null);
 
         const deletedImages = existingImages
-            .filter((ei) => !images.some((img) => img.image.id === ei.image.id))
-            .map((ei) => ({ id: ei.image.id }));
+            .filter(ei => !images.some(img => img.image.id === ei.image.id))
+            .map(ei => ({ id: ei.image.id }));
 
         if (remainingImages.length + newImages.length > 10) {
             Alert.alert("Помилка", "Максимум 10 зображень дозволено");
@@ -225,7 +214,7 @@ export function ChangePostModal({
 
             if (response.status === "success") {
                 Alert.alert("Успіх", "Пост успішно оновлено");
-                refresh()
+                refresh();
                 changeVisibility();
             } else {
                 Alert.alert("Помилка", response.message || "Не вдалося оновити пост");
@@ -234,7 +223,7 @@ export function ChangePostModal({
             console.error("Помилка оновлення поста:", error);
             Alert.alert(
                 "Помилка",
-                error instanceof Error ? error.message : "Не вдалося оновити пост"
+                error instanceof Error ? error.message : "Не вдалося оновити пост",
             );
         } finally {
             setIsLoading(false);
@@ -261,7 +250,7 @@ export function ChangePostModal({
             if (status !== "granted") {
                 Alert.alert(
                     "Дозвіл не надано",
-                    "Для додавання зображень необхідно надати доступ до галереї"
+                    "Для додавання зображень необхідно надати доступ до галереї",
                 );
                 return;
             }
@@ -283,7 +272,7 @@ export function ChangePostModal({
                         if (!asset.mimeType || !asset.base64) {
                             Alert.alert(
                                 "Помилка",
-                                "Вибране зображення не підтримується або не містить даних."
+                                "Вибране зображення не підтримується або не містить даних.",
                             );
                             return null;
                         }
@@ -291,7 +280,7 @@ export function ChangePostModal({
                         if (!allowedFormats.includes(type)) {
                             Alert.alert(
                                 "Помилка",
-                                `Формат зображення ${type} не підтримується. Дозволені формати: ${allowedFormats.join(", ")}.`
+                                `Формат зображення ${type} не підтримується. Дозволені формати: ${allowedFormats.join(", ")}.`,
                             );
                             return null;
                         }
@@ -300,7 +289,7 @@ export function ChangePostModal({
                         if (estimatedSizeInBytes > maxSizeInBytes) {
                             Alert.alert(
                                 "Помилка",
-                                `Зображення занадто велике. Максимальний розмір: ${maxSizeInBytes / (1024 * 1024)} MB`
+                                `Зображення занадто велике. Максимальний розмір: ${maxSizeInBytes / (1024 * 1024)} MB`,
                             );
                             return null;
                         }
@@ -320,20 +309,20 @@ export function ChangePostModal({
                     return;
                 }
 
-                setImages((prev) => [...prev, ...newImages]);
+                setImages(prev => [...prev, ...newImages]);
             } else if (result.canceled) {
                 Alert.alert("Скасовано", "Вибір зображень було скасовано");
             }
         } catch (error) {
             Alert.alert(
                 "Помилка",
-                `Не вдалося вибрати зображення: ${error instanceof Error ? error.message : "Невідома помилка"}`
+                `Не вдалося вибрати зображення: ${error instanceof Error ? error.message : "Невідома помилка"}`,
             );
         }
     }
 
     const removeImage = (index: number) => {
-        setImages((prev) => prev.filter((_, i) => i !== index));
+        setImages(prev => prev.filter((_, i) => i !== index));
     };
 
     const addLinksInput = () => {
@@ -362,8 +351,11 @@ export function ChangePostModal({
                                 source={{ uri: correctImage }}
                                 style={styles.imageAdded}
                                 resizeMode="cover"
-                                onError={(error) => {
-                                    console.error("Помилка завантаження зображення:", error.nativeEvent);
+                                onError={error => {
+                                    console.error(
+                                        "Помилка завантаження зображення:",
+                                        error.nativeEvent,
+                                    );
                                     Alert.alert("Помилка", "Не вдалося завантажити зображення.");
                                 }}
                             />
@@ -480,7 +472,7 @@ export function ChangePostModal({
                                             }}
                                             placeholder="Введіть посилання..."
                                             value={link}
-                                            onChangeText={(text) => handleLinkChange(text, index)}
+                                            onChangeText={text => handleLinkChange(text, index)}
                                             keyboardType="url"
                                         />
                                         {links.length > 1 && (
@@ -495,7 +487,9 @@ export function ChangePostModal({
                                                     alignItems: "center",
                                                 }}
                                             >
-                                                <Text style={{ color: "#543C52", fontSize: 18 }}>×</Text>
+                                                <Text style={{ color: "#543C52", fontSize: 18 }}>
+                                                    ×
+                                                </Text>
                                             </TouchableOpacity>
                                         )}
                                     </View>
@@ -522,7 +516,9 @@ export function ChangePostModal({
                                                 marginRight: 10,
                                             }}
                                         >
-                                            <Text style={{ color: "#543C52", fontSize: 18 }}>+</Text>
+                                            <Text style={{ color: "#543C52", fontSize: 18 }}>
+                                                +
+                                            </Text>
                                         </View>
                                         <Text style={{ color: "#543C52", fontSize: 16 }}>
                                             Додати посилання
@@ -565,15 +561,15 @@ export function ChangePostModal({
                                         zIndex: 1000,
                                         flex: 1,
                                     }}
-                                    onChangeValue={() => { }}
-                                    onChangeSearchText={(text) => {
+                                    onChangeValue={() => {}}
+                                    onChangeSearchText={text => {
                                         const sanitizedText = text.trim();
                                         if (
                                             sanitizedText &&
-                                            !items.some((item) => item.value === sanitizedText) &&
+                                            !items.some(item => item.value === sanitizedText) &&
                                             sanitizedText.length <= 50
                                         ) {
-                                            setItems((prev) => [
+                                            setItems(prev => [
                                                 ...prev,
                                                 { label: sanitizedText, value: sanitizedText },
                                             ]);
@@ -581,7 +577,14 @@ export function ChangePostModal({
                                     }}
                                 />
                             </View>
-                            <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8, marginTop: 5 }}>
+                            <View
+                                style={{
+                                    flexDirection: "row",
+                                    flexWrap: "wrap",
+                                    gap: 8,
+                                    marginTop: 5,
+                                }}
+                            >
                                 {value.map((tag, index) => (
                                     <View
                                         key={`${tag}-${index}`}
@@ -595,11 +598,17 @@ export function ChangePostModal({
                                             gap: 8,
                                         }}
                                     >
-                                        <Text style={{ color: "#543C52", fontSize: 14 }}>{tag}</Text>
+                                        <Text style={{ color: "#543C52", fontSize: 14 }}>
+                                            {tag}
+                                        </Text>
                                         <TouchableOpacity
-                                            onPress={() => setValue((prev) => prev.filter((_, i) => i !== index))}
+                                            onPress={() =>
+                                                setValue(prev => prev.filter((_, i) => i !== index))
+                                            }
                                         >
-                                            <Text style={{ color: "#543C52", fontSize: 14 }}>×</Text>
+                                            <Text style={{ color: "#543C52", fontSize: 14 }}>
+                                                ×
+                                            </Text>
                                         </TouchableOpacity>
                                     </View>
                                 ))}
@@ -649,7 +658,13 @@ export function ChangePostModal({
                                     <ActivityIndicator color="#fff" />
                                 ) : (
                                     <>
-                                        <Text style={{ color: "white", fontWeight: "500", fontSize: 14 }}>
+                                        <Text
+                                            style={{
+                                                color: "white",
+                                                fontWeight: "500",
+                                                fontSize: 14,
+                                            }}
+                                        >
                                             Оновити публікацію
                                         </Text>
                                         <SendArrow style={{ width: 20, height: 20 }} />

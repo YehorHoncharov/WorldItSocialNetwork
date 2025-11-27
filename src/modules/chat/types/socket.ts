@@ -2,17 +2,17 @@ import { Result } from "../../../shared/types/result";
 
 export type Chat = {
     id: number;
-    name: string,
-    is_personal_chat: boolean,
-    admin_id: number,
-    avatar: string,
-    members: ChatGroupMembers[]
-    chat_messages: MessagePayload[]
+    name: string;
+    is_personal_chat: boolean;
+    admin_id: number;
+    avatar: string;
+    members: ChatGroupMembers[];
+    chat_messages: MessagePayload[];
 };
 
 export interface ChatGroupMembers {
-    chat_groupId: number,
-    profile_id: number
+    chat_groupId: number;
+    profile_id: number;
 }
 
 export type ChatWithMessagesAndParticipants = {
@@ -23,20 +23,19 @@ export type ChatWithMessagesAndParticipants = {
 };
 
 export type MessagePayload = {
-    content: string
-    sent_at: Date
-    author_id: number
-    chat_groupId: number
-    attached_image: string
-}
+    content: string;
+    sent_at: Date;
+    author_id: number;
+    chat_groupId: number;
+    attached_image: string;
+};
 
 export type CreateMessage = {
-    content?: string ;
+    content?: string;
     attached_image?: string;
     author_id: number;
     chat_groupId: number;
-    sent_at?: Date
-   
+    sent_at?: Date;
 };
 
 type IChatUpdatePayload = Chat;
@@ -50,9 +49,7 @@ export interface IJoinChatPayload {
 export interface ILeaveChatPayload {
     chatId: number;
 }
-export type IJoinChatCallback = (
-    response: Result<ChatWithMessagesAndParticipants>
-) => void;
+export type IJoinChatCallback = (response: Result<ChatWithMessagesAndParticipants>) => void;
 
 export interface IServerEvents {
     newMessage: (data: NewMessagePayload) => void;
@@ -62,8 +59,5 @@ export interface IServerEvents {
 export interface IClientEvents {
     joinChat: (data: IJoinChatPayload, callback: IJoinChatCallback) => void;
     leaveChat: (data: ILeaveChatPayload) => void;
-    sendMessage: (
-        data: SendMessagePayload
-    ) => void
+    sendMessage: (data: SendMessagePayload) => void;
 }
-

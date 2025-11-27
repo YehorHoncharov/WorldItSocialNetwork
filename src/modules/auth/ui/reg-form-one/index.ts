@@ -1,1 +1,1 @@
-export { RegFormOne } from "./reg-form-one"
+export { RegFormOne } from "./reg-form-one";

@@ -16,7 +16,7 @@ export function useAlbums() {
             const result = await response.json();
 
             if (result.status === "error") {
-                return
+                return;
             }
 
             setAlbums([...result]);

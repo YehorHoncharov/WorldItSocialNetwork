@@ -23,11 +23,16 @@ import { CreateMessage, MessagePayload } from "../../types/socket";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { useUserContext } from "../../../auth/context/user-context";
 import { ChatModalDelete } from "../modals/modal/chatModalDelete";
-import { IAlbumImageShow } from "../../../albums/types/albums.types";
-import { launchImageLibraryAsync, MediaType, requestMediaLibraryPermissionsAsync } from "expo-image-picker";
+import { launchImageLibraryAsync, requestMediaLibraryPermissionsAsync } from "expo-image-picker";
 
 export function PrivatChat() {
-    const params = useLocalSearchParams<{ name: string; chat_id: string; avatar: string, username: string, lastAtMessage: string }>();
+    const params = useLocalSearchParams<{
+        name: string;
+        chat_id: string;
+        avatar: string;
+        username: string;
+        lastAtMessage: string;
+    }>();
     const { user } = useUserContext();
     const { socket } = useSocketContext();
     const [dotsPosition, setDotsPosition] = useState({ x: 50, y: 78 });
@@ -52,7 +57,7 @@ export function PrivatChat() {
         if (!socket || !isMounted) return;
 
         const chatId = +params.chat_id;
-        socket.emit("joinChat", { chatId }, (res) => {
+        socket.emit("joinChat", { chatId }, res => {
             if (!isMounted) return;
             if (res.status === "success" && Array.isArray(res.data?.chat_messages)) {
                 setMessages(res.data.chat_messages);
@@ -68,7 +73,7 @@ export function PrivatChat() {
                 chat_groupId: data.chat_groupId,
                 attached_image: data.attached_image || "",
             };
-            setMessages((prev) => [...prev, newMessage]);
+            setMessages(prev => [...prev, newMessage]);
             scrollViewRef.current?.scrollToEnd({ animated: true });
         };
 
@@ -82,7 +87,7 @@ export function PrivatChat() {
 
     const measureDots = () => {
         if (dotsRef.current) {
-            dotsRef.current.measureInWindow((x, y, width, height) => {
+            dotsRef.current.measureInWindow((x, y) => {
                 setDotsPosition({ x, y });
             });
         }
@@ -137,10 +142,7 @@ export function PrivatChat() {
 
         try {
             setIsUploading(true);
-            const imageUrls: string[] = [];
 
-            // Note: Assuming backend handles single image for now
-            // If backend supports multiple images, modify to send array
             const newMessage: CreateMessage = {
                 content: input.trim(),
                 author_id: user.id,
@@ -163,7 +165,7 @@ export function PrivatChat() {
     const pickImage = async () => {
         try {
             const { status } = await requestMediaLibraryPermissionsAsync();
-            if (status !== 'granted') {
+            if (status !== "granted") {
                 Alert.alert("Дозвіл не надано", "Потрібен доступ до галереї");
                 return;
             }
@@ -204,11 +206,18 @@ export function PrivatChat() {
     return (
         <View style={styles.container}>
             <View style={styles.chatHeader}>
-                <View style={{ flexDirection: 'row', alignItems: "center", gap: 20 }}>
+                <View style={{ flexDirection: "row", alignItems: "center", gap: 20 }}>
                     <TouchableOpacity onPress={onBack}>
                         <BackArrowIcon style={{ width: 20, height: 20 }} />
                     </TouchableOpacity>
-                    <View style={{ flexDirection: "row", justifyContent: "center", gap: 15, alignItems: "center" }}>
+                    <View
+                        style={{
+                            flexDirection: "row",
+                            justifyContent: "center",
+                            gap: 15,
+                            alignItems: "center",
+                        }}
+                    >
                         <Image
                             source={{ uri: API_BASE_URL + "/" + params.avatar }}
                             style={styles.avatar}
@@ -219,17 +228,21 @@ export function PrivatChat() {
                         </View>
                     </View>
                 </View>
-                <TouchableOpacity style={styles.menuBtn} ref={dotsRef} onPress={() => setModalVisible(true)}>
+                <TouchableOpacity
+                    style={styles.menuBtn}
+                    ref={dotsRef}
+                    onPress={() => setModalVisible(true)}
+                >
                     <Dots style={{ width: 20, height: 20 }} />
                 </TouchableOpacity>
             </View>
 
             <KeyboardAwareScrollView
-                innerRef={(ref) => {
+                innerRef={ref => {
                     scrollViewRef.current = ref;
                 }}
                 enableOnAndroid={true}
-                extraScrollHeight={Platform.OS === 'ios' ? 80 : 0}
+                extraScrollHeight={Platform.OS === "ios" ? 80 : 0}
                 keyboardShouldPersistTaps="handled"
                 contentContainerStyle={styles.messages}
                 enableAutomaticScroll={false}
@@ -256,7 +269,10 @@ export function PrivatChat() {
                                     </View>
                                 )}
                                 <View
-                                    style={[styles.message, isMyMessage ? { justifyContent: "flex-end" } : {}]}
+                                    style={[
+                                        styles.message,
+                                        isMyMessage ? { justifyContent: "flex-end" } : {},
+                                    ]}
                                 >
                                     {!isMyMessage && (
                                         <Image
@@ -264,12 +280,29 @@ export function PrivatChat() {
                                             style={{ width: 40, height: 40, borderRadius: 12345 }}
                                         />
                                     )}
-                                    <View style={isMyMessage ? styles.messageBubbleMy : styles.messageBubble}>
+                                    <View
+                                        style={
+                                            isMyMessage
+                                                ? styles.messageBubbleMy
+                                                : styles.messageBubble
+                                        }
+                                    >
                                         {msg.attached_image && (
-                                            <TouchableOpacity onPress={() => showFullScreenImage(msg.attached_image)}>
+                                            <TouchableOpacity
+                                                onPress={() =>
+                                                    showFullScreenImage(msg.attached_image)
+                                                }
+                                            >
                                                 <Image
                                                     source={{ uri: msg.attached_image }}
-                                                    style={[styles.messageImage, { width: 150, height: 150, borderRadius: 8 }]}
+                                                    style={[
+                                                        styles.messageImage,
+                                                        {
+                                                            width: 150,
+                                                            height: 150,
+                                                            borderRadius: 8,
+                                                        },
+                                                    ]}
                                                     resizeMode="cover"
                                                 />
                                             </TouchableOpacity>
@@ -306,20 +339,30 @@ export function PrivatChat() {
                                 resizeMode="cover"
                             />
                             <TouchableOpacity
-                                style={[styles.removeImageButton, {
-                                    position: 'absolute',
-                                    top: -5,
-                                    right: -5,
-                                    backgroundColor: '#9c0a0aff',
-                                    borderRadius: 12,
-                                    width: 24,
-                                    height: 24,
-                                    justifyContent: 'center',
-                                    alignItems: 'center'
-                                }]}
+                                style={[
+                                    styles.removeImageButton,
+                                    {
+                                        position: "absolute",
+                                        top: -5,
+                                        right: -5,
+                                        backgroundColor: "#9c0a0aff",
+                                        borderRadius: 12,
+                                        width: 24,
+                                        height: 24,
+                                        justifyContent: "center",
+                                        alignItems: "center",
+                                    },
+                                ]}
                                 onPress={() => removeImage(index)}
                             >
-                                <Text style={[styles.removeImageText, { color: '#fff', fontSize: 16 }]}>×</Text>
+                                <Text
+                                    style={[
+                                        styles.removeImageText,
+                                        { color: "#fff", fontSize: 16 },
+                                    ]}
+                                >
+                                    ×
+                                </Text>
                             </TouchableOpacity>
                         </View>
                     ))}
@@ -344,11 +387,14 @@ export function PrivatChat() {
                     />
                 </TouchableOpacity>
                 <TouchableOpacity
-                    style={[styles.sendBtn, {
-                        backgroundColor: isUploading ? '#ccc' : '#543C52',
-                        borderRadius: 20,
-                        padding: 10
-                    }]}
+                    style={[
+                        styles.sendBtn,
+                        {
+                            backgroundColor: isUploading ? "#ccc" : "#543C52",
+                            borderRadius: 20,
+                            padding: 10,
+                        },
+                    ]}
                     onPress={sendMessage}
                     disabled={isUploading}
                 >
@@ -362,29 +408,31 @@ export function PrivatChat() {
                 animationType="fade"
                 onRequestClose={() => setFullScreenImage(null)}
             >
-                <View style={{
-                    flex: 1,
-                    backgroundColor: 'rgba(0,0,0,0.9)',
-                    justifyContent: 'center',
-                    alignItems: 'center'
-                }}>
+                <View
+                    style={{
+                        flex: 1,
+                        backgroundColor: "rgba(0,0,0,0.9)",
+                        justifyContent: "center",
+                        alignItems: "center",
+                    }}
+                >
                     <TouchableOpacity
                         style={{
-                            position: 'absolute',
+                            position: "absolute",
                             top: 40,
                             right: 20,
-                            zIndex: 1000
+                            zIndex: 1000,
                         }}
                         onPress={() => setFullScreenImage(null)}
                     >
-                        <Text style={{ color: '#fff', fontSize: 24 }}>×</Text>
+                        <Text style={{ color: "#fff", fontSize: 24 }}>×</Text>
                     </TouchableOpacity>
                     <Image
-                        source={{ uri: fullScreenImage || '' }}
+                        source={{ uri: fullScreenImage || "" }}
                         style={{
-                            width: Dimensions.get('window').width,
-                            height: Dimensions.get('window').height * 0.8,
-                            resizeMode: 'contain'
+                            width: Dimensions.get("window").width,
+                            height: Dimensions.get("window").height * 0.8,
+                            resizeMode: "contain",
                         }}
                     />
                 </View>

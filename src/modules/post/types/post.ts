@@ -1,13 +1,11 @@
 import { IUser } from "../../auth/types";
 
-
 export interface IPostImg {
     image: {
         id: number;
         filename: string;
-        file?: string,
-    }
-
+        file?: string;
+    };
 }
 
 export interface PostTag {
@@ -15,7 +13,7 @@ export interface PostTag {
         userPostId: number;
         tagId: number;
         name: string;
-    }
+    };
 }
 
 export interface IPost {

@@ -13,7 +13,6 @@ import { useEffect, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { DELETE } from "../../../../../shared/api/delete";
 import { API_BASE_URL } from "../../../../../settings";
-import { Chat } from "../../../types/socket";
 import { styles } from "./chatModalDelete.style";
 import Dots from "../../../../../shared/ui/icons/dots";
 
@@ -23,7 +22,7 @@ interface ModalChatProps {
     chat_id: number;
     dotsPosition: { x: number; y: number };
     scrollOffset?: number;
-    onMessagesDeleted: () => void
+    onMessagesDeleted: () => void;
 }
 
 export function ChatModalDelete({
@@ -54,15 +53,12 @@ export function ChatModalDelete({
         10,
         Math.min(
             dotsPosition?.x ? dotsPosition.x - modalWidth + 33 : 0,
-            screenWidth - modalWidth - 10
-        )
+            screenWidth - modalWidth - 10,
+        ),
     );
 
     const adjustedY = dotsPosition?.y ? dotsPosition.y - scrollOffset + 3 : 0;
-    const clampedY = Math.min(
-        Math.max(adjustedY, 10),
-        screenHeight - modalHeight - 10
-    );
+    const clampedY = Math.min(Math.max(adjustedY, 10), screenHeight - modalHeight - 10);
 
     async function handleDelete(chatId: number) {
         if (!tokenUser) {
@@ -81,7 +77,7 @@ export function ChatModalDelete({
             });
 
             await refetchChats();
-            onMessagesDeleted()
+            onMessagesDeleted();
             onClose();
             Alert.alert("Успіх", "Всі повідомлення успішно видалено");
         } catch (error: any) {
@@ -93,17 +89,8 @@ export function ChatModalDelete({
     }
 
     return (
-        <Modal
-            transparent={true}
-            animationType="fade"
-            visible={visible}
-            onRequestClose={onClose}
-        >
-            <TouchableOpacity
-                style={styles.modalOverlay}
-                activeOpacity={1}
-                onPress={onClose}
-            >
+        <Modal transparent={true} animationType="fade" visible={visible} onRequestClose={onClose}>
+            <TouchableOpacity style={styles.modalOverlay} activeOpacity={1} onPress={onClose}>
                 <View
                     style={[
                         styles.modalContainer,

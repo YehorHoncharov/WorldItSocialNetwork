@@ -3,19 +3,20 @@ import { styles } from "./friend.styles";
 import { IUser } from "../../../auth/types";
 import { API_BASE_URL } from "../../../../settings";
 import { useRouter } from "expo-router";
-import { POST } from "../../../../shared/api/post";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useEffect, useState } from "react";
 import { useUserContext } from "../../../auth/context/user-context";
-import { useChats } from "../../hooks/useChats";
-import { Chat } from "../../types/socket";
 
-export function Friend1({userContact, withoutDelete}: {userContact: IUser, withoutDelete: boolean}) {
+export function Friend1({
+    userContact,
+    withoutDelete,
+}: {
+    userContact: IUser;
+    withoutDelete: boolean;
+}) {
     const router = useRouter();
     const { user } = useUserContext();
     const [token, setToken] = useState<string>("");
-    const { chats } = useChats()
-    const [correctChat, setCorrectChat] = useState<Chat[]>()
 
     useEffect(() => {
         async function getToken() {
@@ -29,7 +30,15 @@ export function Friend1({userContact, withoutDelete}: {userContact: IUser, witho
     async function onPress() {
         if (!user) return;
 
-        const { date_of_birth, friendship_from, friendship_to, chat_group_members, chat_messages, administered_groups, ...rest } = userContact;
+        const {
+            date_of_birth,
+            friendship_from,
+            friendship_to,
+            chat_group_members,
+            chat_messages,
+            administered_groups,
+            ...rest
+        } = userContact;
 
         router.navigate({
             pathname: "/friends-profile",
@@ -39,7 +48,6 @@ export function Friend1({userContact, withoutDelete}: {userContact: IUser, witho
                 withoutDelete: withoutDelete ? 1 : 0,
             },
         });
-
     }
 
     return (

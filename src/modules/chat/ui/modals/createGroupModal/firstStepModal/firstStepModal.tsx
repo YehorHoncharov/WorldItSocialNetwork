@@ -1,13 +1,5 @@
 import React, { useEffect, useState } from "react";
-import {
-    Modal,
-    View,
-    Text,
-    TouchableOpacity,
-    ScrollView,
-    TextInput,
-    Alert,
-} from "react-native";
+import { Modal, View, Text, TouchableOpacity, ScrollView, TextInput, Alert } from "react-native";
 import { IUser } from "../../../../../auth/types";
 import { useUserContext } from "../../../../../auth/context/user-context";
 import { useUsers } from "../../../../../friends/hooks/useUsers";
@@ -18,7 +10,6 @@ import { styles } from "./firstStepModal.styles";
 import SearchIcon from "../../../../../../shared/ui/icons/search";
 import { ContactWithCheckbox } from "../../contact/conntactWithCheckbox";
 import { useRouter } from "expo-router";
-import { launchImageLibraryAsync, requestMediaLibraryPermissionsAsync } from "expo-image-picker";
 import { Chat } from "../../../../types/socket";
 
 interface Props {
@@ -39,29 +30,27 @@ export function AddFriendModal({ modalVisible, onClose }: Props) {
     useEffect(() => {
         if (!currentUser) return;
 
-        const myFriends = users.filter((userF) =>
-            currentUser.friendship_to?.some(
-                (f) => f.accepted === true && f.profile1_id === userF.id
-            )
+        const myFriends = users.filter(userF =>
+            currentUser.friendship_to?.some(f => f.accepted === true && f.profile1_id === userF.id),
         );
 
-        const friendsToAdd = users.filter((userF) =>
+        const friendsToAdd = users.filter(userF =>
             currentUser.friendship_from?.some(
-                (f) => f.accepted === true && f.profile2_id === userF.id
-            )
+                f => f.accepted === true && f.profile2_id === userF.id,
+            ),
         );
 
         const allFriends = [...myFriends, ...friendsToAdd];
         setFriends(allFriends);
     }, [users, currentUser]);
 
-    const filteredFriends = friends.filter((friend) =>
-        friend.name?.toLowerCase().includes(searchTerm.toLowerCase())
+    const filteredFriends = friends.filter(friend =>
+        friend.name?.toLowerCase().includes(searchTerm.toLowerCase()),
     );
 
     const handleToggleFriend = (id: number) => {
-        setSelectedFriends((prev) =>
-            prev.includes(id) ? prev.filter((fid) => fid !== id) : [...prev, id]
+        setSelectedFriends(prev =>
+            prev.includes(id) ? prev.filter(fid => fid !== id) : [...prev, id],
         );
     };
 
@@ -83,9 +72,7 @@ export function AddFriendModal({ modalVisible, onClose }: Props) {
             Alert.alert("Помилка", "Користувач не авторизований");
             return;
         }
-        const selectedFriendObjects = friends.filter(friend =>
-            selectedFriends.includes(friend.id)
-        );
+        const selectedFriendObjects = friends.filter(friend => selectedFriends.includes(friend.id));
 
         const members = [currentUser, ...selectedFriendObjects];
 
@@ -108,7 +95,7 @@ export function AddFriendModal({ modalVisible, onClose }: Props) {
                     is_personal_chat: false,
                     admin_id: currentUser.id,
                     members: members,
-                    avatar: "uploads/user.png"
+                    avatar: "uploads/user.png",
                 },
             });
 
@@ -122,7 +109,6 @@ export function AddFriendModal({ modalVisible, onClose }: Props) {
                         chat_id: createdChat.id,
                         name: groupName,
                         avatar: "uploads/user.png",
-
                     },
                 });
             }
@@ -131,67 +117,6 @@ export function AddFriendModal({ modalVisible, onClose }: Props) {
             Alert.alert("Помилка", "Сталася помилка при створенні групи");
         }
     };
-
-    async function onSearch(): Promise<string | null> {
-        try {
-            const { status } = await requestMediaLibraryPermissionsAsync();
-            if (status !== "granted") {
-                Alert.alert(
-                    "Дозвіл не надано",
-                    "Для додавання зображення необхідно надати доступ до галереї"
-                );
-                return null;
-            }
-
-            const result = await launchImageLibraryAsync({
-                mediaTypes: ["images"],
-                quality: 0.8,
-                allowsEditing: false,
-                base64: true,
-            });
-
-            if (
-                result.canceled ||
-                !result.assets ||
-                result.assets.length === 0
-            ) {
-                Alert.alert("Скасовано", "Вибір зображення було скасовано");
-                return null;
-            }
-
-            const asset = result.assets[0];
-            const allowedFormats = ["jpeg", "png", "gif"];
-            const maxSizeInBytes = 5 * 1024 * 1024;
-            const type = asset.mimeType?.split("/")[1]?.toLowerCase() || "";
-
-            if (!asset.base64 || !allowedFormats.includes(type)) {
-                Alert.alert("Помилка", "Непідтримуваний формат зображення");
-                return null;
-            }
-
-            const estimatedSizeInBytes = (asset.base64.length * 3) / 4;
-            if (estimatedSizeInBytes > maxSizeInBytes) {
-                Alert.alert(
-                    "Помилка",
-                    "Зображення занадто велике (макс. 5 МБ)"
-                );
-                return null;
-            }
-
-            const imageUrl = `data:image/${type};base64,${asset.base64}`;
-
-            const newImage = imageUrl
-
-            return newImage;
-        } catch (error) {
-            Alert.alert(
-                "Помилка",
-                `Не вдалося вибрати зображення: ${error instanceof Error ? error.message : "Невідома помилка"
-                }`
-            );
-            return null;
-        }
-    }
 
     const handleCancel = () => {
         setStep(1);
@@ -202,7 +127,12 @@ export function AddFriendModal({ modalVisible, onClose }: Props) {
     };
 
     return (
-        <Modal animationType="fade" transparent={true} visible={modalVisible} onRequestClose={handleCancel}>
+        <Modal
+            animationType="fade"
+            transparent={true}
+            visible={modalVisible}
+            onRequestClose={handleCancel}
+        >
             <View style={styles.centeredView}>
                 <View style={styles.modalView}>
                     {step === 1 ? (
@@ -230,7 +160,7 @@ export function AddFriendModal({ modalVisible, onClose }: Props) {
 
                             <ScrollView style={styles.scrollArea} overScrollMode="never">
                                 <View style={styles.form}>
-                                    {filteredFriends.map((friend) => (
+                                    {filteredFriends.map(friend => (
                                         <TouchableOpacity
                                             key={friend.id}
                                             style={styles.friendItem}

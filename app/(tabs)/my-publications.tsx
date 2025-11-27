@@ -1,13 +1,13 @@
-import { SafeAreaView, StatusBar, View } from "react-native";
+import { SafeAreaView } from "react-native";
 import Providers from "../providers";
 import { MyPublications } from "../../src/modules/my_publications/my-publications";
 
 export default function MyPublication() {
-	return (
-		<Providers>
-			<SafeAreaView style={{ flex: 1, backgroundColor: "#FAF8FF" }}>
-				<MyPublications />
-			</SafeAreaView>
-		</Providers>
-	);
+    return (
+        <Providers>
+            <SafeAreaView style={{ flex: 1, backgroundColor: "#FAF8FF" }}>
+                <MyPublications />
+            </SafeAreaView>
+        </Providers>
+    );
 }

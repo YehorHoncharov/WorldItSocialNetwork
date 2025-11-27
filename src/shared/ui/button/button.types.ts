@@ -1,7 +1,7 @@
-import { TouchableOpacityProps } from "react-native"
+import { TouchableOpacityProps } from "react-native";
 
 export interface IButtonProps extends TouchableOpacityProps {
-    label: string
-    disabled?: boolean
-    icon?: string
+    label: string;
+    disabled?: boolean;
+    icon?: string;
 }

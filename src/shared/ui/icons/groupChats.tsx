@@ -1,12 +1,9 @@
-import * as React from "react"
-import Svg, { G, Path, SvgProps } from "react-native-svg"
+import * as React from "react";
+import Svg, { G, Path, SvgProps } from "react-native-svg";
 
 export function ChatGroupIcon(props: SvgProps) {
     return (
-        <Svg
-            viewBox="0 0 256 256"
-            {...props}
-        >
+        <Svg viewBox="0 0 256 256" {...props}>
             <G
                 stroke="none"
                 strokeWidth={0}
@@ -46,6 +43,5 @@ export function ChatGroupIcon(props: SvgProps) {
                 />
             </G>
         </Svg>
-    )
+    );
 }
-

@@ -1,12 +1,4 @@
-import {
-    View,
-    Text,
-    TouchableOpacity,
-    Modal,
-    Image,
-    Dimensions,
-    Alert,
-} from "react-native";
+import { View, Text, TouchableOpacity, Modal, Image, Dimensions, Alert } from "react-native";
 import Pencil from "../../../../shared/ui/icons/pencil";
 import Dots from "../../../../shared/ui/icons/dots";
 import { useState, useEffect } from "react";
@@ -38,7 +30,7 @@ export function ModalAlbum({
     const [modalOpened, setModalOpened] = useState<boolean>(false);
     const [tokenUser, setTokenUser] = useState<string | null>(null);
     const { albums, setAlbums } = useAlbums();
-    const { user } = useUserContext()
+    const { user } = useUserContext();
 
     const getToken = async (): Promise<string | null> => {
         return await AsyncStorage.getItem("token");
@@ -73,16 +65,11 @@ export function ModalAlbum({
                 token: tokenUser,
             });
 
-            Alert.alert(
-                "Успіх",
-                "Ваш альбом успішно видалився!"
-            );
+            Alert.alert("Успіх", "Ваш альбом успішно видалився!");
             onClose();
-
         } catch (error: any) {
             console.error("Помилка видалення:", error.message);
         }
-
     }
 
     const currentAlbum = albums.find((album: IAlbum) => album.id === albumId);
@@ -94,14 +81,14 @@ export function ModalAlbum({
     const prepareUpdateData = (albumData: IAlbumEditProps): AlbumUpdateBody => {
         return {
             name: albumData.name,
-            tags: albumData.topic ? albumData.topic.map((topic) => topic.tag.name) : undefined,
+            tags: albumData.topic ? albumData.topic.map(topic => topic.tag.name) : undefined,
             images: currentAlbum.images?.map(img => ({
                 image: {
                     id: img.image.id,
-                    filename: img.image.filename
-                }
+                    filename: img.image.filename,
+                },
             })),
-            author_id: user?.id
+            author_id: user?.id,
         };
     };
 
@@ -127,16 +114,15 @@ export function ModalAlbum({
                             albums.map((album: IAlbum) =>
                                 album.id === updatedAlbum.id
                                     ? {
-                                        ...album,
-                                        name: updatedAlbum.name,
-                                        topic: updatedAlbum.topic
-                                            ? updatedAlbum.topic
-                                            : album.topic
-                                    }
-                                    : album
-                            )
+                                          ...album,
+                                          name: updatedAlbum.name,
+                                          topic: updatedAlbum.topic
+                                              ? updatedAlbum.topic
+                                              : album.topic,
+                                      }
+                                    : album,
+                            ),
                         );
-
                     }}
                 />
             )}
@@ -146,11 +132,7 @@ export function ModalAlbum({
                 visible={visible && !modalOpened}
                 onRequestClose={onClose}
             >
-                <TouchableOpacity
-                    style={styles.modalOverlay}
-                    activeOpacity={1}
-                    onPress={onClose}
-                >
+                <TouchableOpacity style={styles.modalOverlay} activeOpacity={1} onPress={onClose}>
                     <View
                         style={[
                             styles.modalContainer,

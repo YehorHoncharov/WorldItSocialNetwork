@@ -1,12 +1,5 @@
 import React, { useState } from "react";
-import {
-    Modal,
-    View,
-    Text,
-    TouchableOpacity,
-    ScrollView,
-    Alert,
-} from "react-native";
+import { Modal, View, Text, TouchableOpacity, ScrollView, Alert } from "react-native";
 import DropDownPicker from "react-native-dropdown-picker";
 import { Input } from "../../../../shared/ui/input";
 import { styles } from "./add-album-modal.styles";
@@ -15,11 +8,7 @@ import { API_BASE_URL } from "../../../../settings";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useUserContext } from "../../../auth/context/user-context";
 import { useAlbums } from "../../hooks/useAlbums";
-import {
-    AlbumUpdateBody,
-    IAlbumTag,
-    IAlbumTheme,
-} from "../../types/albums.types";
+import {IAlbumTheme } from "../../types/albums.types";
 
 interface Props {
     modalVisible: boolean;
@@ -95,8 +84,6 @@ export function AddAlbumModal({ modalVisible, onClose }: Props) {
         resetForm();
         onClose();
     };
-
-
 
     return (
         <Modal
@@ -183,10 +170,7 @@ export function AddAlbumModal({ modalVisible, onClose }: Props) {
                                     <Text style={styles.submitTextCancel}>Скасувати</Text>
                                 </TouchableOpacity>
 
-                                <TouchableOpacity
-                                    style={styles.saveButton}
-                                    onPress={handleSubmit}
-                                >
+                                <TouchableOpacity style={styles.saveButton} onPress={handleSubmit}>
                                     <Text style={styles.submitText}>Зберегти</Text>
                                 </TouchableOpacity>
                             </View>

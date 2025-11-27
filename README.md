@@ -13,11 +13,11 @@
 
 Based on the project modules, the app includes:
 
--   **🔐 Authentication:** Login and Registration flows.
--   **💬 Messaging System:** Private chats and real-time messaging (`modules/chat`).
--   **📝 Feed & Posts:** Create, view, and interact with posts (`modules/post`).
--   **👤 User Profile:** Manage avatar and personal details (`modules/my_publications`).
--   **🖼️ Media Sharing:** Image uploads and galleries.
+- **🔐 Authentication:** Login and Registration flows.
+- **💬 Messaging System:** Private chats and real-time messaging (`modules/chat`).
+- **📝 Feed & Posts:** Create, view, and interact with posts (`modules/post`).
+- **👤 User Profile:** Manage avatar and personal details (`modules/my_publications`).
+- **🖼️ Media Sharing:** Image uploads and galleries.
 
 ---
 
@@ -58,23 +58,23 @@ Based on the current project structure, the following functionality is implement
 
 ### 🔐 Authorization
 
--   Login and registration screens
--   Basic validation logic
+- Login and registration screens
+- Basic validation logic
 
 ### 📝 Feed & Posts
 
--   Creation and editing of publications
--   Viewing your own posts
--   Updated design for post editing (change-post)
+- Creation and editing of publications
+- Viewing your own posts
+- Updated design for post editing (change-post)
 
 ### 💬 Private Chat
 
--   Private messaging interface (privateChat module)
+- Private messaging interface (privateChat module)
 
 ### 👤 User Profile
 
--   Displaying user avatar
--   Viewing a list of personal publications
+- Displaying user avatar
+- Viewing a list of personal publications
 
 ---
 
@@ -84,8 +84,8 @@ Based on the current project structure, the following functionality is implement
 
 Make sure you have installed:
 
--   **Node.js** (LTS version recommended)
--   **Git**
+- **Node.js** (LTS version recommended)
+- **Git**
 
 ---
 
@@ -123,8 +123,8 @@ npx expo start
 
 Install the **Expo Go** app from:
 
-- Google Play  
-- App Store  
+- Google Play
+- App Store
 
 Then scan the QR code displayed in the terminal after running:
 

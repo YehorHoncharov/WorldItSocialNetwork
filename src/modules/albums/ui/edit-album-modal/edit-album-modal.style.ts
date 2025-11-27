@@ -1,4 +1,4 @@
-import { StyleSheet } from "react-native"
+import { StyleSheet } from "react-native";
 
 export const styles = StyleSheet.create({
     centeredView: {
@@ -123,5 +123,5 @@ export const styles = StyleSheet.create({
         color: "#543C52",
         fontSize: 14,
         fontWeight: "500",
-    }
+    },
 });

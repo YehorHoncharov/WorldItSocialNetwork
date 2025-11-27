@@ -2,12 +2,12 @@ import { StyleSheet } from "react-native";
 
 export const styles = StyleSheet.create({
     footer: {
-        height: 72, 
-        paddingBottom: 35, 
-        flexDirection: 'row',
-        justifyContent: 'space-around',
-        alignItems: 'center',
-        backgroundColor: '#FFFFFF',
+        height: 72,
+        paddingBottom: 35,
+        flexDirection: "row",
+        justifyContent: "space-around",
+        alignItems: "center",
+        backgroundColor: "#FFFFFF",
         gap: 10,
         // paddingLeft: 20
     },
@@ -30,9 +30,9 @@ export const styles = StyleSheet.create({
         // borderTopWidth: 2,
         // borderTopColor: '#543C52',
     },
-    font:{
+    font: {
         fontFamily: "Space Grotesk",
         fontWeight: "500",
-        fontStyle: "normal"
-    }
+        fontStyle: "normal",
+    },
 });

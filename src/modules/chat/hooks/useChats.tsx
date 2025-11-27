@@ -30,8 +30,8 @@ export function useChats() {
     }, []);
 
     useEffect(() => {
-        getChats()
-    }, [getChats])
+        getChats();
+    }, [getChats]);
 
     return { chats, isLoading, error, refetchChats: getChats };
 }

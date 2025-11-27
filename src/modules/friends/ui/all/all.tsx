@@ -6,7 +6,15 @@ import { useUserContext } from "../../../auth/context/user-context";
 import { useEffect, useState } from "react";
 import { IUser } from "../../../auth/types";
 
-export function AllFriends({ scrollable = true, limit = undefined, onShowAll }: { scrollable?: boolean; limit?: number; onShowAll?: () => void; }) {
+export function AllFriends({
+    scrollable = true,
+    limit = undefined,
+    onShowAll,
+}: {
+    scrollable?: boolean;
+    limit?: number;
+    onShowAll?: () => void;
+}) {
     const { users, refresh } = useUsers();
     const { user } = useUserContext();
     const [displayedUsers, setDisplayedUsers] = useState<IUser[]>([]);
@@ -14,16 +22,12 @@ export function AllFriends({ scrollable = true, limit = undefined, onShowAll }: 
     function updateFriendList() {
         if (!user) return;
 
-        const myFriends = users.filter((userF) =>
-            user.friendship_to?.some(
-                (f) => f.accepted === true && f.profile1_id === userF.id
-            )
+        const myFriends = users.filter(userF =>
+            user.friendship_to?.some(f => f.accepted === true && f.profile1_id === userF.id),
         );
 
-        const friendsToAdd = users.filter((userF) =>
-            user.friendship_from?.some(
-                (f) => f.accepted === true && f.profile2_id === userF.id
-            )
+        const friendsToAdd = users.filter(userF =>
+            user.friendship_from?.some(f => f.accepted === true && f.profile2_id === userF.id),
         );
 
         const finalFriends = myFriends.concat(friendsToAdd);
@@ -40,8 +44,7 @@ export function AllFriends({ scrollable = true, limit = undefined, onShowAll }: 
         }, 3000);
 
         return () => clearInterval(interval);
-    }, [])
-
+    }, []);
 
     const content = (
         <View style={styles.container}>
@@ -54,7 +57,7 @@ export function AllFriends({ scrollable = true, limit = undefined, onShowAll }: 
 
             <View style={{ gap: 10, flexGrow: 1 }}>
                 {displayedUsers.length > 0 ? (
-                    displayedUsers.map((item) => (
+                    displayedUsers.map(item => (
                         <FriendsForm
                             key={`${item.id}`}
                             {...item}

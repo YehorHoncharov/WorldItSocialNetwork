@@ -1,10 +1,10 @@
-import { ScrollView, View, Text, StyleSheet, ActivityIndicator } from "react-native";
+import { ScrollView, View, Text, StyleSheet } from "react-native";
 import Post from "../post/ui/main-page/main.page";
 import { usePosts } from "../post/hooks/use-get-post";
 import React, { useEffect } from "react";
 
 export function Homepage() {
-    const { posts, refresh, isLoading } = usePosts();
+    const { posts, refresh } = usePosts();
 
     useEffect(() => {
         const interval = setInterval(() => {
@@ -17,17 +17,14 @@ export function Homepage() {
     return (
         <ScrollView
             overScrollMode="never"
-            contentContainerStyle={[
-                styles.listContainer,
-                posts.length === 0 && styles.centerEmpty,
-            ]}
+            contentContainerStyle={[styles.listContainer, posts.length === 0 && styles.centerEmpty]}
         >
             {posts.length === 0 ? (
                 <View style={styles.emptyContainer}>
                     <Text>Немає постів для відображення</Text>
                 </View>
             ) : (
-                posts.map((item) => (
+                posts.map(item => (
                     <View style={styles.postContainer} key={item.id}>
                         <Post
                             id={item.id}

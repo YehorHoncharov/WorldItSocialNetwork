@@ -10,34 +10,34 @@ import I from "../icons/logo-orange/i";
 import T from "../icons/logo-orange/t";
 
 export function MainFrame() {
-	const router = useRouter();
-	function onPress() {
-		router.navigate("/home");
-	}
-	return (
-		<TouchableWithoutFeedback onPress={onPress}>
-			<View style={styles.contsiner}>
+    const router = useRouter();
+    function onPress() {
+        router.navigate("/home");
+    }
+    return (
+        <TouchableWithoutFeedback onPress={onPress}>
+            <View style={styles.contsiner}>
                 <View style={styles.up}>
                     <Image
                         style={styles.worldItLogo}
                         source={require("../../ui/images/world-it-logo-orange.png")}
                     />
-                    <View style={{flexDirection: "row", gap: 1, paddingRight: 8}}>
-                        <W style={styles.w}/>
-                        <O style={styles.o}/>
-                        <R style={styles.r}/>
-                        <L style={styles.l}/>
-                        <D style={styles.d}/>
+                    <View style={{ flexDirection: "row", gap: 1, paddingRight: 8 }}>
+                        <W style={styles.w} />
+                        <O style={styles.o} />
+                        <R style={styles.r} />
+                        <L style={styles.l} />
+                        <D style={styles.d} />
                     </View>
-                    <View style={{flexDirection: "row", gap: 2, paddingTop: 8,}}>
-                        <I style={styles.i}/>
-                        <T style={styles.t}/>
+                    <View style={{ flexDirection: "row", gap: 2, paddingTop: 8 }}>
+                        <I style={styles.i} />
+                        <T style={styles.t} />
                     </View>
                 </View>
                 <View>
                     <Text style={styles.text}>Соціальна мережа</Text>
                 </View>
-			</View>
-		</TouchableWithoutFeedback>
-	);
+            </View>
+        </TouchableWithoutFeedback>
+    );
 }

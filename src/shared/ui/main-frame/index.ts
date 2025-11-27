@@ -1,1 +1,1 @@
-export { MainFrame } from './main-frame'
+export { MainFrame } from "./main-frame";

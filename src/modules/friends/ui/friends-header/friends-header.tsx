@@ -28,7 +28,10 @@ export function FriendsHeader({ activeTab, onTabPress }: FriendsHeaderProps) {
             </TouchableOpacity>
             <TouchableOpacity style={styles.tabItem} onPress={() => onTabPress("recommendations")}>
                 <Text
-                    style={[styles.tabText, activeTab === "recommendations" && styles.tabTextActive]}
+                    style={[
+                        styles.tabText,
+                        activeTab === "recommendations" && styles.tabTextActive,
+                    ]}
                     numberOfLines={1}
                     ellipsizeMode="clip"
                 >

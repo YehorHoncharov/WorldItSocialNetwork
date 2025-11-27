@@ -5,13 +5,10 @@ import {
     Animated,
     Dimensions,
     StyleSheet,
-    FlatList,
     ActivityIndicator,
-    Alert,
-    RefreshControl,
     ScrollView,
 } from "react-native";
-import { useRef, useState, useEffect, useMemo, useCallback } from "react";
+import { useRef, useState, useEffect, useMemo } from "react";
 import { useAlbums } from "../../hooks/useAlbums";
 import { Settings } from "../../../settings";
 import { My } from "../my/my";
@@ -19,7 +16,6 @@ import { Album } from "../album/album";
 import { NoAlbums } from "../no-albums/no-albums";
 import { useUserContext } from "../../../auth/context/user-context";
 import { IAlbum } from "../../types/albums.types";
-import { useRouter } from "expo-router";
 
 const screenWidth = Dimensions.get("window").width;
 
@@ -37,21 +33,18 @@ export function AlbumHeader() {
         }, 3000);
 
         return () => clearInterval(interval);
-    }, [])
+    }, []);
 
-    const correctAlbums = albums.filter((album) => album.author_id === user?.id);
+    const correctAlbums = albums.filter(album => album.author_id === user?.id);
 
     const filteredAlbums = useMemo(() => {
         if (!user) return [];
-        return albums.filter(
-            (album) => album.author_id.toString() === user.id.toString()
-        );
+        return albums.filter(album => album.author_id.toString() === user.id.toString());
     }, [albums, user]);
 
     useEffect(() => {
         setUserAlbums(filteredAlbums);
     }, [filteredAlbums]);
-
 
     useEffect(() => {
         translateX.setValue(0);
@@ -70,45 +63,29 @@ export function AlbumHeader() {
     return (
         <View style={{ flex: 1 }}>
             <View style={styles.tabContainer}>
-                <TouchableOpacity
-                    style={styles.tabItem}
-                    onPress={() => handleTabPress('personal')}
-                >
+                <TouchableOpacity style={styles.tabItem} onPress={() => handleTabPress("personal")}>
                     <Text
-                        style={[
-                            styles.tabText,
-                            activeTab === 'personal' && styles.tabTextActive,
-                        ]}
+                        style={[styles.tabText, activeTab === "personal" && styles.tabTextActive]}
                     >
                         Особиста інформація
                     </Text>
                 </TouchableOpacity>
-                <TouchableOpacity
-                    style={styles.tabItem}
-                    onPress={() => handleTabPress('albums')}
-                >
-                    <Text
-                        style={[
-                            styles.tabText,
-                            activeTab === 'albums' && styles.tabTextActive,
-                        ]}
-                    >
+                <TouchableOpacity style={styles.tabItem} onPress={() => handleTabPress("albums")}>
+                    <Text style={[styles.tabText, activeTab === "albums" && styles.tabTextActive]}>
                         Альбоми
                     </Text>
                 </TouchableOpacity>
             </View>
 
-            <View style={{ flex: 1, width: screenWidth * 2, flexDirection: 'row' }}>
+            <View style={{ flex: 1, width: screenWidth * 2, flexDirection: "row" }}>
                 <Animated.View
                     style={{
-                        flexDirection: 'row',
+                        flexDirection: "row",
                         width: screenWidth * 2,
                         transform: [{ translateX }],
                     }}
                 >
-                    <View
-                        style={{ width: screenWidth, flex: 1, backgroundColor: '#E9E5EE' }}
-                    >
+                    <View style={{ width: screenWidth, flex: 1, backgroundColor: "#E9E5EE" }}>
                         <Settings />
                     </View>
 
@@ -123,21 +100,20 @@ export function AlbumHeader() {
                             style={{
                                 flex: 1,
                                 width: screenWidth,
-                                justifyContent: 'center',
-                                alignItems: 'center',
+                                justifyContent: "center",
+                                alignItems: "center",
                             }}
                         >
-                            <Text style={{ color: '#070A1C' }}>Помилка: {error}</Text>
+                            <Text style={{ color: "#070A1C" }}>Помилка: {error}</Text>
                         </View>
                     ) : (
                         <ScrollView
                             style={{
                                 width: screenWidth,
                                 flex: 1,
-                                backgroundColor: '#E9E5EE',
+                                backgroundColor: "#E9E5EE",
                             }}
                             contentContainerStyle={{ gap: 8, paddingBottom: 60 }}
-
                         >
                             <View
                                 style={{
@@ -150,17 +126,19 @@ export function AlbumHeader() {
                                 <My albums={correctAlbums} />
                             </View>
                             {userAlbums.length > 1 ? (
-                                userAlbums.slice(1).map((item) => (
-                                    <Album
-                                        key={`${item.id}`}
-                                        id={item.id}
-                                        name={item.name}
-                                        topic={item.topic}
-                                        created_at={item.created_at}
-                                        author_id={item.author_id}
-                                        images={item.images}
-                                    />
-                                ))
+                                userAlbums
+                                    .slice(1)
+                                    .map(item => (
+                                        <Album
+                                            key={`${item.id}`}
+                                            id={item.id}
+                                            name={item.name}
+                                            topic={item.topic}
+                                            created_at={item.created_at}
+                                            author_id={item.author_id}
+                                            images={item.images}
+                                        />
+                                    ))
                             ) : (
                                 <NoAlbums />
                             )}

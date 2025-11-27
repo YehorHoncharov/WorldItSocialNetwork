@@ -15,16 +15,19 @@ import { styles } from "./group.style";
 import Dots from "../../../../shared/ui/icons/dots";
 import CheckMarkIcon from "../../../../shared/ui/icons/checkMark";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { useGetChatById } from "../../hooks/useGetChatById";
 import { API_BASE_URL } from "../../../../settings";
 import { useSocketContext } from "../../context/socketContext";
 import { CreateMessage, MessagePayload } from "../../types/socket";
 import { useUserContext } from "../../../auth/context/user-context";
 
 export function Group() {
-    const params = useLocalSearchParams<{ name: string; chat_id: string; avatar: string, username: string }>();
+    const params = useLocalSearchParams<{
+        name: string;
+        chat_id: string;
+        avatar: string;
+        username: string;
+    }>();
     const { user } = useUserContext();
-    const chat = useGetChatById(+params.chat_id);
     const { socket } = useSocketContext();
 
     const [messages, setMessages] = useState<MessagePayload[]>([]);
@@ -42,7 +45,7 @@ export function Group() {
         if (!socket || !isMounted) return;
 
         const chatId = +params.chat_id;
-        socket.emit("joinChat", { chatId }, (res) => {
+        socket.emit("joinChat", { chatId }, res => {
             if (!isMounted) return;
             if (res.status === "success" && Array.isArray(res.data?.chat_messages)) {
                 setMessages(res.data.chat_messages);
@@ -58,7 +61,7 @@ export function Group() {
                 chat_groupId: data.chat_groupId,
                 attached_image: data.attached_image || "",
             };
-            setMessages((prev) => [...prev, newMessage]);
+            setMessages(prev => [...prev, newMessage]);
             scrollViewRef.current?.scrollToEnd({ animated: true });
         };
 
@@ -69,7 +72,6 @@ export function Group() {
             socket.emit("leaveChat", { chatId });
         };
     }, [socket, params.chat_id, isMounted]);
-
 
     const sendMessage = () => {
         if (!socket || !input.trim() || !user) return;
@@ -95,7 +97,7 @@ export function Group() {
     return (
         <View style={styles.container}>
             <View style={styles.chatHeader}>
-                <View style={{ flexDirection: 'row', alignItems: "center", gap: 20 }}>
+                <View style={{ flexDirection: "row", alignItems: "center", gap: 20 }}>
                     <TouchableOpacity onPress={onBack}>
                         <BackArrowIcon style={{ width: 20, height: 20 }} />
                     </TouchableOpacity>
@@ -115,7 +117,13 @@ export function Group() {
                 </TouchableOpacity>
             </View>
 
-            <Text style={styles.chatDate}>{new Date().toLocaleDateString("uk-UA", { day: "numeric", month: "long", year: "numeric" })}</Text>
+            <Text style={styles.chatDate}>
+                {new Date().toLocaleDateString("uk-UA", {
+                    day: "numeric",
+                    month: "long",
+                    year: "numeric",
+                })}
+            </Text>
 
             <KeyboardAvoidingView
                 behavior={Platform.OS === "ios" ? "padding" : "height"}
@@ -133,7 +141,10 @@ export function Group() {
                         return (
                             <View
                                 key={index}
-                                style={[styles.message, isMyMessage ? { justifyContent: "flex-end" } : {}]}
+                                style={[
+                                    styles.message,
+                                    isMyMessage ? { justifyContent: "flex-end" } : {},
+                                ]}
                             >
                                 {!isMyMessage && (
                                     <Image
@@ -141,7 +152,11 @@ export function Group() {
                                         style={{ width: 40, height: 40, borderRadius: 12345 }}
                                     />
                                 )}
-                                <View style={isMyMessage ? styles.messageBubbleMy : styles.messageBubble}>
+                                <View
+                                    style={
+                                        isMyMessage ? styles.messageBubbleMy : styles.messageBubble
+                                    }
+                                >
                                     <Text style={styles.messageText}>{msg.content}</Text>
                                     <Text style={styles.messageTime}>
                                         {new Date(msg.sent_at).toLocaleTimeString([], {

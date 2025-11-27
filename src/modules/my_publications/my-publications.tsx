@@ -8,11 +8,11 @@ import Post from "../post/ui/main-page/main.page";
 export function MyPublications() {
     const { posts, refresh } = usePosts();
     const { user } = useUserContext();
-    const [userPosts, setUserPosts] = useState<IPost[]>([])
+    const [userPosts, setUserPosts] = useState<IPost[]>([]);
 
     useEffect(() => {
         if (!user) return;
-        const myPosts = posts.filter((post) => post.author_id === user.id);
+        const myPosts = posts.filter(post => post.author_id === user.id);
         setUserPosts(myPosts);
     }, [posts, user]);
 
@@ -29,7 +29,7 @@ export function MyPublications() {
             overScrollMode="never"
             style={{ gap: 20 }}
             data={userPosts}
-            keyExtractor={(item) => `${item.id}`}
+            keyExtractor={item => `${item.id}`}
             contentContainerStyle={styles.listContainer}
             renderItem={({ item }) => (
                 <View style={styles.postContainer}>
@@ -47,7 +47,6 @@ export function MyPublications() {
                     />
                 </View>
             )}
-
             ListEmptyComponent={
                 <View style={styles.emptyContainer}>
                     <Text>Немає постів для відображення</Text>

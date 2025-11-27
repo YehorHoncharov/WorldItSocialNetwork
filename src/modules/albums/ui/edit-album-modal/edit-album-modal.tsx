@@ -1,27 +1,18 @@
 import React, { useEffect, useState } from "react";
-import {
-    Modal,
-    View,
-    Text,
-    StyleSheet,
-    TouchableOpacity,
-    ScrollView,
-    Alert,
-} from "react-native";
+import { Modal, View, Text, TouchableOpacity, ScrollView, Alert } from "react-native";
 import DropDownPicker from "react-native-dropdown-picker";
 import { Input } from "../../../../shared/ui/input";
 import { API_BASE_URL } from "../../../../settings";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { styles } from "./edit-album-modal.style";
-import { AlbumUpdateBody, IAlbum, IAlbumTag, IAlbumTheme, } from "../../types/albums.types";
+import { AlbumUpdateBody, IAlbum, IAlbumTheme } from "../../types/albums.types";
 import { PUT } from "../../../../shared/api/put";
 import { useUserContext } from "../../../auth/context/user-context";
-import { useAlbums } from "../../hooks/useAlbums";
 
 interface Props {
     modalVisible: boolean;
     album_id: number;
-    initialData: { name: string; topic: string; };
+    initialData: { name: string; topic: string };
     changeVisibility: () => void;
     onClose: () => void;
     onUpdate: (updatedAlbum: IAlbum) => void;
@@ -31,14 +22,13 @@ export function EditAlbumModal({
     modalVisible,
     album_id,
     initialData,
-    changeVisibility,
     onClose,
     onUpdate,
 }: Props) {
     const [name, setName] = useState(initialData.name);
     const [topic, setTopic] = useState(initialData.topic);
     const [openTheme, setOpenTheme] = useState(false);
-    const { user } = useUserContext()
+    const { user } = useUserContext();
     const [themeItems, setThemeItems] = useState<IAlbumTheme[]>([
         { label: "Відпочинок", value: "#відпочинок" },
         { label: "Натхнення", value: "#натхнення" },
@@ -57,11 +47,9 @@ export function EditAlbumModal({
         setTopic(initialData.topic);
     }, []);
 
-
     const resetForm = () => {
         setName(initialData.name);
         setTopic(initialData.topic);
-
     };
 
     const handleSubmit = async () => {
@@ -101,13 +89,15 @@ export function EditAlbumModal({
             onUpdate({
                 id: album_id,
                 name,
-                topic: [{
-                    tag: {
-                        id: Date.now(),
-                        name: "#" + topic
-                    }
-                }],
-                author_id: user.id
+                topic: [
+                    {
+                        tag: {
+                            id: Date.now(),
+                            name: "#" + topic,
+                        },
+                    },
+                ],
+                author_id: user.id,
             });
             onClose();
         } catch (err) {
@@ -115,7 +105,6 @@ export function EditAlbumModal({
             Alert.alert("Помилка", "Сталася помилка при оновленні альбому");
         }
     };
-
 
     return (
         <Modal
@@ -167,14 +156,16 @@ export function EditAlbumModal({
                                         borderColor: "#543C52",
                                         zIndex: 2000,
                                     }}
-                                    onChangeSearchText={(text) => {
+                                    onChangeSearchText={text => {
                                         const sanitizedText = text.trim();
                                         if (
                                             sanitizedText &&
-                                            !themeItems.some((item) => item.value === sanitizedText) &&
+                                            !themeItems.some(
+                                                item => item.value === sanitizedText,
+                                            ) &&
                                             sanitizedText.length <= 50
                                         ) {
-                                            setThemeItems((prev) => [
+                                            setThemeItems(prev => [
                                                 ...prev,
                                                 {
                                                     label: sanitizedText,
@@ -241,10 +232,7 @@ export function EditAlbumModal({
                                     <Text style={styles.submitTextCancel}>Скасувати</Text>
                                 </TouchableOpacity>
 
-                                <TouchableOpacity
-                                    style={styles.saveButton}
-                                    onPress={handleSubmit}
-                                >
+                                <TouchableOpacity style={styles.saveButton} onPress={handleSubmit}>
                                     <Text style={styles.submitText}>Зберегти</Text>
                                 </TouchableOpacity>
                             </View>

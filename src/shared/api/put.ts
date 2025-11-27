@@ -1,4 +1,4 @@
-import { Result, Success, Error } from "../types/result";
+import { Result } from "../types/result";
 
 interface IPutRequestParams {
     endpoint: string;
@@ -22,15 +22,13 @@ export async function PUT<T>(params: IPutRequestParams): Promise<Result<T>> {
             method: "PUT",
         });
 
-
         const responseData: Result<T> = await response.json();
 
-		if (responseData.status === "error"){
-			return { ...responseData, code: response.status }
-		}
+        if (responseData.status === "error") {
+            return { ...responseData, code: response.status };
+        }
 
-        return responseData
-        
+        return responseData;
     } catch (err) {
         console.error("Помилка в PUT:", err);
 
