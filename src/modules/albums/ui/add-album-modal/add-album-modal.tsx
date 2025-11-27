@@ -8,7 +8,7 @@ import { API_BASE_URL } from "../../../../settings";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useUserContext } from "../../../auth/context/user-context";
 import { useAlbums } from "../../hooks/useAlbums";
-import {IAlbumTheme } from "../../types/albums.types";
+import { IAlbumTheme } from "../../types/albums.types";
 
 interface Props {
     modalVisible: boolean;

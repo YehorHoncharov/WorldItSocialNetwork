@@ -1,13 +1,5 @@
 import React, { useEffect, useState } from "react";
-import {
-    Modal,
-    View,
-    Text,
-    StyleSheet,
-    TouchableOpacity,
-    ScrollView,
-    Alert,
-} from "react-native";
+import { Modal, View, Text, StyleSheet, TouchableOpacity, ScrollView, Alert } from "react-native";
 import { Input } from "../../../src/shared/ui/input";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useUserContext } from "../../../src/modules/auth/context/user-context";

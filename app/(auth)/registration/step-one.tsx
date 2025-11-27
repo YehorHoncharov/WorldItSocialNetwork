@@ -1,13 +1,6 @@
 import { RegFormOne } from "../../../src/modules/auth/ui/reg-form-one";
 import { LoginFormOne } from "../../../src/modules/auth/ui/login-form-one";
-import {
-    Animated,
-    Dimensions,
-    Text,
-    TouchableOpacity,
-    View,
-    StyleSheet,
-} from "react-native";
+import { Animated, Dimensions, Text, TouchableOpacity, View, StyleSheet } from "react-native";
 import { useRef, useState, useEffect } from "react";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 

@@ -18,13 +18,7 @@ interface Props {
     onUpdate: (updatedAlbum: IAlbum) => void;
 }
 
-export function EditAlbumModal({
-    modalVisible,
-    album_id,
-    initialData,
-    onClose,
-    onUpdate,
-}: Props) {
+export function EditAlbumModal({ modalVisible, album_id, initialData, onClose, onUpdate }: Props) {
     const [name, setName] = useState(initialData.name);
     const [topic, setTopic] = useState(initialData.topic);
     const [openTheme, setOpenTheme] = useState(false);
