@@ -80,8 +80,8 @@ export function ModalPost({
             setPosts(posts.filter((post: IPost) => post.id !== postId));
             onClose();
             Alert.alert("Успіх", "Публікацію успішно видалено");
-        } catch (error: any) {
-            console.error("Помилка видалення:", error.message);
+        } catch (error) {
+            if (error instanceof Error) console.error("Помилка видалення:", error.message);
         }
     }
 

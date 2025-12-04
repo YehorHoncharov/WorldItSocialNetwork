@@ -106,7 +106,11 @@ export function UserContextProvider({ children }: IUserContextProviderProps) {
             await AsyncStorage.setItem("token", result.data);
             await getData(result.data);
         } catch (error) {
-            console.error("[login] Error:", error);
+            if (error instanceof Error) {
+                console.error("Error delete:", error.message);
+            } else {
+                console.error("Unknown error");
+            }
         }
     }
 
@@ -167,7 +171,11 @@ export function UserContextProvider({ children }: IUserContextProviderProps) {
                 console.log(err);
             }
         } catch (error) {
-            console.error("Registration error:", error);
+            if (error instanceof Error) {
+                console.error("Error delete:", error.message);
+            } else {
+                console.error("Unknown error");
+            }
         }
     }
 

@@ -4,7 +4,7 @@ interface IPutRequestParams {
     endpoint: string;
     headers?: HeadersInit;
     token?: string;
-    body: any;
+    body: object;
 }
 
 export async function PUT<T>(params: IPutRequestParams): Promise<Result<T>> {

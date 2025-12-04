@@ -79,7 +79,7 @@ export function RecomendFriends({
 
             Alert.alert("Успіх", "Запит відправлено");
         } catch (error) {
-            Alert.alert("Помилка", "Не вдалося зберегти дані");
+            Alert.alert("Error", "Could not save data");
         }
     }
     return (

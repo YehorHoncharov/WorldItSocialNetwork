@@ -157,8 +157,8 @@ export function PrivatChat() {
             setIsUploading(false);
         } catch (error) {
             setIsUploading(false);
-            Alert.alert("Помилка", "Не вдалося відправити повідомлення");
-            console.error("Помилка відправки:", error);
+            Alert.alert("Error", "Could not send message");
+            console.error("Error request:", error);
         }
     };
 
@@ -190,8 +190,8 @@ export function PrivatChat() {
                 setSelectedImages(prev => [...prev, ...newImages]);
             }
         } catch (error) {
-            console.error("Помилка вибору зображення:", error);
-            Alert.alert("Помилка", "Не вдалося вибрати зображення");
+            console.error("Could not select image:", error);
+            Alert.alert("Error", "Could not select image");
         }
     };
 

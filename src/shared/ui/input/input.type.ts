@@ -11,4 +11,4 @@ export interface IInputProps extends TextInputProps {
     width?: number;
 }
 
-export interface IInputPasswordProps extends Omit<IInputProps, "rightIcon" | "leftIcon"> {}
+export type IInputPasswordProps = Omit<IInputProps, "rightIcon" | "leftIcon">;

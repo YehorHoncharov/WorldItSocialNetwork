@@ -67,8 +67,12 @@ export function ModalAlbum({
 
             Alert.alert("Успіх", "Ваш альбом успішно видалився!");
             onClose();
-        } catch (error: any) {
-            console.error("Помилка видалення:", error.message);
+        } catch (error) {
+            if (error instanceof Error) {
+                console.error("Error delete:", error.message);
+            } else {
+                console.error("Unknown error");
+            }
         }
     }
 

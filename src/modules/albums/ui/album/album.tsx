@@ -2,6 +2,7 @@ import { ScrollView, View, Text, TouchableOpacity, Image, Alert } from "react-na
 import { styles } from "./album.style";
 import Dots from "../../../../shared/ui/icons/dots";
 import { useEffect, useState, useRef } from "react";
+import { LayoutChangeEvent } from "react-native";
 import {
     launchImageLibraryAsync,
     MediaTypeOptions,
@@ -18,8 +19,8 @@ export function Album({ scrollOffset = 0, ...props }: IAlbum & { scrollOffset?: 
     const [images, setImages] = useState<IAlbumImageShow[]>([]);
     const [imagesToDelete, setImagesToDelete] = useState<number[]>([]);
     const [modalVisible, setModalVisible] = useState(false);
-    const [dotsPosition, setDotsPosition] = useState({ x: 0, y: 0 });
-    const dotsRef = useRef<any>(null);
+    const [dotsPosition, setDotsPosition] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
+    const dotsRef = useRef<View>(null);
     const [imageDimensions, setImageDimensions] = useState<{
         [key: string]: { width: number; height: number };
     }>({});
@@ -67,7 +68,7 @@ export function Album({ scrollOffset = 0, ...props }: IAlbum & { scrollOffset?: 
         }
     }, [modalVisible, scrollOffset]);
 
-    const handleContainerLayout = (event: any) => {
+    const handleContainerLayout = (event: LayoutChangeEvent) => {
         const { width, height } = event.nativeEvent.layout;
         setContainerSize({ width, height });
     };
@@ -143,8 +144,8 @@ export function Album({ scrollOffset = 0, ...props }: IAlbum & { scrollOffset?: 
             }
         } catch (error) {
             Alert.alert(
-                "Помилка",
-                `Не вдалося вибрати зображення: ${error instanceof Error ? error.message : "Невідома помилка"}`,
+                "Error",
+                `Could not select image: ${error instanceof Error ? error.message : "Unknown error"}`,
             );
         }
     }

@@ -460,7 +460,7 @@ export function Settings() {
                                     color: "#543C52",
                                 }}
                             >
-                                Ім'я та прізвище
+                                Ім`я та прізвище
                             </Text>
                             <Text
                                 style={{

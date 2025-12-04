@@ -109,8 +109,8 @@ export function My(props: IAlbumProps) {
             }
         } catch (error) {
             Alert.alert(
-                "Помилка",
-                `Не вдалося вибрати зображення: ${error instanceof Error ? error.message : "Невідома помилка"}`,
+                "Error",
+                `Could not select image: ${error instanceof Error ? error.message : "Unknown error"}`,
             );
         }
     }

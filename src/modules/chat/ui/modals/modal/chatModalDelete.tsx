@@ -80,7 +80,7 @@ export function ChatModalDelete({
             onMessagesDeleted();
             onClose();
             Alert.alert("Успіх", "Всі повідомлення успішно видалено");
-        } catch (error: any) {
+        } catch (error) {
             console.error("Помилка видалення:", error);
             Alert.alert("Помилка", "Не вдалося видалити повідомлення");
         } finally {

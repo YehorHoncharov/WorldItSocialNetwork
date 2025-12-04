@@ -260,7 +260,7 @@ export function MyPublicationModal({ modalVisible, changeVisibility }: Props) {
                 Alert.alert("Скасовано", "Вибір зображень було скасовано");
             }
         } catch (error) {
-            console.error("[MyPublicationModal] Помилка вибору зображення:", error);
+            console.error("[MyPublicationModal] Error select photo:", error);
             Alert.alert(
                 "Помилка",
                 `Не вдалося вибрати зображення: ${

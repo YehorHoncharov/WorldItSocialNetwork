@@ -84,7 +84,7 @@ export function ChangePostModal({ modalVisible, changeVisibility, postData }: Pr
                 setText(postData.content || "");
                 setLinks(
                     Array.isArray(postData.links)
-                        ? postData.links.map((l: any) =>
+                        ? postData.links.map(l =>
                               typeof l === "string"
                                   ? l
                                   : typeof l === "object" && l !== null && "url" in l
@@ -181,7 +181,7 @@ export function ChangePostModal({ modalVisible, changeVisibility, postData }: Pr
 
                     return { url: img.image.filename };
                 } catch (error) {
-                    console.error("Помилка обробки зображення:", error);
+                    console.error("Error:", error);
                     return null;
                 }
             })
@@ -220,7 +220,7 @@ export function ChangePostModal({ modalVisible, changeVisibility, postData }: Pr
                 Alert.alert("Помилка", response.message || "Не вдалося оновити пост");
             }
         } catch (error) {
-            console.error("Помилка оновлення поста:", error);
+            console.error("Error update post:", error);
             Alert.alert(
                 "Помилка",
                 error instanceof Error ? error.message : "Не вдалося оновити пост",

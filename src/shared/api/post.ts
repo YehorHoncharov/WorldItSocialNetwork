@@ -4,7 +4,7 @@ interface IPostRequestParams {
     endpoint: string;
     headers?: HeadersInit;
     token?: string;
-    body: any;
+    body: object;
 }
 
 export async function POST<T>(params: IPostRequestParams): Promise<Result<T>> {
