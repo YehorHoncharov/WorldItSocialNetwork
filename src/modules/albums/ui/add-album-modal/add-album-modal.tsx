@@ -75,7 +75,7 @@ export function AddAlbumModal({ modalVisible, onClose }: Props) {
             resetForm();
             await refetch();
         } catch (err) {
-            console.error("Error creating album:", err);
+            console.log("Error creating album:", err);
             Alert.alert("Помилка", "Сталася помилка при створенні альбому");
         }
     };

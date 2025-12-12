@@ -159,7 +159,7 @@ export function My(props: IAlbumProps) {
             setImagesToDelete([]);
             setChangeImage(false);
         } catch (err) {
-            console.error("Помилка збереження:", err);
+            console.log("Помилка збереження:", err);
             Alert.alert("Помилка", "Не вдалося зберегти зміни");
         }
     }

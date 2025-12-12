@@ -19,7 +19,7 @@ export function useUsers() {
             setUsers(result);
         } catch (err) {
             const message = err instanceof Error ? err.message : "Unknown error";
-            console.error(message);
+            console.log(message);
             setError(message);
         } finally {
             setIsLoading(false);

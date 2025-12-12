@@ -22,7 +22,7 @@ export function useChats() {
             setChats([...result.data]);
         } catch (error) {
             const message = error instanceof Error ? error.message : "Unknown error";
-            console.error(message);
+            console.log(message);
             setError(message);
         } finally {
             setIsLoading(false);

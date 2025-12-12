@@ -181,7 +181,7 @@ export function ChangePostModal({ modalVisible, changeVisibility, postData }: Pr
 
                     return { url: img.image.filename };
                 } catch (error) {
-                    console.error("Error:", error);
+                    console.log("Error:", error);
                     return null;
                 }
             })
@@ -220,7 +220,7 @@ export function ChangePostModal({ modalVisible, changeVisibility, postData }: Pr
                 Alert.alert("Помилка", response.message || "Не вдалося оновити пост");
             }
         } catch (error) {
-            console.error("Error update post:", error);
+            console.log("Error update post:", error);
             Alert.alert(
                 "Помилка",
                 error instanceof Error ? error.message : "Не вдалося оновити пост",
@@ -352,7 +352,7 @@ export function ChangePostModal({ modalVisible, changeVisibility, postData }: Pr
                                 style={styles.imageAdded}
                                 resizeMode="cover"
                                 onError={error => {
-                                    console.error(
+                                    console.log(
                                         "Помилка завантаження зображення:",
                                         error.nativeEvent,
                                     );

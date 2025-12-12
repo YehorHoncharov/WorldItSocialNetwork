@@ -158,7 +158,7 @@ export function PrivatChat() {
         } catch (error) {
             setIsUploading(false);
             Alert.alert("Error", "Could not send message");
-            console.error("Error request:", error);
+            console.log("Error request:", error);
         }
     };
 
@@ -190,7 +190,7 @@ export function PrivatChat() {
                 setSelectedImages(prev => [...prev, ...newImages]);
             }
         } catch (error) {
-            console.error("Could not select image:", error);
+            console.log("Could not select image:", error);
             Alert.alert("Error", "Could not select image");
         }
     };
