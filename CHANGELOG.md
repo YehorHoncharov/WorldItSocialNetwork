@@ -1,23 +1,21 @@
 # 1.0.0 (2025-12-05)
 
-
 ### Bug Fixes
 
-* update API_BASE_URL to correct server address ([e06a379](https://github.com/sema-gr/WorldItSocialNetwork-Front-End/commit/e06a379df345ec39ea9c4893706a5a644f8c16da))
-
+- update API_BASE_URL to correct server address ([e06a379](https://github.com/YehorHoncharov/WorldItSocialNetwork/commit/e06a379df345ec39ea9c4893706a5a644f8c16da))
 
 ### Features
 
-* add CI workflow for automated builds and testing ([d320460](https://github.com/sema-gr/WorldItSocialNetwork-Front-End/commit/d320460bae4bd08a24d98a3d8b1439d9e23a35d7))
-* add friendship management features and improve UI interactions ([dbfff2d](https://github.com/sema-gr/WorldItSocialNetwork-Front-End/commit/dbfff2d683cd6ade79fa8e832ae462ba01c9a1f9))
-* Add HeaderRegAuth component with styles and routing functionality ([5da7ca1](https://github.com/sema-gr/WorldItSocialNetwork-Front-End/commit/5da7ca1c749ed60e84ef6a7cfc5903a703a1a997))
-* add react-native-signature-canvas for signature input in settings ([c0ffd2d](https://github.com/sema-gr/WorldItSocialNetwork-Front-End/commit/c0ffd2df28da19434304c0e7e22dd60e82463b90))
-* Enhance Button component with icon support and remove Footer component ([348d01e](https://github.com/sema-gr/WorldItSocialNetwork-Front-End/commit/348d01ecfca0b5509587bbed3ab9ef7cafc32c13))
-* enhance friends and user management features with improved UI and state handling ([6673def](https://github.com/sema-gr/WorldItSocialNetwork-Front-End/commit/6673deff8664aedcc2512f725f5501ec59c558f9))
-* enhance private chat UI with improved image handling, multi-image selection, and full-screen preview ([900d752](https://github.com/sema-gr/WorldItSocialNetwork-Front-End/commit/900d752450ffd199e8e4e42e9db0677f90f901bf))
-* Implement Homepage component to display posts and update MainPage layout ([97843b0](https://github.com/sema-gr/WorldItSocialNetwork-Front-End/commit/97843b079fd92078aacc61c29fa850ee49f1b20c))
-* implement image upload functionality in chat, enhance message handling, and add delete modal for messages ([6cd7d37](https://github.com/sema-gr/WorldItSocialNetwork-Front-End/commit/6cd7d37845ee779371fc6b468c95b97b1bd9625d))
-* update album and chat components with new icons and improved functionality ([e665e72](https://github.com/sema-gr/WorldItSocialNetwork-Front-End/commit/e665e7221acdae828f61a6beb4d6b8db0eeebb97))
-* update API endpoints and base URL; add husky pre-commit hook ([4980893](https://github.com/sema-gr/WorldItSocialNetwork-Front-End/commit/4980893ba16f42349380fb08b3acc5575acd6e30))
-* Update dependencies and enhance publication modal ([cb755e4](https://github.com/sema-gr/WorldItSocialNetwork-Front-End/commit/cb755e4d87f0690771d1cd28df166074b2d8738f))
-* Update layout components and enhance keyboard handling with new dependencies ([4ac1a40](https://github.com/sema-gr/WorldItSocialNetwork-Front-End/commit/4ac1a4086cb649c6d45e1a471b8aef46148e2b0c))
+- add CI workflow for automated builds and testing ([d320460](https://github.com/YehorHoncharov/WorldItSocialNetwork/commit/d320460bae4bd08a24d98a3d8b1439d9e23a35d7))
+- add friendship management features and improve UI interactions ([dbfff2d](https://github.com/YehorHoncharov/WorldItSocialNetwork/commit/dbfff2d683cd6ade79fa8e832ae462ba01c9a1f9))
+- Add HeaderRegAuth component with styles and routing functionality ([5da7ca1](https://github.com/YehorHoncharov/WorldItSocialNetwork/commit/5da7ca1c749ed60e84ef6a7cfc5903a703a1a997))
+- add react-native-signature-canvas for signature input in settings ([c0ffd2d](https://github.com/YehorHoncharov/WorldItSocialNetwork/commit/c0ffd2df28da19434304c0e7e22dd60e82463b90))
+- Enhance Button component with icon support and remove Footer component ([348d01e](https://github.com/YehorHoncharov/WorldItSocialNetwork/commit/348d01ecfca0b5509587bbed3ab9ef7cafc32c13))
+- enhance friends and user management features with improved UI and state handling ([6673def](https://github.com/YehorHoncharov/WorldItSocialNetwork/commit/6673deff8664aedcc2512f725f5501ec59c558f9))
+- enhance private chat UI with improved image handling, multi-image selection, and full-screen preview ([900d752](https://github.com/YehorHoncharov/WorldItSocialNetwork/commit/900d752450ffd199e8e4e42e9db0677f90f901bf))
+- Implement Homepage component to display posts and update MainPage layout ([97843b0](https://github.com/YehorHoncharov/WorldItSocialNetwork/commit/97843b079fd92078aacc61c29fa850ee49f1b20c))
+- implement image upload functionality in chat, enhance message handling, and add delete modal for messages ([6cd7d37](https://github.com/YehorHoncharov/WorldItSocialNetwork/commit/6cd7d37845ee779371fc6b468c95b97b1bd9625d))
+- update album and chat components with new icons and improved functionality ([e665e72](https://github.com/YehorHoncharov/WorldItSocialNetwork/commit/e665e7221acdae828f61a6beb4d6b8db0eeebb97))
+- update API endpoints and base URL; add husky pre-commit hook ([4980893](https://github.com/YehorHoncharov/WorldItSocialNetwork/commit/4980893ba16f42349380fb08b3acc5575acd6e30))
+- Update dependencies and enhance publication modal ([cb755e4](https://github.com/YehorHoncharov/WorldItSocialNetwork/commit/cb755e4d87f0690771d1cd28df166074b2d8738f))
+- Update layout components and enhance keyboard handling with new dependencies ([4ac1a40](https://github.com/YehorHoncharov/WorldItSocialNetwork/commit/4ac1a4086cb649c6d45e1a471b8aef46148e2b0c))

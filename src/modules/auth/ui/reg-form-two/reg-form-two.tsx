@@ -15,9 +15,9 @@ const defaultImage = require("../../../../shared/ui/images/bitch.png");
 
 export function RegFormTwo() {
     const params = useLocalSearchParams<{
-        username: string;
-        email: string;
-        password: string;
+        username?: string;
+        email?: string;
+        password?: string;
     }>();
 
     const { control, handleSubmit } = useForm<IRegisterForm>();
@@ -26,34 +26,37 @@ export function RegFormTwo() {
     const router = useRouter();
 
     function onSubmit(data: IRegisterForm) {
-        const { ...rightData } = data;
-
         const fullParams = {
-            ...rightData,
+            ...data,
             ...params,
         };
 
-        sendCode(params.email);
-        router.navigate({
+        if (params.email) {
+            sendCode(params.email);
+        }
+
+        router.push({
             pathname: "/registration/step-three",
             params: fullParams,
         });
     }
 
     async function onSearch() {
-        const result = await requestMediaLibraryPermissionsAsync();
-        if (result.status === "granted") {
+        const { status } = await requestMediaLibraryPermissionsAsync();
+        if (status === "granted") {
             const images = await launchImageLibraryAsync({
-                mediaTypes: "images",
                 allowsEditing: true,
                 allowsMultipleSelection: false,
                 selectionLimit: 1,
                 base64: false,
             });
 
-            if (images.assets) {
+            if (images.assets && images.assets.length > 0) {
                 setImage(images.assets[0].uri);
             }
+        } else {
+            console.warn("Permission to access media library denied");
+            // Можна показати Alert або Toast користувачу
         }
     }
 
@@ -64,76 +67,51 @@ export function RegFormTwo() {
                 source={require("../../../../shared/ui/images/black-bitch.png")}
             />
             <Text style={styles.headerText}>Sign up</Text>
-            <Text
-                style={{
-                    color: COLORS.blue20,
-                    textAlign: "center",
-                    maxWidth: 170,
-                }}
-            >
+            <Text style={{ color: COLORS.blue20, textAlign: "center", maxWidth: 170 }}>
                 Please enter your personal information
             </Text>
             <Controller
                 control={control}
                 name="name"
                 rules={{
-                    required: {
-                        value: true,
-                        message: "Name is required",
-                    },
-                    minLength: {
-                        value: 3,
-                        message: "Name must be at least 3 characters long",
-                    },
+                    required: { value: true, message: "Name is required" },
+                    minLength: { value: 3, message: "Name must be at least 3 characters long" },
                 }}
-                render={({ field, fieldState }) => {
-                    return (
-                        <Input
-                            value={field.value}
-                            onChangeText={field.onChange}
-                            onChange={field.onChange}
-                            placeholder="Nickname"
-                            error={fieldState.error?.message}
-                        />
-                    );
-                }}
+                render={({ field, fieldState }) => (
+                    <Input
+                        value={field.value}
+                        onChangeText={field.onChange}
+                        placeholder="Nickname"
+                        error={fieldState.error?.message}
+                    />
+                )}
             />
             <Controller
                 control={control}
                 name="about"
                 rules={{
-                    required: {
-                        value: true,
-                        message: "About is required",
-                    },
+                    required: { value: true, message: "About is required" },
                     maxLength: {
                         value: 100,
-                        message: "About must be conrain a maximum of 100 characters",
+                        message: "About must contain a maximum of 100 characters",
                     },
                 }}
-                render={({ field, fieldState }) => {
-                    return (
-                        <Input
-                            value={field.value}
-                            onChange={field.onChange}
-                            onChangeText={field.onChange}
-                            placeholder="About"
-                            height={120}
-                            error={fieldState.error?.message}
-                        />
-                    );
-                }}
+                render={({ field, fieldState }) => (
+                    <Input
+                        value={field.value}
+                        onChangeText={field.onChange}
+                        placeholder="About"
+                        height={120}
+                        error={fieldState.error?.message}
+                    />
+                )}
             />
             <TouchableOpacity onPress={onSearch}>
                 <View style={styles.imageContainer}>
                     <View style={styles.imageWrapper}>
                         <Image
                             source={image ? { uri: image } : defaultImage}
-                            style={{
-                                width: 75,
-                                height: 75,
-                                borderRadius: 37.5,
-                            }}
+                            style={{ width: 75, height: 75, borderRadius: 37.5 }}
                             resizeMode="cover"
                         />
                         <PlusIcon width={32} height={34} style={styles.searchIcon} />

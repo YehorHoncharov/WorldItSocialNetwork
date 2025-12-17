@@ -1,19 +1,26 @@
 import { API_BASE_URL } from "../../../settings";
 import { Response } from "../context/types";
 
-export async function sendCode(email: string) {
+export async function sendCode(email: string): Promise<void> {
     try {
-        const response = await fetch(`${API_BASE_URL}/user/sendCode`, {
+        const response = await fetch(`${API_BASE_URL}/users/sendCode`, {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ email: email }),
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ email }),
         });
+
         const result: Response<string> = await response.json();
 
         if (result.status === "error") {
-            return;
+            console.log("Error sending code:", result.message);
         }
     } catch (error) {
-        console.log("Login error:", error);
+        if (error instanceof Error) {
+            console.log("sendCode error:", error.message);
+        } else {
+            console.log("sendCode unknown error", error);
+        }
     }
 }

@@ -7,7 +7,7 @@ export function useUserByID(id: number) {
     useEffect(() => {
         async function getUser() {
             try {
-                const response = await fetch(`${API_BASE_URL}/user/${id}`);
+                const response = await fetch(`${API_BASE_URL}/users/${id}`);
                 const user = await response.json();
                 if (user.status === "error") {
                     return;

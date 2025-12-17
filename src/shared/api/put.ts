@@ -30,7 +30,7 @@ export async function PUT<T>(params: IPutRequestParams): Promise<Result<T>> {
 
         return responseData;
     } catch (err) {
-        console.error("Помилка в PUT:", err);
+        console.log("Помилка в PUT:", err);
 
         return {
             status: "error",

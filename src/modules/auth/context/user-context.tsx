@@ -19,7 +19,6 @@ interface IUserContext {
         username: string,
     ) => void;
     isAuthenticated: () => boolean;
-    updateUser: (updatedUser: IUser) => void;
     refreshUser: () => void;
     setShowWelcomeModal: (value: boolean) => void;
     showWelcomeModal: boolean;
@@ -31,7 +30,6 @@ const initialValue: IUserContext = {
     login: async () => {},
     register: async () => {},
     isAuthenticated: () => false,
-    updateUser: async () => {},
     refreshUser: async () => {},
     setShowWelcomeModal: () => {},
     showWelcomeModal: false,
@@ -75,27 +73,12 @@ export function UserContextProvider({ children }: IUserContextProviderProps) {
         }
     }
 
-    // useEffect(() => {
-    //     async function refreshUser() {
-    //         const token = await AsyncStorage.getItem("token");
-    //         if (token) {
-    //             const interval = setInterval(() => {
-    //                 getData(token);
-    //             }, 3000);
-
-    //             return () => clearInterval(interval);
-    //         }
-    //     }
-    //     refreshUser();
-    // }, [])
-
     async function login(email: string, password: string) {
         try {
             const response = await fetch(`${API_BASE_URL}/users/log`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
-                    // "Cache-Control": "no-cache",
                 },
                 body: JSON.stringify({ email, password }),
             });
@@ -107,9 +90,9 @@ export function UserContextProvider({ children }: IUserContextProviderProps) {
             await getData(result.data);
         } catch (error) {
             if (error instanceof Error) {
-                console.error("Error delete:", error.message);
+                console.log("Error delete:", error.message);
             } else {
-                console.error("Unknown error");
+                console.log("Unknown error");
             }
         }
     }
@@ -133,10 +116,10 @@ export function UserContextProvider({ children }: IUserContextProviderProps) {
             const result: Response<string> = await response.json();
             if (result.status === "error") {
                 Alert.alert("Помилка Реєстрації!", result.message);
-                throw console.log(result.message);
+                throw new Error(result.message);
             }
-            AsyncStorage.setItem("token", result.data);
-            getData(result.data);
+            await AsyncStorage.setItem("token", result.data);
+            await getData(result.data);
 
             try {
                 const create_start_album = await POST({
@@ -165,16 +148,15 @@ export function UserContextProvider({ children }: IUserContextProviderProps) {
 
                 if (create_start_album.status === "error") {
                     console.log(create_start_album.message + " CREATED!");
-                    return;
                 }
             } catch (err) {
                 console.log(err);
             }
         } catch (error) {
             if (error instanceof Error) {
-                console.error("Error delete:", error.message);
+                console.log("Registration error:", error.message);
             } else {
-                console.error("Unknown error");
+                console.log("Unknown registration error");
             }
         }
     }
@@ -192,26 +174,21 @@ export function UserContextProvider({ children }: IUserContextProviderProps) {
                 });
                 const result = await response.json();
                 if (result.status === "error") {
-                    console.error("[logout] Server error:", result.message);
+                    console.log("[logout] Server error:", result.message);
                 }
             }
 
             await AsyncStorage.multiRemove(["token", "user"]);
             setUser(null);
         } catch (error) {
-            console.error("[logout] Error:", error);
+            console.log("[logout] Error:", error);
             throw error;
         }
     }
 
-    async function updateUser(updatedUser: IUser) {
-        try {
-            setUser(updatedUser);
-            await AsyncStorage.setItem("user", JSON.stringify(updatedUser));
-        } catch (error) {
-            console.error("[updateUser] Error:", error);
-        }
-    }
+    useEffect(() => {
+        refreshUser();
+    }, []);
 
     async function refreshUser() {
         try {
@@ -222,31 +199,13 @@ export function UserContextProvider({ children }: IUserContextProviderProps) {
                 setUser(null);
             }
         } catch (error) {
-            console.error("[refreshUser] Error:", error);
+            console.log("[refreshUser] Error:", error);
         }
     }
 
     function isAuthenticated() {
         return !!user;
     }
-
-    useEffect(() => {
-        async function checkToken() {
-            const token = await AsyncStorage.getItem("token");
-            if (token) {
-                const interval = setInterval(() => {
-                    getData(token);
-                }, 500);
-
-                return () => clearInterval(interval);
-            } else {
-                router.push({
-                    pathname: "/registration/step-one",
-                });
-            }
-        }
-        checkToken();
-    }, []);
 
     return (
         <userContext.Provider
@@ -255,7 +214,6 @@ export function UserContextProvider({ children }: IUserContextProviderProps) {
                 login,
                 register,
                 isAuthenticated,
-                updateUser,
                 refreshUser,
                 showWelcomeModal,
                 setShowWelcomeModal,

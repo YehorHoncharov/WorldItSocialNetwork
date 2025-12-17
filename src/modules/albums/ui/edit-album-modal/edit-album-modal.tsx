@@ -95,7 +95,7 @@ export function EditAlbumModal({ modalVisible, album_id, initialData, onClose, o
             });
             onClose();
         } catch (err) {
-            console.error(err);
+            console.log(err);
             Alert.alert("Помилка", "Сталася помилка при оновленні альбому");
         }
     };

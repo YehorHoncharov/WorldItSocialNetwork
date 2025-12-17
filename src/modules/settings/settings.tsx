@@ -19,18 +19,8 @@ import { Controller, useForm } from "react-hook-form";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { launchImageLibraryAsync, requestMediaLibraryPermissionsAsync } from "expo-image-picker";
 import { API_BASE_URL } from "../../settings";
-
-interface IUserForm {
-    id: number;
-    name?: string;
-    username?: string;
-    surname?: string;
-    dateOfBirth?: Date;
-    email: string;
-    password: string;
-    signature?: string;
-    image?: string;
-}
+import { IUserForm } from "./types";
+import { IUser } from "../auth/types";
 
 export function Settings() {
     const { control, handleSubmit, reset } = useForm<IUserForm>({
@@ -53,21 +43,33 @@ export function Settings() {
     async function handleSave(data: IUserForm) {
         const formattedImage = data.image ? data.image : "";
 
+        if ((data.oldPassword && !data.newPassword) || (!data.oldPassword && data.newPassword)) {
+            Alert.alert("Помилка", "Для зміни пароля потрібно ввести і старий, і новий пароль");
+            return;
+        }
+
         try {
             if (!user) return;
-            const response = await fetch(`${API_BASE_URL}/user/${user.id}`, {
+
+            const body: any = {
+                name: data.name,
+                username: data.username,
+                surname: data.surname,
+                dateOfBirth: data.dateOfBirth ? new Date(data.dateOfBirth) : new Date(),
+                email: data.email,
+                signature: data.signature,
+                image: formattedImage,
+            };
+
+            if (data.oldPassword && data.newPassword) {
+                body.oldPassword = data.oldPassword;
+                body.newPassword = data.newPassword;
+            }
+
+            const response = await fetch(`${API_BASE_URL}/users/${user.id}`, {
                 method: "PUT",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    name: data.name,
-                    username: data.username,
-                    surname: data.surname,
-                    dateOfBirth: data.dateOfBirth ? new Date(data.dateOfBirth) : new Date(),
-                    email: data.email,
-                    password: data.password,
-                    signature: data.signature,
-                    image: formattedImage,
-                }),
+                body: JSON.stringify(body),
             });
             const result = await response.json();
 
@@ -77,10 +79,17 @@ export function Settings() {
             }
             setIsEditing(false);
             setIsEditing2(false);
+
+            reset({
+                ...data,
+                oldPassword: "",
+                newPassword: "",
+            });
         } catch (error) {
             Alert.alert("Помилка", "Не вдалося зберегти дані");
         }
     }
+
     function handleEditToggle2() {
         setIsEditing2(!isEditing2);
     }
@@ -98,9 +107,10 @@ export function Settings() {
                     surname: user.surname || "",
                     dateOfBirth: user.date_of_birth ? new Date(user.date_of_birth) : new Date(),
                     email: user.email || "",
-                    password: user.password || "",
+                    oldPassword: "",
+                    newPassword: "",
                     signature: user.signature || "",
-                    image: `${API_BASE_URL}/${user.image}` || "",
+                    image: user.image ? `${API_BASE_URL}/${user.image}` : "",
                 });
             }
         }
@@ -424,13 +434,30 @@ export function Settings() {
                                 />
                             )}
                         />
+                        <Text>Для зміни паролю необхідно ввести старий та новий паролі!</Text>
                         <Controller
                             control={control}
-                            name="password"
+                            name="newPassword"
                             render={({ field }) => (
                                 <Input.Password
                                     style={{ width: "100%" }}
-                                    label="Пароль"
+                                    label="Новий пароль"
+                                    placeholder="Введіть ваш пароль"
+                                    secureTextEntry
+                                    editable={isEditing2}
+                                    value={field.value}
+                                    onChange={field.onChange}
+                                    onChangeText={field.onChange}
+                                />
+                            )}
+                        />
+                        <Controller
+                            control={control}
+                            name="oldPassword"
+                            render={({ field }) => (
+                                <Input.Password
+                                    style={{ width: "100%" }}
+                                    label="Старий пароль"
                                     placeholder="Введіть ваш пароль"
                                     secureTextEntry
                                     editable={isEditing2}

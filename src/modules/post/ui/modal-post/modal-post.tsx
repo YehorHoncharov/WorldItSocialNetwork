@@ -66,7 +66,7 @@ export function ModalPost({
 
     async function handleDelete(postId: number) {
         if (!tokenUser) {
-            console.error("No token found");
+            console.log("No token found");
             return;
         }
         try {
@@ -81,7 +81,7 @@ export function ModalPost({
             onClose();
             Alert.alert("Успіх", "Публікацію успішно видалено");
         } catch (error) {
-            if (error instanceof Error) console.error("Помилка видалення:", error.message);
+            if (error instanceof Error) console.log("Помилка видалення:", error.message);
         }
     }
 

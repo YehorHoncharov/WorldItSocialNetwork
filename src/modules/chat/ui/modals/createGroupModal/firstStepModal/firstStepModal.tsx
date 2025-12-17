@@ -113,7 +113,7 @@ export function AddFriendModal({ modalVisible, onClose }: Props) {
                 });
             }
         } catch (err) {
-            console.error("Error creating chat/group:", err);
+            console.log("Error creating chat/group:", err);
             Alert.alert("Помилка", "Сталася помилка при створенні групи");
         }
     };

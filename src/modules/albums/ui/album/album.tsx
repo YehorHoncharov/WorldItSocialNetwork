@@ -164,7 +164,7 @@ export function Album({ scrollOffset = 0, ...props }: IAlbum & { scrollOffset?: 
                                 style={styles.imageAdded}
                                 resizeMode="cover"
                                 onError={error => {
-                                    console.error(
+                                    console.log(
                                         "Помилка завантаження зображення:",
                                         error.nativeEvent,
                                     );
@@ -250,7 +250,7 @@ export function Album({ scrollOffset = 0, ...props }: IAlbum & { scrollOffset?: 
             setImagesToDelete([]);
             setIsChange(false);
         } catch (err) {
-            console.error("Помилка збереження:", err);
+            console.log("Помилка збереження:", err);
             Alert.alert("Помилка", "Не вдалося зберегти зміни");
         }
     }

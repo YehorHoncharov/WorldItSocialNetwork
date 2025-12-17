@@ -1,4 +1,4 @@
-import { SafeAreaView } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import Providers from "../providers";
 import { AlbumHeader } from "../../src/modules/albums/ui/album-header/album-header";
 

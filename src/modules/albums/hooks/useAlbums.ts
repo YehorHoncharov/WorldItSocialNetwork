@@ -23,7 +23,7 @@ export function useAlbums() {
         } catch (error) {
             const err = error instanceof Error ? error.message : "Unknown error";
             setError(err);
-            console.error(err);
+            console.log(err);
         } finally {
             setIsLoading(false);
         }
