@@ -22,26 +22,7 @@ import SendArrow from "../../../../shared/ui/icons/send-arrow";
 import { styles } from "./change-post.styles";
 import { IPost, IPostImg } from "../../types/post";
 import { API_BASE_URL } from "../../../../settings";
-
-interface TagItem {
-    label: string;
-    value: string;
-}
-
-interface UpdateData {
-    title: string;
-    theme: string;
-    content: string;
-    links?: string;
-    tags?: string[];
-    images?: ({ id?: number; url: string } | { id: number; url?: string })[];
-}
-
-interface Props {
-    modalVisible: boolean;
-    changeVisibility: () => void;
-    postData: IPost | null;
-}
+import { Props, TagItem, UpdateData } from "./types";
 
 export function ChangePostModal({ modalVisible, changeVisibility, postData }: Props) {
     const [name, setName] = useState("");

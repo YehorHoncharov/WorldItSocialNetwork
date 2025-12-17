@@ -77,7 +77,6 @@ export default function Register() {
                 </View>
             </View>
         </KeyboardAwareScrollView>
-        // </SafeAreaView>
     );
 }
 

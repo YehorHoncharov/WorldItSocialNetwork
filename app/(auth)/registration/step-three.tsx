@@ -1,5 +1,6 @@
 import { router } from "expo-router";
-import { SafeAreaView, ScrollView } from "react-native";
+import { ScrollView } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { RegFormThree } from "../../../src/modules/auth/ui/reg-form-three";
 
 export default function RegThree() {

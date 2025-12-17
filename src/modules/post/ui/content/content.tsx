@@ -57,7 +57,6 @@ export function Content(props: IPost) {
             >
                 {rowImages.map((imageItem, index) => {
                     const imageUrl = getImageUrl(imageItem.image.filename);
-
                     if (!imageUrl) return null;
 
                     return (

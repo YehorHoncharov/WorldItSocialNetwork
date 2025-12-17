@@ -20,10 +20,9 @@ export interface PostData {
     likes: number | null;
 }
 
-export interface Props {
-    modalVisible: boolean;
-    changeVisibility: () => void;
-    postData: IPost;
+export interface ImageUpdate {
+    create?: { url: string }[];
+    delete?: string[];
 }
 
 export interface TagItem {
@@ -31,19 +30,17 @@ export interface TagItem {
     value: string;
 }
 
-export interface ImageUpdate {
-    create?: { url: string }[];
-    delete?: string[];
-}
-
 export interface UpdateData {
-    name?: string;
-    theme?: string;
-    text?: string;
+    title: string;
+    theme: string;
+    content: string;
     links?: string;
     tags?: string[];
-    images?: {
-        create?: { url: string }[];
-        delete?: { id: number }[];
-    };
+    images?: ({ id?: number; url: string } | { id: number; url?: string })[];
+}
+
+export interface Props {
+    modalVisible: boolean;
+    changeVisibility: () => void;
+    postData: IPost | null;
 }

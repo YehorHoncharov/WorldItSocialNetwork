@@ -188,7 +188,7 @@ export function UserContextProvider({ children }: IUserContextProviderProps) {
 
     useEffect(() => {
         refreshUser();
-    });
+    }, []);
 
     async function refreshUser() {
         try {
