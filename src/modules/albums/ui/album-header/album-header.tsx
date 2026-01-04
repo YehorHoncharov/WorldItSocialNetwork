@@ -15,50 +15,48 @@ import { My } from "../my/my";
 import { Album } from "../album/album";
 import { NoAlbums } from "../no-albums/no-albums";
 import { useUserContext } from "../../../auth/context/user-context";
-import { IAlbum } from "../../types/albums.types";
 
 const screenWidth = Dimensions.get("window").width;
 
 export function AlbumHeader() {
-    const [activeTab, setActiveTab] = useState("personal");
+    const [activeTab, setActiveTab] = useState<"personal" | "albums">("personal");
     const translateX = useRef(new Animated.Value(0)).current;
-    const { user } = useUserContext();
+    const { user, refreshUser } = useUserContext();
     const { albums, refetch, error } = useAlbums();
-    const [userAlbums, setUserAlbums] = useState<IAlbum[]>([]);
-    const [isLoading, setIsLoading] = useState<boolean>(false);
+    const [isLoading, setIsLoading] = useState(false);
 
     useEffect(() => {
+        if (!user) return;
+
         const interval = setInterval(() => {
             refetch();
+            refreshUser();
         }, 3000);
 
         return () => clearInterval(interval);
-    }, []);
+    }, [user]);
 
-    const correctAlbums = albums.filter(album => album.author_id === user?.id);
-
-    const filteredAlbums = useMemo(() => {
+    const userAlbums = useMemo(() => {
         if (!user) return [];
         return albums.filter(album => album.author_id.toString() === user.id.toString());
     }, [albums, user]);
 
     useEffect(() => {
-        setUserAlbums(filteredAlbums);
-    }, [filteredAlbums]);
-
-    useEffect(() => {
         translateX.setValue(0);
     }, []);
 
-    const handleTabPress = (tab: string) => {
-        const toValue = tab === "personal" ? 0 : -screenWidth;
+    const handleTabPress = (tab: "personal" | "albums") => {
         Animated.timing(translateX, {
-            toValue,
+            toValue: tab === "personal" ? 0 : -screenWidth,
             duration: 300,
             useNativeDriver: true,
         }).start();
+
         setActiveTab(tab);
     };
+
+    const mainAlbum = userAlbums[0];
+    const otherAlbums = userAlbums.slice(1);
 
     return (
         <View style={{ flex: 1 }}>
@@ -70,6 +68,7 @@ export function AlbumHeader() {
                         Особиста інформація
                     </Text>
                 </TouchableOpacity>
+
                 <TouchableOpacity style={styles.tabItem} onPress={() => handleTabPress("albums")}>
                     <Text style={[styles.tabText, activeTab === "albums" && styles.tabTextActive]}>
                         Альбоми
@@ -115,30 +114,31 @@ export function AlbumHeader() {
                             }}
                             contentContainerStyle={{ gap: 8, paddingBottom: 60 }}
                         >
-                            <View
-                                style={{
-                                    alignItems: "center",
-                                    justifyContent: "center",
-                                    paddingTop: 16,
-                                    backgroundColor: "#E9E5EE",
-                                }}
-                            >
-                                <My albums={correctAlbums} />
-                            </View>
-                            {userAlbums.length > 1 ? (
-                                userAlbums
-                                    .slice(1)
-                                    .map(item => (
-                                        <Album
-                                            key={`${item.id}`}
-                                            id={item.id}
-                                            name={item.name}
-                                            topic={item.topic}
-                                            created_at={item.created_at}
-                                            author_id={item.author_id}
-                                            images={item.images}
-                                        />
-                                    ))
+                            {mainAlbum && (
+                                <View
+                                    style={{
+                                        alignItems: "center",
+                                        justifyContent: "center",
+                                        paddingTop: 16,
+                                        backgroundColor: "#E9E5EE",
+                                    }}
+                                >
+                                    <My albums={[mainAlbum]} />
+                                </View>
+                            )}
+
+                            {otherAlbums.length > 0 ? (
+                                otherAlbums.map(item => (
+                                    <Album
+                                        key={item.id}
+                                        id={item.id}
+                                        name={item.name}
+                                        topic={item.topic}
+                                        created_at={item.created_at}
+                                        author_id={item.author_id}
+                                        images={item.images}
+                                    />
+                                ))
                             ) : (
                                 <NoAlbums />
                             )}
@@ -157,7 +157,6 @@ const styles = StyleSheet.create({
         flexDirection: "row",
         justifyContent: "center",
         width: "100%",
-        alignContent: "center",
         backgroundColor: "#E9E5EE",
     },
     tabItem: {

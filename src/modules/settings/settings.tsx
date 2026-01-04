@@ -20,7 +20,6 @@ import DateTimePicker from "@react-native-community/datetimepicker";
 import { launchImageLibraryAsync, requestMediaLibraryPermissionsAsync } from "expo-image-picker";
 import { API_BASE_URL } from "../../settings";
 import { IUserForm } from "./types";
-import { IUser } from "../auth/types";
 
 export function Settings() {
     const { control, handleSubmit, reset } = useForm<IUserForm>({
@@ -29,7 +28,7 @@ export function Settings() {
             image: "",
         },
     });
-    const { user } = useUserContext();
+    const { user, refreshUser } = useUserContext();
     const [isEditing, setIsEditing] = useState(false);
     const [isEditing2, setIsEditing2] = useState(false);
     const router = useRouter();
@@ -41,42 +40,41 @@ export function Settings() {
     }
 
     async function handleSave(data: IUserForm) {
-        const formattedImage = data.image ? data.image : "";
+        if (!user) return;
 
-        if ((data.oldPassword && !data.newPassword) || (!data.oldPassword && data.newPassword)) {
-            Alert.alert("Помилка", "Для зміни пароля потрібно ввести і старий, і новий пароль");
-            return;
+        const isImageChanged = data.image !== `${API_BASE_URL}/${user.image}`;
+
+        const body: any = {
+            name: data.name,
+            username: data.username,
+            surname: data.surname,
+            dateOfBirth: data.dateOfBirth ? new Date(data.dateOfBirth) : new Date(),
+            email: data.email,
+            signature: data.signature,
+            image: isImageChanged ? data.image : user.image,
+        };
+
+        if (data.oldPassword && data.newPassword) {
+            body.oldPassword = data.oldPassword;
+            body.newPassword = data.newPassword;
         }
 
         try {
-            if (!user) return;
-
-            const body: any = {
-                name: data.name,
-                username: data.username,
-                surname: data.surname,
-                dateOfBirth: data.dateOfBirth ? new Date(data.dateOfBirth) : new Date(),
-                email: data.email,
-                signature: data.signature,
-                image: formattedImage,
-            };
-
-            if (data.oldPassword && data.newPassword) {
-                body.oldPassword = data.oldPassword;
-                body.newPassword = data.newPassword;
-            }
-
             const response = await fetch(`${API_BASE_URL}/users/${user.id}`, {
                 method: "PUT",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(body),
             });
+
             const result = await response.json();
 
             if (result.status === "error") {
                 Alert.alert("Помилка", result.message);
                 return;
             }
+
+            Alert.alert("Успіх", "Дані успішно збережено");
+
             setIsEditing(false);
             setIsEditing2(false);
 
@@ -85,9 +83,10 @@ export function Settings() {
                 oldPassword: "",
                 newPassword: "",
             });
-        } catch (error) {
+        } catch {
             Alert.alert("Помилка", "Не вдалося зберегти дані");
         }
+        refreshUser();
     }
 
     function handleEditToggle2() {
@@ -347,7 +346,7 @@ export function Settings() {
                             )}
                         </TouchableOpacity>
                     </View>
-                    <View>
+                    <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
                         <Controller
                             control={control}
                             name="name"
@@ -434,7 +433,7 @@ export function Settings() {
                                 />
                             )}
                         />
-                        <Text>Для зміни паролю необхідно ввести старий та новий паролі!</Text>
+
                         <Controller
                             control={control}
                             name="newPassword"
@@ -467,6 +466,17 @@ export function Settings() {
                                 />
                             )}
                         />
+                        <Text
+                            style={{
+                                color: "#543C52",
+                                fontSize: 14,
+                                marginTop: 8,
+                                alignItems: "center",
+                                textAlign: "center",
+                            }}
+                        >
+                            Для зміни паролю необхідно ввести старий та новий паролі!
+                        </Text>
                     </View>
                 </View>
 

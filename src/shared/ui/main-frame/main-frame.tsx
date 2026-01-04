@@ -8,14 +8,19 @@ import L from "../icons/logo-orange/l";
 import D from "../icons/logo-orange/d";
 import I from "../icons/logo-orange/i";
 import T from "../icons/logo-orange/t";
+import { useEffect } from "react";
 
 export function MainFrame() {
     const router = useRouter();
-    function onPress() {
-        router.navigate("/home");
-    }
+
+    useEffect(() => {
+        setTimeout(() => {
+            router.replace("/home");
+        }, 1000);
+    });
+
     return (
-        <TouchableWithoutFeedback onPress={onPress}>
+        <TouchableWithoutFeedback>
             <View style={styles.contsiner}>
                 <View style={styles.up}>
                     <Image

@@ -1,9 +1,11 @@
 import { Stack } from "expo-router";
 import Providers from "./providers";
+import { StatusBar } from "expo-status-bar";
 
 export default function RootLayout() {
     return (
         <Providers>
+            <StatusBar style="dark" />
             <Stack>
                 <Stack.Screen
                     name="index"
@@ -18,19 +20,12 @@ export default function RootLayout() {
                     }}
                 />
                 <Stack.Screen
-                    name="(main)"
-                    options={{
-                        headerShown: false,
-                    }}
-                />
-                <Stack.Screen
                     name="(chats)"
                     options={{
                         headerShown: false,
                     }}
                 />
                 <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-                <Stack.Screen name="(settings)" options={{ headerShown: false }} />
                 <Stack.Screen name="(friends)" options={{ headerShown: false }} />
             </Stack>
         </Providers>

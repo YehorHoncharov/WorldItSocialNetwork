@@ -19,9 +19,9 @@ interface IUserContext {
         username: string,
     ) => void;
     isAuthenticated: () => boolean;
-    refreshUser: () => void;
     setShowWelcomeModal: (value: boolean) => void;
     showWelcomeModal: boolean;
+    refreshUser: () => void;
     logout: () => void;
 }
 
@@ -30,10 +30,10 @@ const initialValue: IUserContext = {
     login: async () => {},
     register: async () => {},
     isAuthenticated: () => false,
-    refreshUser: async () => {},
     setShowWelcomeModal: () => {},
     showWelcomeModal: false,
     logout: async () => {},
+    refreshUser: () => {},
 };
 
 const userContext = createContext<IUserContext>(initialValue);
@@ -66,9 +66,9 @@ export function UserContextProvider({ children }: IUserContextProviderProps) {
             await AsyncStorage.setItem("user", JSON.stringify(result.data));
             return result.data;
         } catch (error) {
-            router.push({
-                pathname: "/registration/step-one",
-            });
+            // router.push({
+            //     pathname: "/registration/step-one",
+            // });
             return null;
         }
     }
@@ -90,7 +90,8 @@ export function UserContextProvider({ children }: IUserContextProviderProps) {
             await getData(result.data);
         } catch (error) {
             if (error instanceof Error) {
-                console.log("Error delete:", error.message);
+                Alert.alert("Помилка Входу!", error.message);
+                console.log("Error:", error.message);
             } else {
                 console.log("Unknown error");
             }
@@ -163,23 +164,13 @@ export function UserContextProvider({ children }: IUserContextProviderProps) {
 
     async function logout() {
         try {
-            const token = await AsyncStorage.getItem("token");
-            if (token) {
-                const response = await fetch(`${API_BASE_URL}/users/logout`, {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        Authorization: `Bearer ${token}`,
-                    },
-                });
-                const result = await response.json();
-                if (result.status === "error") {
-                    console.log("[logout] Server error:", result.message);
-                }
-            }
-
+            await AsyncStorage.removeItem("token");
             await AsyncStorage.multiRemove(["token", "user"]);
             setUser(null);
+            router.replace({
+                pathname: "/home",
+            });
+            await getData("");
         } catch (error) {
             console.log("[logout] Error:", error);
             throw error;
@@ -214,10 +205,10 @@ export function UserContextProvider({ children }: IUserContextProviderProps) {
                 login,
                 register,
                 isAuthenticated,
-                refreshUser,
                 showWelcomeModal,
                 setShowWelcomeModal,
                 logout,
+                refreshUser,
             }}
         >
             {children}

@@ -243,8 +243,6 @@ export function Album({ scrollOffset = 0, ...props }: IAlbum & { scrollOffset?: 
                 },
             });
 
-            console.log("Response from PUT:", response.data);
-
             Alert.alert("Успіх", "Зміни успішно збережено");
             setImages(response.data?.images || []);
             setImagesToDelete([]);

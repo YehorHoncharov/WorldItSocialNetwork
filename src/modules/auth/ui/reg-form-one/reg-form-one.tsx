@@ -106,7 +106,7 @@ export function RegFormOne() {
             </View>
 
             <View style={{ gap: 10 }}>
-                <Button onPress={handleSubmit(onSubmit)} label="Next"></Button>
+                <Button onPress={handleSubmit(onSubmit)} label="Далі"></Button>
             </View>
         </View>
     );

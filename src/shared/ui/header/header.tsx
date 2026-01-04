@@ -16,29 +16,16 @@ import { AddAlbumModal } from "../../../modules/albums/ui/add-album-modal/add-al
 import { AddFriendModal } from "../../../modules/chat/ui/modals/createGroupModal/firstStepModal/firstStepModal";
 
 interface HeaderProps {
-    actionType?: 1 | 2 | 3; // 1 пости, 2 фльбоми, 3 групові чати
+    actionType?: 1 | 2 | 3; // 1 пости, 2 альбоми, 3 групові чати
 }
 
 function Header({ actionType }: HeaderProps) {
     const router = useRouter();
-    const { user, refreshUser } = useUserContext();
+    const { user, logout } = useUserContext();
     const [modalOpened, setModalOpened] = useState<boolean>(false);
 
-    const Logout = async () => {
-        try {
-            await AsyncStorage.removeItem("token");
-        } catch {
-            console.log("Помилка виходу");
-        } finally {
-            await refreshUser();
-            router.push({
-                pathname: "/registration/step-one",
-            });
-        }
-    };
-
     const onReg = () => {
-        router.navigate("/settings");
+        router.push("/settings");
     };
 
     const toggleModal = () => {
@@ -104,7 +91,7 @@ function Header({ actionType }: HeaderProps) {
                         source={require("../images/settings-in-circle.png")}
                     />
                 </TouchableWithoutFeedback>
-                <TouchableWithoutFeedback onPress={Logout}>
+                <TouchableWithoutFeedback onPress={logout}>
                     <Image style={styles.exit} source={require("../images/exit-in-circle.png")} />
                 </TouchableWithoutFeedback>
             </View>

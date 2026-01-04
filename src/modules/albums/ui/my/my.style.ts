@@ -57,6 +57,7 @@ export const styles = StyleSheet.create({
         // borderWidth: 1,
     },
     imageContainer: {
+        justifyContent: "center",
         alignItems: "center",
         position: "relative",
         flexDirection: "row",

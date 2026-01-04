@@ -7,7 +7,7 @@ import Post from "../post/ui/main-page/main.page";
 
 export function MyPublications() {
     const { posts, refresh } = usePosts();
-    const { user } = useUserContext();
+    const { user, refreshUser } = useUserContext();
     const [userPosts, setUserPosts] = useState<IPost[]>([]);
 
     useEffect(() => {
@@ -19,6 +19,7 @@ export function MyPublications() {
     useEffect(() => {
         const interval = setInterval(() => {
             refresh();
+            refreshUser();
         }, 3000); // кожні 3 секунди
 
         return () => clearInterval(interval);

@@ -152,8 +152,6 @@ export function My(props: IAlbumProps) {
                 },
             });
 
-            console.log("Response from PUT:", response.data);
-
             Alert.alert("Успіх", "Зміни успішно збережено");
             setImages(response.data?.images || []);
             setImagesToDelete([]);
